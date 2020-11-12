@@ -14,7 +14,7 @@
 ./bin/envsetup.sh
 ```
 
-#### Run the Go application
+#### Run the Go application for development
 ```go
 go run main.go
 ```
@@ -22,7 +22,7 @@ To visit app locally: `localhost:8080`
 
 #### Run tests
 ```go
-go test
+make test
 ```
 
 ## About
