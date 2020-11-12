@@ -5,7 +5,7 @@ import (
 	"github.com/gutakk/go-google-scraper/controllers"
 )
 
-func NewRouter() *gin.Engine {
+func SetupRouter() *gin.Engine {
 	router := gin.Default()
 
 	health := new(controllers.HealthController)

@@ -9,7 +9,7 @@ func main() {
 	config.LoadEnv()
 	db.InitDB()
 
-	r := config.NewRouter()
+	r := config.SetupRouter()
 
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
