@@ -1,4 +1,4 @@
-module https: //github.com/gutakk/go-google-scraper
+module github.com/gutakk/go-google-scraper
 
 go 1.15
 
