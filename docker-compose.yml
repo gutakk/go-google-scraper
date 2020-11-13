@@ -18,6 +18,6 @@ services:
     image: ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BRANCH_TAG}
     container_name: go_google_scraper_app
     ports:
-      - $PORT:$PORT
+      - "${PORT}:${PORT}"
     depends_on:
       - db
