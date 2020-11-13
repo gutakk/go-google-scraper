@@ -10,7 +10,12 @@ import (
 )
 
 func InitDB() {
-	_, err := gorm.Open(postgres.Open(constructDsn()), &gorm.Config{})
+	pgConnection := constructDsn()
+
+	if os.Getenv("APP_ENV") == "release" {
+		pgConnection = os.Getenv("DATABASE_URL")
+	}
+	_, err := gorm.Open(postgres.Open(pgConnection), &gorm.Config{})
 
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Failed to connect to database %v", err))
