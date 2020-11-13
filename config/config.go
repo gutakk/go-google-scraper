@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -17,7 +19,12 @@ func LoadEnv() {
 
 	switch env {
 	case ReleaseMode:
-		_ = godotenv.Load(".env." + ReleaseMode)
+		err := godotenv.Load(".env." + ReleaseMode)
+		if err != nil {
+			log.Fatal(fmt.Sprintf("Load .env.release failed with reason %v", err))
+		} else {
+			log.Print("Load .env.release successfully")
+		}
 	case TestMode:
 		_ = godotenv.Load(".env." + TestMode)
 	default:
