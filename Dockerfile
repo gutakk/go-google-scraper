@@ -1,6 +1,7 @@
-FROM golang:1.15-buster as builder
+FROM golang:alpine
 
-ENV GO111MOD=on
+ENV GIN_MODE=release \
+    APP_ENV=release
 
 WORKDIR /app
 
@@ -9,20 +10,6 @@ RUN go mod download
 
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
-
-# Release stage
-FROM alpine as release
-
-RUN apk update \
-    && apk upgrade \
-    && apk add --no-cache \
-    ca-certificates \
-    && update-ca-certificates 2>/dev/null || true
-
-ENV APP_ENV=release \
-    GIN_MODE=release
-
-COPY --from=builder /app/go-google-scraper /app/
 
 EXPOSE 8080
 
