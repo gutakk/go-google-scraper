@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"log"
+
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/db"
 )
@@ -11,5 +14,7 @@ func main() {
 
 	r := config.SetupRouter()
 
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	if error := r.Run(); error != nil {
+		log.Fatal(fmt.Sprintf("Failed to start the server %v", error))
+	}
 }
