@@ -1,0 +1,50 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+      - development
+  workflow_dispatch:
+
+env:
+  DOCKER_IMAGE: ${{ github.repository }}
+  DOCKER_REGISTRY: ghcr.io
+  DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+  DOCKER_USERNAME: ${{ github.repository_owner }}
+  HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+
+      - name: Branch Tag
+        uses: nimblehq/branch-tag-action@v1.2
+
+      - name: Set HEROKU_APP
+        run: |
+          if [[ $BRANCH_TAG = "latest" ]]
+          then
+            echo "::set-env name=HEROKU_APP::ruby-google-scraper"
+          else
+            echo "::set-env name=HEROKU_APP::ruby-google-scraper-staging"
+          fi
+
+      - name: Docker login to docker container registry
+        run: "echo $DOCKER_TOKEN | docker login $DOCKER_REGISTRY -u $DOCKER_USERNAME --password-stdin"
+
+      - name: Docker build
+        run: |
+          docker-compose build
+          docker-compose push app
+
+      - name: Heroku login
+        run: heroku container:login
+  
+      - name: Heroku release
+        run: |
+          heroku container:push --arg DOCKER_REGISTRY=$DOCKER_REGISTRY,DOCKER_IMAGE=$DOCKER_IMAGE,BRANCH_TAG=$BRANCH_TAG --recursive
+          heroku container:release app
