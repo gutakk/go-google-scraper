@@ -11,7 +11,7 @@
 ## Usage
 #### Setup and boot the Docker containers
 ```sh
-./bin/envsetup.sh
+make env-setup
 ```
 
 #### Run the Go application for development
