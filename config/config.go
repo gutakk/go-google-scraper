@@ -6,11 +6,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
-const {
-	DevMode = "dev"
+const (
+	DevMode     = "dev"
 	ReleaseMode = "release"
-	TestMode = "test"
-}
+	TestMode    = "test"
+)
 
 func LoadEnv() {
 	env := os.Getenv("APP_ENV")
