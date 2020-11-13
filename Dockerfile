@@ -1,8 +1,7 @@
 FROM golang:alpine
 
 ENV GIN_MODE=release \
-    APP_ENV=release \
-    PORT=8080
+    APP_ENV=release
 
 WORKDIR /app
 
@@ -12,6 +11,6 @@ RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 
-EXPOSE $PORT
+EXPOSE 8080
 
 ENTRYPOINT ["/app/go-google-scraper"]
