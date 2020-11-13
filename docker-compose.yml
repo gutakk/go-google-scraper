@@ -1,0 +1,22 @@
+version: "3.5"
+
+services:
+  db:
+    image: postgres:12.1
+    container_name: go_google_scraper_db
+    environment:
+      - POSTGRES_DB=go_google_scraper_development
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      cache_from: 
+        - go-google-scraper_app:latest
+    container_name: go_google_scraper_app
+    ports:
+      - $PORT:$PORT
+    depends_on:
+      - db
