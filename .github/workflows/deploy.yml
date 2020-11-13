@@ -28,9 +28,9 @@ jobs:
         run: |
           if [[ $BRANCH_TAG = "latest" ]]
           then
-            echo "::set-env name=HEROKU_APP::ruby-google-scraper"
+            echo "::set-env name=HEROKU_APP::go-google-scraper"
           else
-            echo "::set-env name=HEROKU_APP::ruby-google-scraper-staging"
+            echo "::set-env name=HEROKU_APP::go-google-scraper-staging"
           fi
 
       - name: Docker login to docker container registry
