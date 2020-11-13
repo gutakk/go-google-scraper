@@ -14,8 +14,5 @@ jobs:
         with:
           go-version: 1.15.x
 
-      - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v1.2.1
-
       - name: Test
         run: make test
