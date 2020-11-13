@@ -1,40 +1,29 @@
+FROM golang:1.15-buster as builder
 
-# Start from golang base image
-FROM golang:alpine as builder
+ENV GO111MOD=on
 
-ENV GIN_MODE=release \
-    APP_ENV=release
-
-# Install git.
-# Git is required for fetching the dependencies.
-RUN apk update && apk add --no-cache git
-
-# Set the current working directory inside the container 
 WORKDIR /app
 
-# Copy go mod and sum files 
 COPY go.mod go.sum ./
+RUN go mod download
 
-# Download all dependencies. Dependencies will be cached if the go.mod and the go.sum files are not changed 
-RUN go mod download 
-
-# Copy the source from the current directory to the working Directory inside the container 
 COPY . .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 
-# Build the Go app
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main ./cmd
+# Release stage
+FROM alpine as release
 
-# Start a new stage from scratch
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
+RUN apk update \
+    && apk upgrade \
+    && apk add --no-cache \
+    ca-certificates \
+    && update-ca-certificates 2>/dev/null || true
 
-WORKDIR /root/
+ENV APP_ENV=release \
+    GIN_MODE=release
 
-# Copy the Pre-built binary file from the previous stage.
-COPY --from=builder /app/main .
+COPY --from=builder /app/go-google-scraper /app/
 
-# Expose port to the outside world
 EXPOSE 8080
 
-#Command to run the executable
-CMD [ "./main" ]
+ENTRYPOINT ["/app/go-google-scraper"]
