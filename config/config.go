@@ -17,11 +17,11 @@ func LoadEnv() {
 
 	switch env {
 	case ReleaseMode:
-		godotenv.Load(".env." + ReleaseMode)
+		_ = godotenv.Load(".env." + ReleaseMode)
 	case TestMode:
-		godotenv.Load(".env." + TestMode)
+		_ = godotenv.Load(".env." + TestMode)
 	default:
-		godotenv.Load(".env." + DevMode)
+		_ = godotenv.Load(".env." + DevMode)
 	}
 
 	_ = godotenv.Load()
