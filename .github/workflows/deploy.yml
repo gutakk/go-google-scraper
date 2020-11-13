@@ -1,11 +1,6 @@
 name: Deploy
 
-on:
-  push:
-    branches:
-      - master
-      - development
-  workflow_dispatch:
+on: push
 
 env:
   DOCKER_IMAGE: ${{ github.repository }}
