@@ -6,17 +6,23 @@ import (
 	"github.com/joho/godotenv"
 )
 
+const {
+	DevMode = "dev"
+	ReleaseMode = "release"
+	TestMode = "test"
+}
+
 func LoadEnv() {
 	env := os.Getenv("APP_ENV")
 
 	if "" == env {
-		env = "dev"
+		env = DevMode
 	}
 
 	godotenv.Load(".env." + env + ".local")
-	if "test" != env {
+	if TestMode != env {
 		godotenv.Load(".env.local")
 	}
 	godotenv.Load(".env." + env)
-	godotenv.Load() // The Original .env
+	godotenv.Load()
 }
