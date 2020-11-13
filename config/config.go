@@ -15,14 +15,14 @@ const (
 func LoadEnv() {
 	env := os.Getenv("APP_ENV")
 
-	if "" == env {
-		env = DevMode
+	switch env {
+	case ReleaseMode:
+		godotenv.Load(".env." + ReleaseMode)
+	case TestMode:
+		godotenv.Load(".env." + TestMode)
+	default:
+		godotenv.Load(".env." + DevMode)
 	}
 
-	godotenv.Load(".env." + env + ".local")
-	if TestMode != env {
-		godotenv.Load(".env.local")
-	}
-	godotenv.Load(".env." + env)
-	godotenv.Load()
+	_ = godotenv.Load()
 }
