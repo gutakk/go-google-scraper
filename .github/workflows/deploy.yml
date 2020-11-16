@@ -4,9 +4,6 @@ on:
   workflow_run:
     workflows:
       - Test
-    branches:
-      - master
-      - development
     types:
       - completed
   workflow_dispatch:
