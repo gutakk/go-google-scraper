@@ -37,6 +37,7 @@ jobs:
 
       - name: Docker build
         run: |
+          docker-compose pull
           docker-compose build
           docker-compose push app
 
