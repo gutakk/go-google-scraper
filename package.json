@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "parcel assets/javascripts/index.js",
+    "dev": "parcel watch assets/javascripts/index.js",
     "build": "parcel build assets/javascripts/index.js"
   },
   "dependencies": {
