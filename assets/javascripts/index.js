@@ -1,1 +1,1 @@
-console.log("HELLO WORLD")
+import '../stylesheets/index.scss';
