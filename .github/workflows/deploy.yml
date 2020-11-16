@@ -28,8 +28,8 @@ jobs:
             echo "::set-env name=HEROKU_APP::go-google-scraper-staging"
           fi
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
+      - name: Docker Login
+        uses: docker/login-action@v1.6.0
         with:
           registry: $DOCKER_REGISTRY
           username: $DOCKER_USERNAME
