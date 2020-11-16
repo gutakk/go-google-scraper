@@ -8,7 +8,6 @@ env:
   DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
   DOCKER_USERNAME: ${{ github.repository_owner }}
   HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-  PORT: 8080
 
 jobs:
   deploy:
