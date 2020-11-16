@@ -8,8 +8,8 @@ import (
 
 type AuthController struct{}
 
-func (a *AuthController) applyRoutes(e *gin.Engine) {
-	e.GET("/register", a.displayRegister)
+func (a *AuthController) applyRoutes(engine *gin.Engine) {
+	engine.GET("/register", a.displayRegister)
 }
 
 func (a *AuthController) displayRegister(c *gin.Context) {

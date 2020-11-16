@@ -8,8 +8,8 @@ import (
 
 type HomeController struct{}
 
-func (h *HomeController) applyRoutes(e *gin.Engine) {
-	e.GET("/", h.displayHome)
+func (h *HomeController) applyRoutes(engine *gin.Engine) {
+	engine.GET("/", h.displayHome)
 }
 
 func (h *HomeController) displayHome(c *gin.Context) {

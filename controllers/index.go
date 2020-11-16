@@ -2,7 +2,7 @@ package controllers
 
 import "github.com/gin-gonic/gin"
 
-func CombineRoutes(e *gin.Engine) {
-	new(AuthController).applyRoutes(e)
-	new(HomeController).applyRoutes(e)
+func CombineRoutes(engine *gin.Engine) {
+	new(AuthController).applyRoutes(engine)
+	new(HomeController).applyRoutes(engine)
 }
