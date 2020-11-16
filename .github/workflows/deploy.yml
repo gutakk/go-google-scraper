@@ -1,15 +1,6 @@
 name: Deploy
 
-on:
-  workflow_run:
-    workflows:
-      - Test
-    branches:
-      - master
-      - development
-    types:
-      - completed
-  workflow_dispatch:
+on: push
 
 env:
   DOCKER_IMAGE: ${{ github.repository }}
@@ -21,17 +12,12 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2.3.4
-        with:
-          ref: ${{ github.event.workflow_run.head_branch || github.ref }}
 
       - name: Branch Tag
         uses: nimblehq/branch-tag-action@v1.2
-        with:
-          ref: ${{ github.event.workflow_run.head_branch || github.ref }}
 
       - name: Set HEROKU_APP
         run: |
