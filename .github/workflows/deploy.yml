@@ -3,6 +3,10 @@ name: Deploy
 on: push
 
 env:
+  DOCKER_IMAGE: ${{ github.repository }}
+  DOCKER_REGISTRY: ghcr.io
+  DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+  DOCKER_USERNAME: ${{ github.repository_owner }}
   HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
 jobs:
@@ -19,9 +23,9 @@ jobs:
         run: |
           if [[ $BRANCH_TAG = "latest" ]]
           then
-            echo "HEROKU_APP::go-google-scraper" >> $GITHUB_ENV
+            echo "HEROKU_APP=go-google-scraper" >> $GITHUB_ENV
           else
-            echo "HEROKU_APP::go-google-scraper-staging" >> $GITHUB_ENV
+            echo "HEROKU_APP=go-google-scraper-staging" >> $GITHUB_ENV
           fi
 
       - name: Docker Login
@@ -41,5 +45,5 @@ jobs:
   
       - name: Heroku release
         run: |
-          heroku container:push --arg DOCKER_REGISTRY=ghcr.io,DOCKER_IMAGE=${{ github.repository }},BRANCH_TAG=$BRANCH_TAG --recursive
+          heroku container:push --arg DOCKER_REGISTRY=$DOCKER_REGISTRY,DOCKER_IMAGE=$DOCKER_IMAGE,BRANCH_TAG=$BRANCH_TAG --recursive
           heroku container:release web
