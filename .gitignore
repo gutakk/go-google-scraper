@@ -15,3 +15,5 @@
 !.env.example
 
 node_modules
+.cache
+dist
