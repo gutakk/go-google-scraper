@@ -47,11 +47,9 @@ func (a *AuthController) register(c *gin.Context) {
 			"title": "Register",
 			"error": result.Error,
 		})
-
 		return
 	}
 
 	session.Set(c, "status", "Register successfully")
-
 	c.Redirect(http.StatusFound, "/")
 }
