@@ -5,18 +5,31 @@ import (
 	"log"
 	"os"
 
+	"github.com/gutakk/go-google-scraper/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func InitDB() {
-	_, err := gorm.Open(postgres.Open(constructDsn()), &gorm.Config{})
+	db := connectDB()
+
+	if error := db.AutoMigrate(&models.User{}); error != nil {
+		log.Fatal(fmt.Sprintf("Failed to migrate database %v", error))
+	} else {
+		log.Print("Migrate to database successfully")
+	}
+}
+
+func connectDB() (db *gorm.DB) {
+	db, err := gorm.Open(postgres.Open(constructDsn()), &gorm.Config{})
 
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Failed to connect to database %v", err))
 	} else {
 		log.Print("Connect to database successfully")
 	}
+
+	return db
 }
 
 func constructDsn() string {
