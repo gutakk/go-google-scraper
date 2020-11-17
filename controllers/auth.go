@@ -12,8 +12,8 @@ import (
 type AuthController struct{}
 
 type UserCredential struct {
-	Email           string `form:"email" binding:"required"`
-	Password        string `form:"password" binding:"required"`
+	Email           string `form:"email" binding:"email,required"`
+	Password        string `form:"password" binding:"required,min=6"`
 	ConfirmPassword string `form:"confirm-password" binding:"eqfield=Password,required"`
 }
 
