@@ -20,6 +20,10 @@ func InitDB() {
 }
 
 func constructDsn() string {
+	if os.Getenv("APP_ENV") == "release" {
+		return os.Getenv("DATABASE_URL")
+	}
+
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")

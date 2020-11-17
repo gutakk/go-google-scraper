@@ -1,0 +1,21 @@
+version: "3.5"
+
+services:
+  app:
+    build:
+      context: .
+      cache_from: 
+        - ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BRANCH_TAG}
+    image: ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BRANCH_TAG}
+    container_name: go_google_scraper_app
+    depends_on:
+      - db
+      
+  db:
+    image: postgres:12.1
+    container_name: go_google_scraper_db
+    environment:
+      - POSTGRES_DB=go_google_scraper_development
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
