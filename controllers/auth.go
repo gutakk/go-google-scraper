@@ -12,8 +12,9 @@ import (
 type AuthController struct{}
 
 type UserCredential struct {
-	Email    string `form:"email" binding:"required"`
-	Password string `form:"password" binding:"required"`
+	Email           string `form:"email" binding:"required"`
+	Password        string `form:"password" binding:"required"`
+	ConfirmPassword string `form:"confirm-password" binding:"eqfield=Password,required"`
 }
 
 func (a *AuthController) applyRoutes(engine *gin.Engine) {
