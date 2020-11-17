@@ -5,13 +5,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/db"
+	session "github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthController struct{}
 
-type UserCredential struct {
+type UserCredentials struct {
 	Email           string `form:"email" binding:"email,required"`
 	Password        string `form:"password" binding:"required,min=6"`
 	ConfirmPassword string `form:"confirm-password" binding:"eqfield=Password,required"`
@@ -29,9 +30,9 @@ func (a *AuthController) displayRegister(c *gin.Context) {
 }
 
 func (a *AuthController) register(c *gin.Context) {
-	credential := &UserCredential{}
+	credentials := &UserCredentials{}
 
-	if err := c.ShouldBind(credential); err != nil {
+	if err := c.ShouldBind(credentials); err != nil {
 		c.HTML(http.StatusBadRequest, "register.html", gin.H{
 			"title": "Register",
 			"error": err.Error(),
@@ -39,9 +40,9 @@ func (a *AuthController) register(c *gin.Context) {
 		return
 	}
 
-	encryptedPassword, _ := bcrypt.GenerateFromPassword([]byte(credential.Password), bcrypt.DefaultCost)
+	encryptedPassword, _ := bcrypt.GenerateFromPassword([]byte(credentials.Password), bcrypt.DefaultCost)
 
-	if result := db.DB.Create(&models.User{Email: credential.Email, Password: string(encryptedPassword)}); result.Error != nil {
+	if result := db.DB.Create(&models.User{Email: credentials.Email, Password: string(encryptedPassword)}); result.Error != nil {
 		c.HTML(http.StatusBadRequest, "register.html", gin.H{
 			"title": "Register",
 			"error": result.Error,
@@ -49,6 +50,8 @@ func (a *AuthController) register(c *gin.Context) {
 
 		return
 	}
+
+	session.Set(c, "status", "Register successfully")
 
 	c.Redirect(http.StatusFound, "/")
 }

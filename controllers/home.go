@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	session "github.com/gutakk/go-google-scraper/helpers/session"
 )
 
 type HomeController struct{}
@@ -14,6 +15,7 @@ func (h *HomeController) applyRoutes(engine *gin.Engine) {
 
 func (h *HomeController) displayHome(c *gin.Context) {
 	c.HTML(http.StatusOK, "home.html", gin.H{
-		"title": "Home",
+		"title":  "Home",
+		"status": session.GetAndDelete(c, "status"),
 	})
 }
