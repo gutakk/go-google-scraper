@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthController struct{}
@@ -37,7 +38,9 @@ func (a *AuthController) register(c *gin.Context) {
 		return
 	}
 
-	if result := db.DB.Create(&models.User{Email: credential.Email, Password: credential.Password}); result.Error != nil {
+	encryptedPassword, _ := bcrypt.GenerateFromPassword([]byte(credential.Password), bcrypt.DefaultCost)
+
+	if result := db.DB.Create(&models.User{Email: credential.Email, Password: string(encryptedPassword)}); result.Error != nil {
 		c.HTML(http.StatusBadRequest, "register.html", gin.H{
 			"title": "Register",
 			"error": result.Error,
