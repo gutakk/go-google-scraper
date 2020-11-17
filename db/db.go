@@ -10,6 +10,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var DB *gorm.DB
+
 func InitDB() {
 	db := connectDB()
 
@@ -28,6 +30,8 @@ func connectDB() (db *gorm.DB) {
 	} else {
 		log.Print("Connect to database successfully")
 	}
+
+	DB = db
 
 	return db
 }
