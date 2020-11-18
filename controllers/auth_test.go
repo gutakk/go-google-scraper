@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/tests"
 	"github.com/stretchr/testify/suite"
@@ -32,46 +33,48 @@ func TestDisplayRegister(t *testing.T) {
 
 type DBTestSuite struct {
 	suite.Suite
-	DB *gorm.DB
+	DB       *gorm.DB
+	engine   *gin.Engine
+	formData url.Values
 }
 
-func (suite *DBTestSuite) SetupTest() {
+func (s *DBTestSuite) SetupTest() {
 	db, _ := gorm.Open(postgres.Open(tests.ConstructTestDsn()), &gorm.Config{})
-	suite.DB = db
+	s.DB = db
 
 	if error := db.AutoMigrate(&models.User{}); error != nil {
 		log.Fatal(fmt.Sprintf("Failed to migrate database %v", error))
 	} else {
 		log.Print("Migrate to database successfully")
 	}
+
+	s.engine = tests.GetRouter(true)
+	authController := &AuthController{DB: s.DB}
+	authController.applyRoutes(s.engine)
+
+	s.formData = url.Values{}
+	s.formData.Set("email", "test@hello.com")
+	s.formData.Set("password", "123456")
+	s.formData.Set("confirm-password", "123456")
 }
 
-func (suite *DBTestSuite) TearDownTest() {
-	suite.DB.Exec("DELETE FROM users")
+func (s *DBTestSuite) TearDownTest() {
+	s.DB.Exec("DELETE FROM users")
 }
 
-func (suite *DBTestSuite) TestRegisterWithValidParameters() {
-	engine := tests.GetRouter(true)
-	authController := &AuthController{DB: suite.DB}
-	authController.applyRoutes(engine)
-
-	formData := url.Values{}
-	formData.Set("email", "test@hello.com")
-	formData.Set("password", "123456")
-	formData.Set("confirm-password", "123456")
-
-	req, _ := http.NewRequest("POST", "/register", strings.NewReader(formData.Encode()))
+func (s *DBTestSuite) TestRegisterWithValidParameters() {
+	req, _ := http.NewRequest("POST", "/register", strings.NewReader(s.formData.Encode()))
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	w := httptest.NewRecorder()
-	engine.ServeHTTP(w, req)
+	s.engine.ServeHTTP(w, req)
 
 	user := models.User{}
-	suite.DB.First(&user)
+	s.DB.First(&user)
 
-	assert.Equal(suite.T(), http.StatusFound, w.Code)
-	assert.Equal(suite.T(), "/", w.Header().Get("Location"))
-	assert.Equal(suite.T(), "test@hello.com", user.Email)
+	assert.Equal(s.T(), http.StatusFound, w.Code)
+	assert.Equal(s.T(), "/", w.Header().Get("Location"))
+	assert.Equal(s.T(), "test@hello.com", user.Email)
 }
 
 func TestDBTestSuite(t *testing.T) {
