@@ -78,8 +78,11 @@ func (s *DBTestSuite) TestRegisterWithBlankEmail() {
 	s.formData.Del("email")
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
+	p, err := ioutil.ReadAll(response.Body)
+	pageOK := err == nil && strings.Index(string(p), "Invalid email format") > 0
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
+	assert.Equal(s.T(), true, pageOK)
 
 	user := models.User{}
 	result := s.DB.First(&user)
@@ -91,21 +94,11 @@ func (s *DBTestSuite) TestRegisterWithBlankPassword() {
 	s.formData.Del("password")
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
+	p, err := ioutil.ReadAll(response.Body)
+	pageOK := err == nil && strings.Index(string(p), "Password is required") > 0
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
-
-	user := models.User{}
-	result := s.DB.First(&user)
-
-	assert.Equal(s.T(), true, errors.Is(result.Error, gorm.ErrRecordNotFound))
-}
-
-func (s *DBTestSuite) TestRegisterWithBlankConfirmPassword() {
-	s.formData.Del("confirm-password")
-
-	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
-
-	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
+	assert.Equal(s.T(), true, pageOK)
 
 	user := models.User{}
 	result := s.DB.First(&user)
@@ -117,8 +110,11 @@ func (s *DBTestSuite) TestRegisterWithPasswordNotMatch() {
 	s.formData.Set("confirm-password", "1234567")
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
+	p, err := ioutil.ReadAll(response.Body)
+	pageOK := err == nil && strings.Index(string(p), "Password not match") > 0
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
+	assert.Equal(s.T(), true, pageOK)
 
 	user := models.User{}
 	result := s.DB.First(&user)
@@ -131,8 +127,11 @@ func (s *DBTestSuite) TestRegisterWithPasswordNotReachMinLength() {
 	s.formData.Set("confirm-password", "12345")
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
+	p, err := ioutil.ReadAll(response.Body)
+	pageOK := err == nil && strings.Index(string(p), "Password must be longer than 6") > 0
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
+	assert.Equal(s.T(), true, pageOK)
 
 	user := models.User{}
 	result := s.DB.First(&user)

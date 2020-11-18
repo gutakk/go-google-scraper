@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
 	"golang.org/x/crypto/bcrypt"
@@ -35,11 +37,13 @@ func (a *AuthController) register(c *gin.Context) {
 	credentials := &UserCredentials{}
 
 	if err := c.ShouldBind(credentials); err != nil {
-		c.HTML(http.StatusBadRequest, "register.html", gin.H{
-			"title": "Register",
-			"error": err.Error(),
-		})
-		return
+		for _, fieldErr := range err.(validator.ValidationErrors) {
+			c.HTML(http.StatusBadRequest, "register.html", gin.H{
+				"title": "Register",
+				"error": errorHandler.ValidationErrorToText(fieldErr),
+			})
+			return
+		}
 	}
 
 	encryptedPassword, _ := bcrypt.GenerateFromPassword([]byte(credentials.Password), bcrypt.DefaultCost)
