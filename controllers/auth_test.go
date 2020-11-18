@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -75,6 +76,92 @@ func (s *DBTestSuite) TestRegisterWithValidParameters() {
 	assert.Equal(s.T(), http.StatusFound, w.Code)
 	assert.Equal(s.T(), "/", w.Header().Get("Location"))
 	assert.Equal(s.T(), "test@hello.com", user.Email)
+}
+
+func (s *DBTestSuite) TestRegisterWithBlankEmail() {
+	s.formData.Del("email")
+
+	req, _ := http.NewRequest("POST", "/register", strings.NewReader(s.formData.Encode()))
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	w := httptest.NewRecorder()
+	s.engine.ServeHTTP(w, req)
+
+	assert.Equal(s.T(), http.StatusBadRequest, w.Code)
+
+	user := models.User{}
+	result := s.DB.First(&user)
+
+	assert.Equal(s.T(), true, errors.Is(result.Error, gorm.ErrRecordNotFound))
+}
+
+func (s *DBTestSuite) TestRegisterWithBlankPassword() {
+	s.formData.Del("password")
+
+	req, _ := http.NewRequest("POST", "/register", strings.NewReader(s.formData.Encode()))
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	w := httptest.NewRecorder()
+	s.engine.ServeHTTP(w, req)
+
+	assert.Equal(s.T(), http.StatusBadRequest, w.Code)
+
+	user := models.User{}
+	result := s.DB.First(&user)
+
+	assert.Equal(s.T(), true, errors.Is(result.Error, gorm.ErrRecordNotFound))
+}
+
+func (s *DBTestSuite) TestRegisterWithBlankConfirmPassword() {
+	s.formData.Del("confirm-password")
+
+	req, _ := http.NewRequest("POST", "/register", strings.NewReader(s.formData.Encode()))
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	w := httptest.NewRecorder()
+	s.engine.ServeHTTP(w, req)
+
+	assert.Equal(s.T(), http.StatusBadRequest, w.Code)
+
+	user := models.User{}
+	result := s.DB.First(&user)
+
+	assert.Equal(s.T(), true, errors.Is(result.Error, gorm.ErrRecordNotFound))
+}
+
+func (s *DBTestSuite) TestRegisterWithPasswordNotMatch() {
+	s.formData.Set("confirm-password", "1234567")
+
+	req, _ := http.NewRequest("POST", "/register", strings.NewReader(s.formData.Encode()))
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	w := httptest.NewRecorder()
+	s.engine.ServeHTTP(w, req)
+
+	assert.Equal(s.T(), http.StatusBadRequest, w.Code)
+
+	user := models.User{}
+	result := s.DB.First(&user)
+
+	assert.Equal(s.T(), true, errors.Is(result.Error, gorm.ErrRecordNotFound))
+}
+
+func (s *DBTestSuite) TestRegisterWithPasswordNotReachMinLength() {
+	s.formData.Set("password", "12345")
+	s.formData.Set("confirm-password", "12345")
+
+	req, _ := http.NewRequest("POST", "/register", strings.NewReader(s.formData.Encode()))
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	w := httptest.NewRecorder()
+	s.engine.ServeHTTP(w, req)
+
+	assert.Equal(s.T(), http.StatusBadRequest, w.Code)
+
+	user := models.User{}
+	result := s.DB.First(&user)
+
+	assert.Equal(s.T(), true, errors.Is(result.Error, gorm.ErrRecordNotFound))
 }
 
 func TestDBTestSuite(t *testing.T) {
