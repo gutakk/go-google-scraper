@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
@@ -24,7 +23,7 @@ func TestDisplayRegister(t *testing.T) {
 	engine := tests.GetRouter(true)
 	new(AuthController).applyRoutes(engine)
 
-	w := tests.PerformRequest(engine, "GET", "/register")
+	w := tests.PerformRequest(engine, "GET", "/register", nil, nil)
 	p, err := ioutil.ReadAll(w.Body)
 	pageOK := err == nil && strings.Index(string(p), "<title>Register</title>") > 0
 
@@ -37,6 +36,7 @@ type DBTestSuite struct {
 	DB       *gorm.DB
 	engine   *gin.Engine
 	formData url.Values
+	headers  []tests.Header
 }
 
 func (s *DBTestSuite) SetupTest() {
@@ -53,6 +53,10 @@ func (s *DBTestSuite) SetupTest() {
 	authController := &AuthController{DB: s.DB}
 	authController.applyRoutes(s.engine)
 
+	s.headers = []tests.Header{
+		{Key: "Content-Type", Value: "application/x-www-form-urlencoded"},
+	}
+
 	s.formData = url.Values{}
 	s.formData.Set("email", "test@hello.com")
 	s.formData.Set("password", "123456")
@@ -67,8 +71,7 @@ func (s *DBTestSuite) TestRegisterWithValidParameters() {
 	req, _ := http.NewRequest("POST", "/register", strings.NewReader(s.formData.Encode()))
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	w := httptest.NewRecorder()
-	s.engine.ServeHTTP(w, req)
+	w := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
 	user := models.User{}
 	s.DB.First(&user)
@@ -81,11 +84,7 @@ func (s *DBTestSuite) TestRegisterWithValidParameters() {
 func (s *DBTestSuite) TestRegisterWithBlankEmail() {
 	s.formData.Del("email")
 
-	req, _ := http.NewRequest("POST", "/register", strings.NewReader(s.formData.Encode()))
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-
-	w := httptest.NewRecorder()
-	s.engine.ServeHTTP(w, req)
+	w := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
 	assert.Equal(s.T(), http.StatusBadRequest, w.Code)
 
@@ -98,11 +97,7 @@ func (s *DBTestSuite) TestRegisterWithBlankEmail() {
 func (s *DBTestSuite) TestRegisterWithBlankPassword() {
 	s.formData.Del("password")
 
-	req, _ := http.NewRequest("POST", "/register", strings.NewReader(s.formData.Encode()))
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-
-	w := httptest.NewRecorder()
-	s.engine.ServeHTTP(w, req)
+	w := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
 	assert.Equal(s.T(), http.StatusBadRequest, w.Code)
 
@@ -115,11 +110,7 @@ func (s *DBTestSuite) TestRegisterWithBlankPassword() {
 func (s *DBTestSuite) TestRegisterWithBlankConfirmPassword() {
 	s.formData.Del("confirm-password")
 
-	req, _ := http.NewRequest("POST", "/register", strings.NewReader(s.formData.Encode()))
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-
-	w := httptest.NewRecorder()
-	s.engine.ServeHTTP(w, req)
+	w := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
 	assert.Equal(s.T(), http.StatusBadRequest, w.Code)
 
@@ -132,11 +123,7 @@ func (s *DBTestSuite) TestRegisterWithBlankConfirmPassword() {
 func (s *DBTestSuite) TestRegisterWithPasswordNotMatch() {
 	s.formData.Set("confirm-password", "1234567")
 
-	req, _ := http.NewRequest("POST", "/register", strings.NewReader(s.formData.Encode()))
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-
-	w := httptest.NewRecorder()
-	s.engine.ServeHTTP(w, req)
+	w := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
 	assert.Equal(s.T(), http.StatusBadRequest, w.Code)
 
@@ -150,11 +137,7 @@ func (s *DBTestSuite) TestRegisterWithPasswordNotReachMinLength() {
 	s.formData.Set("password", "12345")
 	s.formData.Set("confirm-password", "12345")
 
-	req, _ := http.NewRequest("POST", "/register", strings.NewReader(s.formData.Encode()))
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-
-	w := httptest.NewRecorder()
-	s.engine.ServeHTTP(w, req)
+	w := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
 	assert.Equal(s.T(), http.StatusBadRequest, w.Code)
 
