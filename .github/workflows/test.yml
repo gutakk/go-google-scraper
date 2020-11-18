@@ -19,7 +19,7 @@ jobs:
         with:
           version: v1.29
 
-      - name: Setup ENV
+      - name: Setup database
         run: make env-setup
 
       - name: Tests
