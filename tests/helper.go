@@ -12,11 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Header struct {
-	Key   string
-	Value string
-}
-
 // Helper function to create a router during testing
 func GetRouter(withTemplates bool) *gin.Engine {
 	router := gin.Default()
@@ -31,17 +26,15 @@ func GetRouter(withTemplates bool) *gin.Engine {
 	return router
 }
 
-func PerformRequest(r http.Handler, method, path string, headers []Header, payload url.Values) *httptest.ResponseRecorder {
+func PerformRequest(r http.Handler, method, path string, headers http.Header, payload url.Values) *httptest.ResponseRecorder {
 	req, _ := http.NewRequest(method, path, strings.NewReader(payload.Encode()))
-	for _, h := range headers {
-		req.Header.Add(h.Key, h.Value)
-	}
+	req.Header = headers
 
-	w := httptest.NewRecorder()
+	response := httptest.NewRecorder()
 
-	r.ServeHTTP(w, req)
+	r.ServeHTTP(response, req)
 
-	return w
+	return response
 }
 
 func ConstructTestDsn() string {

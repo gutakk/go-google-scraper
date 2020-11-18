@@ -2,9 +2,7 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -23,11 +21,11 @@ func TestDisplayRegister(t *testing.T) {
 	engine := tests.GetRouter(true)
 	new(AuthController).applyRoutes(engine)
 
-	w := tests.PerformRequest(engine, "GET", "/register", nil, nil)
-	p, err := ioutil.ReadAll(w.Body)
+	response := tests.PerformRequest(engine, "GET", "/register", nil, nil)
+	p, err := ioutil.ReadAll(response.Body)
 	pageOK := err == nil && strings.Index(string(p), "<title>Register</title>") > 0
 
-	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, http.StatusOK, response.Code)
 	assert.Equal(t, true, pageOK)
 }
 
@@ -36,26 +34,21 @@ type DBTestSuite struct {
 	DB       *gorm.DB
 	engine   *gin.Engine
 	formData url.Values
-	headers  []tests.Header
+	headers  http.Header
 }
 
 func (s *DBTestSuite) SetupTest() {
 	db, _ := gorm.Open(postgres.Open(tests.ConstructTestDsn()), &gorm.Config{})
 	s.DB = db
 
-	if error := db.AutoMigrate(&models.User{}); error != nil {
-		log.Fatal(fmt.Sprintf("Failed to migrate database %v", error))
-	} else {
-		log.Print("Migrate to database successfully")
-	}
+	_ = db.AutoMigrate(&models.User{})
 
 	s.engine = tests.GetRouter(true)
 	authController := &AuthController{DB: s.DB}
 	authController.applyRoutes(s.engine)
 
-	s.headers = []tests.Header{
-		{Key: "Content-Type", Value: "application/x-www-form-urlencoded"},
-	}
+	s.headers = http.Header{}
+	s.headers.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	s.formData = url.Values{}
 	s.formData.Set("email", "test@hello.com")
@@ -71,22 +64,22 @@ func (s *DBTestSuite) TestRegisterWithValidParameters() {
 	req, _ := http.NewRequest("POST", "/register", strings.NewReader(s.formData.Encode()))
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	w := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
+	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
 	user := models.User{}
 	s.DB.First(&user)
 
-	assert.Equal(s.T(), http.StatusFound, w.Code)
-	assert.Equal(s.T(), "/", w.Header().Get("Location"))
+	assert.Equal(s.T(), http.StatusFound, response.Code)
+	assert.Equal(s.T(), "/", response.Header().Get("Location"))
 	assert.Equal(s.T(), "test@hello.com", user.Email)
 }
 
 func (s *DBTestSuite) TestRegisterWithBlankEmail() {
 	s.formData.Del("email")
 
-	w := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
+	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
-	assert.Equal(s.T(), http.StatusBadRequest, w.Code)
+	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 
 	user := models.User{}
 	result := s.DB.First(&user)
@@ -97,9 +90,9 @@ func (s *DBTestSuite) TestRegisterWithBlankEmail() {
 func (s *DBTestSuite) TestRegisterWithBlankPassword() {
 	s.formData.Del("password")
 
-	w := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
+	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
-	assert.Equal(s.T(), http.StatusBadRequest, w.Code)
+	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 
 	user := models.User{}
 	result := s.DB.First(&user)
@@ -110,9 +103,9 @@ func (s *DBTestSuite) TestRegisterWithBlankPassword() {
 func (s *DBTestSuite) TestRegisterWithBlankConfirmPassword() {
 	s.formData.Del("confirm-password")
 
-	w := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
+	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
-	assert.Equal(s.T(), http.StatusBadRequest, w.Code)
+	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 
 	user := models.User{}
 	result := s.DB.First(&user)
@@ -123,9 +116,9 @@ func (s *DBTestSuite) TestRegisterWithBlankConfirmPassword() {
 func (s *DBTestSuite) TestRegisterWithPasswordNotMatch() {
 	s.formData.Set("confirm-password", "1234567")
 
-	w := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
+	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
-	assert.Equal(s.T(), http.StatusBadRequest, w.Code)
+	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 
 	user := models.User{}
 	result := s.DB.First(&user)
@@ -137,9 +130,9 @@ func (s *DBTestSuite) TestRegisterWithPasswordNotReachMinLength() {
 	s.formData.Set("password", "12345")
 	s.formData.Set("confirm-password", "12345")
 
-	w := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
+	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
-	assert.Equal(s.T(), http.StatusBadRequest, w.Code)
+	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 
 	user := models.User{}
 	result := s.DB.First(&user)
