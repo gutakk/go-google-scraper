@@ -4,13 +4,14 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gutakk/go-google-scraper/db"
-	session "github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
-type AuthController struct{}
+type AuthController struct {
+	DB *gorm.DB
+}
 
 type UserCredentials struct {
 	Email           string `form:"email" binding:"email,required"`
@@ -42,7 +43,7 @@ func (a *AuthController) register(c *gin.Context) {
 
 	encryptedPassword, _ := bcrypt.GenerateFromPassword([]byte(credentials.Password), bcrypt.DefaultCost)
 
-	if result := db.DB.Create(&models.User{Email: credentials.Email, Password: string(encryptedPassword)}); result.Error != nil {
+	if result := a.DB.Create(&models.User{Email: credentials.Email, Password: string(encryptedPassword)}); result.Error != nil {
 		c.HTML(http.StatusBadRequest, "register.html", gin.H{
 			"title": "Register",
 			"error": result.Error,
@@ -50,6 +51,6 @@ func (a *AuthController) register(c *gin.Context) {
 		return
 	}
 
-	session.Set(c, "status", "Register successfully")
+	// session.Set(c, "status", "Register successfully")
 	c.Redirect(http.StatusFound, "/")
 }
