@@ -5,12 +5,16 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
 
 // Helper function to create a router during testing
 func GetRouter(withTemplates bool) *gin.Engine {
 	router := gin.Default()
+	store := cookie.NewStore([]byte("secret"))
+	router.Use(sessions.Sessions("mysession", store))
 
 	if withTemplates {
 		router.LoadHTMLGlob("templates/*")

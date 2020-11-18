@@ -53,8 +53,7 @@ func (suite *DBTestSuite) TearDownTest() {
 func (suite *DBTestSuite) TestRegisterWithValidParameters() {
 	engine := tests.GetRouter(true)
 	authController := &AuthController{DB: suite.DB}
-
-	authController.applyRoutes((engine))
+	authController.applyRoutes(engine)
 
 	formData := url.Values{}
 	formData.Set("email", "test@hello.com")
@@ -67,9 +66,14 @@ func (suite *DBTestSuite) TestRegisterWithValidParameters() {
 	w := httptest.NewRecorder()
 	engine.ServeHTTP(w, req)
 
+	user := models.User{}
+	suite.DB.First(&user)
+
 	assert.Equal(suite.T(), http.StatusFound, w.Code)
+	assert.Equal(suite.T(), "/", w.Header().Get("Location"))
+	assert.Equal(suite.T(), "test@hello.com", user.Email)
 }
 
-func TestTestSuite(t *testing.T) {
+func TestDBTestSuite(t *testing.T) {
 	suite.Run(t, new(DBTestSuite))
 }

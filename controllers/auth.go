@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	session "github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -51,6 +52,6 @@ func (a *AuthController) register(c *gin.Context) {
 		return
 	}
 
-	// session.Set(c, "status", "Register successfully")
+	session.Set(c, "status", "Register successfully")
 	c.Redirect(http.StatusFound, "/")
 }
