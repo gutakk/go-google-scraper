@@ -5,8 +5,7 @@ ENV GIN_MODE=release \
 
 WORKDIR /app
 
-RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends nodejs npm
+RUN apk add --update nodejs npm
 
 # Install JS dependencies
 COPY package.json package-lock.json ./
