@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type AuthController struct {
+type RegisterController struct {
 	DB *gorm.DB
 }
 
@@ -22,18 +22,18 @@ type UserCredentials struct {
 	ConfirmPassword string `form:"confirm-password" binding:"eqfield=Password,required"`
 }
 
-func (a *AuthController) applyRoutes(engine *gin.Engine) {
-	engine.GET("/register", a.displayRegister)
-	engine.POST("/register", a.register)
+func (r *RegisterController) applyRoutes(engine *gin.Engine) {
+	engine.GET("/register", r.displayRegister)
+	engine.POST("/register", r.register)
 }
 
-func (a *AuthController) displayRegister(c *gin.Context) {
+func (r *RegisterController) displayRegister(c *gin.Context) {
 	c.HTML(http.StatusOK, "register.html", gin.H{
 		"title": "Register",
 	})
 }
 
-func (a *AuthController) register(c *gin.Context) {
+func (r *RegisterController) register(c *gin.Context) {
 	credentials := &UserCredentials{}
 
 	if err := c.ShouldBind(credentials); err != nil {
@@ -48,7 +48,7 @@ func (a *AuthController) register(c *gin.Context) {
 
 	encryptedPassword, _ := bcrypt.GenerateFromPassword([]byte(credentials.Password), bcrypt.DefaultCost)
 
-	if result := a.DB.Create(&models.User{Email: credentials.Email, Password: string(encryptedPassword)}); result.Error != nil {
+	if result := r.DB.Create(&models.User{Email: credentials.Email, Password: string(encryptedPassword)}); result.Error != nil {
 		c.HTML(http.StatusBadRequest, "register.html", gin.H{
 			"title": "Register",
 			"error": errorHandler.DatabaseErrorToText(result.Error),

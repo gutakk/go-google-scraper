@@ -6,8 +6,8 @@ import (
 )
 
 func CombineRoutes(engine *gin.Engine) {
-	authController := &AuthController{DB: db.DB}
-	authController.applyRoutes(engine)
+	registerController := &RegisterController{DB: db.DB}
+	registerController.applyRoutes(engine)
 
 	homeController := &HomeController{}
 	homeController.applyRoutes(engine)

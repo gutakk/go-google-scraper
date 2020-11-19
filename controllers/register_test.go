@@ -18,7 +18,7 @@ import (
 
 func TestDisplayRegister(t *testing.T) {
 	engine := tests.GetRouter(true)
-	new(AuthController).applyRoutes(engine)
+	new(RegisterController).applyRoutes(engine)
 
 	response := tests.PerformRequest(engine, "GET", "/register", nil, nil)
 	p, err := ioutil.ReadAll(response.Body)
@@ -43,8 +43,8 @@ func (s *DBTestSuite) SetupTest() {
 	_ = db.AutoMigrate(&models.User{})
 
 	s.engine = tests.GetRouter(true)
-	authController := &AuthController{DB: s.DB}
-	authController.applyRoutes(s.engine)
+	registerController := &RegisterController{DB: s.DB}
+	registerController.applyRoutes(s.engine)
 
 	s.headers = http.Header{}
 	s.headers.Set("Content-Type", "application/x-www-form-urlencoded")
