@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -60,10 +59,11 @@ func (s *DBTestSuite) TearDownTest() {
 	s.DB.Exec("DELETE FROM users")
 }
 
-func (s *DBTestSuite) TestRegisterWithValidParameters() {
-	req, _ := http.NewRequest("POST", "/register", strings.NewReader(s.formData.Encode()))
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+func TestDBTestSuite(t *testing.T) {
+	suite.Run(t, new(DBTestSuite))
+}
 
+func (s *DBTestSuite) TestRegisterWithValidParameters() {
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
 	user := models.User{}
@@ -79,15 +79,10 @@ func (s *DBTestSuite) TestRegisterWithBlankEmail() {
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 	p, err := ioutil.ReadAll(response.Body)
-	pageOK := err == nil && strings.Index(string(p), "Invalid email format") > 0
+	pageError := err == nil && strings.Index(string(p), "Invalid email format") > 0
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
-	assert.Equal(s.T(), true, pageOK)
-
-	user := models.User{}
-	result := s.DB.First(&user)
-
-	assert.Equal(s.T(), true, errors.Is(result.Error, gorm.ErrRecordNotFound))
+	assert.Equal(s.T(), true, pageError)
 }
 
 func (s *DBTestSuite) TestRegisterWithBlankPassword() {
@@ -95,15 +90,10 @@ func (s *DBTestSuite) TestRegisterWithBlankPassword() {
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 	p, err := ioutil.ReadAll(response.Body)
-	pageOK := err == nil && strings.Index(string(p), "Password is required") > 0
+	pageError := err == nil && strings.Index(string(p), "Password is required") > 0
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
-	assert.Equal(s.T(), true, pageOK)
-
-	user := models.User{}
-	result := s.DB.First(&user)
-
-	assert.Equal(s.T(), true, errors.Is(result.Error, gorm.ErrRecordNotFound))
+	assert.Equal(s.T(), true, pageError)
 }
 
 func (s *DBTestSuite) TestRegisterWithPasswordNotMatch() {
@@ -111,15 +101,10 @@ func (s *DBTestSuite) TestRegisterWithPasswordNotMatch() {
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 	p, err := ioutil.ReadAll(response.Body)
-	pageOK := err == nil && strings.Index(string(p), "Password not match") > 0
+	pageError := err == nil && strings.Index(string(p), "Password not match") > 0
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
-	assert.Equal(s.T(), true, pageOK)
-
-	user := models.User{}
-	result := s.DB.First(&user)
-
-	assert.Equal(s.T(), true, errors.Is(result.Error, gorm.ErrRecordNotFound))
+	assert.Equal(s.T(), true, pageError)
 }
 
 func (s *DBTestSuite) TestRegisterWithPasswordNotReachMinLength() {
@@ -128,17 +113,19 @@ func (s *DBTestSuite) TestRegisterWithPasswordNotReachMinLength() {
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 	p, err := ioutil.ReadAll(response.Body)
-	pageOK := err == nil && strings.Index(string(p), "Password must be longer than 6") > 0
+	pageError := err == nil && strings.Index(string(p), "Password must be longer than 6") > 0
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
-	assert.Equal(s.T(), true, pageOK)
-
-	user := models.User{}
-	result := s.DB.First(&user)
-
-	assert.Equal(s.T(), true, errors.Is(result.Error, gorm.ErrRecordNotFound))
+	assert.Equal(s.T(), true, pageError)
 }
 
-func TestDBTestSuite(t *testing.T) {
-	suite.Run(t, new(DBTestSuite))
+func (s *DBTestSuite) TestRegisterWithDuplicateEmail() {
+	s.DB.Create(&models.User{Email: "test@hello.com", Password: "123456"})
+
+	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
+	p, err := ioutil.ReadAll(response.Body)
+	pageError := err == nil && strings.Index(string(p), "Email already exists") > 0
+
+	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
+	assert.Equal(s.T(), true, pageError)
 }
