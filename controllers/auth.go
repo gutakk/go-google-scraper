@@ -51,7 +51,7 @@ func (a *AuthController) register(c *gin.Context) {
 	if result := a.DB.Create(&models.User{Email: credentials.Email, Password: string(encryptedPassword)}); result.Error != nil {
 		c.HTML(http.StatusBadRequest, "register.html", gin.H{
 			"title": "Register",
-			"error": result.Error,
+			"error": errorHandler.DatabaseErrorToText(result.Error),
 		})
 		return
 	}
