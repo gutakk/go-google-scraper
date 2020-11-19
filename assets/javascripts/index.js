@@ -1,1 +1,1 @@
-import '../stylesheets/index.scss';
+console.log("HELLO GO GOOGLE SCRAPER")
