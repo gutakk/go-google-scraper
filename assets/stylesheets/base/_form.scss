@@ -1,16 +1,8 @@
-form {
-  border: 1px solid $border-color;
-  border-radius: .5rem;
-  margin-top: 1.5rem;
-  min-width: 35%;
-  padding: 2rem;
-}
-
-[type="text"],
+[type="email"],
 [type="password"] {
-  border: 1px solid $border-color;
-  border-radius: .25rem;
-  font-size: small;
-  padding: .4rem .5rem;
-  width: 100%;
+  @apply relative block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md;
+
+  &:focus {
+    @apply outline-none border-indigo-500 z-10;
+  }
 }

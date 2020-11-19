@@ -2,43 +2,41 @@
 
 <html>
   <head>
-    <link type="text/css" rel="stylesheet" href="dist/index.css" />
+    <link type="text/css" rel="stylesheet" href="dist/stylesheets/index.css" />
     <title>{{ .title }}</title>
   </head>
 
   <body>
-    <main class="vh-100 p-3">
-      <div class="main__content d-flex flex-column align-items-center">
-        <h1 class="text-secondary mt-5">Register</h1>
-
-        <form ction="/register" method="POST">
-          <div>{{ .error }}</div>
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" name="email" required=true/>
+    <main class="auth-main">
+      <div class="auth-main__content">
+        <img class="auth-main__image" src="dist/images/google-go.jpg" alt="Workflow">
+        <h2 class="auth-main__title">
+          Register a new account
+        </h2>
+        
+        {{ if .error }}
+          <div class="alert-danger">
+            {{ .error }}
           </div>
+        {{ end }}
 
-          <div class="form-group">
-            <label>Password</label>
-            <input type="password" name="password" required=true/>
-          </div>
-
-          <div class="form-group">
-            <label>Confirm Password</label>
-            <input type="password" name="confirm-password" required=true/>
-          </div>
-
-          <div class="actions">
-            <input type="submit" class="btn btn-dark" value="Register">
-          </div>
-
-          <div class="small mt-3">
-            Already have an account? <a href="#">Login</a>
-          </div>
+        <form class="mt-8 space-y-6" action="/register" method="POST">
+          <input id="email-address" name="email" type="email" required placeholder="Email address">
+          <input id="password" name="password" type="password" required placeholder="Password">
+          <input id="password" name="password" type="password" required placeholder="Confirm Password">
+  
+          <button type="submit">
+            Register
+          </button>
         </form>
+        
+        <div class="auth-main__content--small">
+          Already have an account?
+          <a href="https://google.com">Login</a>
+        </div>
       </div>
     </main>
 
-    <script src="dist/index.js"></script>
+    <script src="dist/javascripts/index.js"></script>
   </body>
 </html>

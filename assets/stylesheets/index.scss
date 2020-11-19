@@ -1,5 +1,15 @@
 // Dependencies
-@import 'node_modules/bootstrap/scss/bootstrap';
+@import 'node_modules/tailwindcss/base';
+@import 'node_modules/tailwindcss/components';
+@import 'node_modules/tailwindcss/utilities';
 
 // Base
 @import 'base/form';
+@import 'base/button';
+@import 'base/a';
+
+// Components
+@import 'components/alert-danger';
+
+// Layouts
+@import 'layout/authentication';
