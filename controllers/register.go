@@ -16,7 +16,7 @@ type RegisterController struct {
 	DB *gorm.DB
 }
 
-type UserCredentials struct {
+type RegisterForm struct {
 	Email           string `form:"email" binding:"email,required"`
 	Password        string `form:"password" binding:"required,min=6"`
 	ConfirmPassword string `form:"confirm-password" binding:"eqfield=Password,required"`
@@ -34,9 +34,9 @@ func (r *RegisterController) displayRegister(c *gin.Context) {
 }
 
 func (r *RegisterController) register(c *gin.Context) {
-	credentials := &UserCredentials{}
+	form := &RegisterForm{}
 
-	if err := c.ShouldBind(credentials); err != nil {
+	if err := c.ShouldBind(form); err != nil {
 		for _, fieldErr := range err.(validator.ValidationErrors) {
 			c.HTML(http.StatusBadRequest, "register.html", gin.H{
 				"title": "Register",
@@ -46,9 +46,9 @@ func (r *RegisterController) register(c *gin.Context) {
 		}
 	}
 
-	encryptedPassword, _ := bcrypt.GenerateFromPassword([]byte(credentials.Password), bcrypt.DefaultCost)
+	encryptedPassword, _ := bcrypt.GenerateFromPassword([]byte(form.Password), bcrypt.DefaultCost)
 
-	if result := r.DB.Create(&models.User{Email: credentials.Email, Password: string(encryptedPassword)}); result.Error != nil {
+	if result := r.DB.Create(&models.User{Email: form.Email, Password: string(encryptedPassword)}); result.Error != nil {
 		c.HTML(http.StatusBadRequest, "register.html", gin.H{
 			"title": "Register",
 			"error": errorHandler.DatabaseErrorToText(result.Error),
