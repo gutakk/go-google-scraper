@@ -6,7 +6,7 @@ ENV GIN_MODE=release \
 WORKDIR /app
 
 # Install JS dependencies
-COPY package.json package.lock.json ./
+COPY package.json package-lock.json ./
 RUN npm install
 
 # Install Go dependencies
