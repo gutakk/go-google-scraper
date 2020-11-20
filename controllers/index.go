@@ -9,8 +9,8 @@ func CombineRoutes(engine *gin.Engine) {
 	homeController := &HomeController{}
 	homeController.applyRoutes(engine)
 
-	loginController := &LoginController{DB: db.DB}
-	loginController.applyRoutes(engine)
+	userSessionController := &UserSessionController{DB: db.DB}
+	userSessionController.applyRoutes(engine)
 
 	registerController := &RegisterController{}
 	registerController.applyRoutes(engine)
