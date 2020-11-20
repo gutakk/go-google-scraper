@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -37,7 +38,7 @@ func connectDB() (db *gorm.DB) {
 }
 
 func constructDsn() string {
-	if os.Getenv("APP_ENV") == "release" {
+	if gin.Mode() == gin.ReleaseMode {
 		return os.Getenv("DATABASE_URL")
 	}
 

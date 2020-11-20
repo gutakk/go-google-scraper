@@ -1,7 +1,6 @@
 FROM golang:alpine
 
-ENV GIN_MODE=release \
-    APP_ENV=release
+ENV GIN_MODE=release 
 
 WORKDIR /app
 
