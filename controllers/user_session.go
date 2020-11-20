@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	render "github.com/gutakk/go-google-scraper/helpers/render"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
 	"golang.org/x/crypto/bcrypt"
@@ -15,6 +16,13 @@ import (
 type UserSessionController struct {
 	DB *gorm.DB
 }
+
+const (
+	loginTitle = "Login"
+	loginView  = "login.html"
+
+	invalidUsernameOrPassword = "Username or password is invalid"
+)
 
 type LoginForm struct {
 	Email    string `form:"email" binding:"email,required"`
@@ -27,10 +35,7 @@ func (us *UserSessionController) applyRoutes(engine *gin.Engine) {
 }
 
 func (us *UserSessionController) displayLogin(c *gin.Context) {
-	c.HTML(http.StatusOK, "login.html", gin.H{
-		"title":  "Login",
-		"notice": session.GetAndDelete(c, "notice"),
-	})
+	render.HtmlWithNotice(c, loginTitle, loginView, http.StatusOK, session.GetAndDelete(c, "notice"))
 }
 
 func (us *UserSessionController) login(c *gin.Context) {
@@ -38,31 +43,26 @@ func (us *UserSessionController) login(c *gin.Context) {
 
 	if err := c.ShouldBind(form); err != nil {
 		for _, fieldErr := range err.(validator.ValidationErrors) {
-			c.HTML(http.StatusBadRequest, "login.html", gin.H{
-				"title": "Login",
-				"error": errorHandler.ValidationErrorToText(fieldErr),
-			})
+			renderLoginWithError(c, http.StatusBadRequest, errorHandler.ValidationErrorToText(fieldErr))
 			return
 		}
 	}
 
 	user := &models.User{Email: form.Email}
 	if result := us.DB.Where(user).First(user); result.Error != nil {
-		c.HTML(http.StatusUnauthorized, "login.html", gin.H{
-			"title": "Login",
-			"error": "Username or password is invalid",
-		})
+		renderLoginWithError(c, http.StatusUnauthorized, invalidUsernameOrPassword)
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(form.Password)); err != nil {
-		c.HTML(http.StatusUnauthorized, "login.html", gin.H{
-			"title": "Login",
-			"error": "Username or password is invalid",
-		})
+		renderLoginWithError(c, http.StatusUnauthorized, invalidUsernameOrPassword)
 		return
 	}
 
 	session.Set(c, "user_id", user.ID)
 	c.Redirect(http.StatusFound, "/")
+}
+
+func renderLoginWithError(c *gin.Context, status int, errorMsg string) {
+	render.HtmlWithError(c, loginTitle, loginView, status, errorMsg)
 }
