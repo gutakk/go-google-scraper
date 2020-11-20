@@ -107,7 +107,7 @@ func (s *DBTestSuite) TestRegisterWithPasswordNotMatch() {
 	assert.Equal(s.T(), true, pageError)
 }
 
-func (s *DBTestSuite) TestRegisterWithPasswordNotReachMinLength() {
+func (s *DBTestSuite) TestRegisterWithTooShortPassword() {
 	s.formData.Set("password", "12345")
 	s.formData.Set("confirm-password", "12345")
 
