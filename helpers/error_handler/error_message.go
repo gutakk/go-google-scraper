@@ -16,7 +16,7 @@ func ValidationErrorToText(err validator.FieldError) string {
 	case "email":
 		return "Invalid email format"
 	case "eqfield":
-		return "Password not match"
+		return "Passwords do not match"
 	}
 	return fmt.Sprintf("%s is not valid", err.Field())
 }
