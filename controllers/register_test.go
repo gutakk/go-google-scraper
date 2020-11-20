@@ -101,7 +101,7 @@ func (s *DBTestSuite) TestRegisterWithPasswordNotMatch() {
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 	p, err := ioutil.ReadAll(response.Body)
-	pageError := err == nil && strings.Index(string(p), "Password not match") > 0
+	pageError := err == nil && strings.Index(string(p), "Passwords do not match") > 0
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, pageError)
