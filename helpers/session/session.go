@@ -5,18 +5,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetAndDelete(c *gin.Context, key string) interface{} {
+func AddFlash(c *gin.Context, value interface{}) {
 	session := sessions.Default(c)
-	value := session.Get(key)
-	session.Delete(key)
+	session.AddFlash(value)
 	_ = session.Save()
-
-	return value
 }
 
-func Set(c *gin.Context, key string, value interface{}) {
+func Flashes(c *gin.Context) []interface{} {
 	session := sessions.Default(c)
-
-	session.Set(key, value)
+	flashes := session.Flashes()
 	_ = session.Save()
+
+	return flashes
 }

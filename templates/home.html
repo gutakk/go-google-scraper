@@ -8,7 +8,9 @@
 
   <body>
     <h1 class="text-primary">HELLO GOLANG</h1>
-    <h2>{{ .status }}</h2>
+    {{ range $flash := .flashes }}
+      <h2>{{ $flash }}</h2>
+    {{ end }}
 
     <script src="dist/index.js"></script>
   </body>
