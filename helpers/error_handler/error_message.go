@@ -21,6 +21,7 @@ func ValidationErrorToText(err validator.FieldError) string {
 	return fmt.Sprintf("%s is not valid", err.Field())
 }
 
+// TODO: Improve later as this feel brittle
 func DatabaseErrorToText(err error) string {
 	pgErr := err.(*pgconn.PgError)
 
