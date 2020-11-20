@@ -32,7 +32,6 @@ npm run build
 ```
 
 #### Run tests
-[**`.env.test` file is required**](#create-necessary-dot-env-files)
 ```sh
 make test
 ```
