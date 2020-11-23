@@ -15,7 +15,7 @@
   - `.env.release`
   - `.env.debug` (for development)
   - `.env.test`
-- Add values from `.env.example` (for env dependent variables eg. `DB_NAME` must add to dependent env  files)
+- Add values from `.env.example` (env dependent variables eg. `DB_NAME` must be added to each dependent env file)
 
 ## Usage
 ### Start development server steps
