@@ -1,17 +1,8 @@
-<!DOCTYPE html>
+{{ define "content" }}
 
-<html>
-  <head>
-    <link type="text/css" rel="stylesheet" href="dist/index.css" />
-    <title>{{ .title }}</title>
-  </head>
+<h1 class="text-primary">HELLO GOLANG</h1>
+{{ range $flash := .flashes }}
+  <h2>{{ $flash }}</h2>
+{{ end }}
 
-  <body>
-    <h1 class="text-primary">HELLO GOLANG</h1>
-    {{ range $flash := .flashes }}
-      <h2>{{ $flash }}</h2>
-    {{ end }}
-
-    <script src="dist/index.js"></script>
-  </body>
-</html>
+{{ end }}

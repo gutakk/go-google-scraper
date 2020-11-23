@@ -7,6 +7,7 @@ require (
 	github.com/creack/pty v1.1.11 // indirect
 	github.com/ddollar/forego v0.16.1 // indirect
 	github.com/fatih/color v1.10.0 // indirect
+	github.com/foolin/goview v0.3.0
 	github.com/gin-contrib/sessions v0.0.3
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.2.0

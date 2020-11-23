@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -13,7 +14,7 @@ func SetupRouter() *gin.Engine {
 	store := cookie.NewStore([]byte("secret"))
 	router.Use(sessions.Sessions("mysession", store))
 
-	router.LoadHTMLGlob("templates/*")
+	router.HTMLRender = ginview.New(goviewConfig())
 	router.Static("/dist", "./dist")
 	controllers.CombineRoutes(router)
 

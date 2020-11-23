@@ -14,7 +14,7 @@ func (h *HomeController) applyRoutes(engine *gin.Engine) {
 }
 
 func (h *HomeController) displayHome(c *gin.Context) {
-	c.HTML(http.StatusOK, "home.html", gin.H{
+	c.HTML(http.StatusOK, "home", gin.H{
 		"title":   "Home",
 		"flashes": session.Flashes(c),
 	})

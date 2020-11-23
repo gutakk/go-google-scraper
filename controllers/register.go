@@ -24,7 +24,7 @@ func (r *RegisterController) applyRoutes(engine *gin.Engine) {
 }
 
 func (r *RegisterController) displayRegister(c *gin.Context) {
-	c.HTML(http.StatusOK, "register.html", gin.H{
+	c.HTML(http.StatusOK, "register", gin.H{
 		"title": "Register",
 	})
 }
