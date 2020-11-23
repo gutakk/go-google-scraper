@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/tests"
 	"github.com/stretchr/testify/suite"
@@ -30,20 +31,21 @@ func TestDisplayRegister(t *testing.T) {
 
 type DBTestSuite struct {
 	suite.Suite
-	DB       *gorm.DB
 	engine   *gin.Engine
 	formData url.Values
 	headers  http.Header
 }
 
 func (s *DBTestSuite) SetupTest() {
-	db, _ := gorm.Open(postgres.Open(tests.ConstructTestDsn()), &gorm.Config{})
-	s.DB = db
+	testDB, _ := gorm.Open(postgres.Open(tests.ConstructTestDsn()), &gorm.Config{})
+	db.GetDB = func() *gorm.DB {
+		return testDB
+	}
 
-	_ = db.AutoMigrate(&models.User{})
+	_ = db.GetDB().AutoMigrate(&models.User{})
 
 	s.engine = tests.GetRouter(true)
-	registerController := &RegisterController{DB: s.DB}
+	registerController := &RegisterController{}
 	registerController.applyRoutes(s.engine)
 
 	s.headers = http.Header{}
@@ -56,7 +58,7 @@ func (s *DBTestSuite) SetupTest() {
 }
 
 func (s *DBTestSuite) TearDownTest() {
-	s.DB.Exec("DELETE FROM users")
+	db.GetDB().Exec("DELETE FROM users")
 }
 
 func TestDBTestSuite(t *testing.T) {
@@ -67,7 +69,7 @@ func (s *DBTestSuite) TestRegisterWithValidParameters() {
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
 	user := models.User{}
-	s.DB.First(&user)
+	db.GetDB().First(&user)
 
 	assert.Equal(s.T(), http.StatusFound, response.Code)
 	assert.Equal(s.T(), "/", response.Header().Get("Location"))
@@ -120,7 +122,7 @@ func (s *DBTestSuite) TestRegisterWithTooShortPassword() {
 }
 
 func (s *DBTestSuite) TestRegisterWithDuplicateEmail() {
-	s.DB.Create(&models.User{Email: "test@hello.com", Password: "123456"})
+	db.GetDB().Create(&models.User{Email: "test@hello.com", Password: "123456"})
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 	p, err := ioutil.ReadAll(response.Body)

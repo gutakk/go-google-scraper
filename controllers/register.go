@@ -8,13 +8,9 @@ import (
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
-type RegisterController struct {
-	DB *gorm.DB
-}
+type RegisterController struct{}
 
 type RegisterForm struct {
 	Email           string `form:"email" binding:"email,required"`
@@ -46,12 +42,18 @@ func (r *RegisterController) register(c *gin.Context) {
 		}
 	}
 
-	encryptedPassword, _ := bcrypt.GenerateFromPassword([]byte(form.Password), bcrypt.DefaultCost)
+	hashedPassword, hashError := models.HashPassword(form.Password)
+	if hashError != nil {
+		c.HTML(http.StatusUnprocessableEntity, "register.html", gin.H{
+			"title": "Register",
+			"error": "Something went wrong, please try again.",
+		})
+	}
 
-	if result := r.DB.Create(&models.User{Email: form.Email, Password: string(encryptedPassword)}); result.Error != nil {
+	if err := models.SaveUser(form.Email, hashedPassword); err != nil {
 		c.HTML(http.StatusBadRequest, "register.html", gin.H{
 			"title": "Register",
-			"error": errorHandler.DatabaseErrorToText(result.Error),
+			"error": errorHandler.DatabaseErrorToText(err),
 		})
 		return
 	}

@@ -6,11 +6,13 @@ import (
 
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/db"
+	"github.com/gutakk/go-google-scraper/migration"
 )
 
 func main() {
 	config.LoadEnv()
-	db.InitDB()
+	db := db.ConnectDB()
+	migration.Migrate(db)
 
 	r := config.SetupRouter()
 
