@@ -34,7 +34,7 @@ func (r *RegisterController) register(c *gin.Context) {
 
 	if err := c.ShouldBind(form); err != nil {
 		for _, fieldErr := range err.(validator.ValidationErrors) {
-			c.HTML(http.StatusBadRequest, "register.html", gin.H{
+			c.HTML(http.StatusBadRequest, "register", gin.H{
 				"title": "Register",
 				"error": errorHandler.ValidationErrorToText(fieldErr),
 				"email": form.Email,
@@ -45,14 +45,14 @@ func (r *RegisterController) register(c *gin.Context) {
 
 	hashedPassword, hashError := models.HashPassword(form.Password)
 	if hashError != nil {
-		c.HTML(http.StatusUnprocessableEntity, "register.html", gin.H{
+		c.HTML(http.StatusUnprocessableEntity, "register", gin.H{
 			"title": "Register",
 			"error": "Something went wrong, please try again.",
 		})
 	}
 
 	if err := models.SaveUser(form.Email, hashedPassword); err != nil {
-		c.HTML(http.StatusBadRequest, "register.html", gin.H{
+		c.HTML(http.StatusBadRequest, "register", gin.H{
 			"title": "Register",
 			"error": errorHandler.DatabaseErrorToText(err),
 			"email": form.Email,

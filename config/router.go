@@ -5,7 +5,6 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"github.com/gutakk/go-google-scraper/controllers"
 )
 
 func SetupRouter() *gin.Engine {
@@ -14,9 +13,8 @@ func SetupRouter() *gin.Engine {
 	store := cookie.NewStore([]byte("secret"))
 	router.Use(sessions.Sessions("mysession", store))
 
-	router.HTMLRender = ginview.New(goviewConfig())
+	router.HTMLRender = ginview.New(GoviewConfig())
 	router.Static("/dist", "./dist")
-	controllers.CombineRoutes(router)
 
 	return router
 }

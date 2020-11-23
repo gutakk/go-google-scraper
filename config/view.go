@@ -6,7 +6,7 @@ import (
 	"github.com/foolin/goview"
 )
 
-func goviewConfig() goview.Config {
+func GoviewConfig() goview.Config {
 	return goview.Config{
 		Root:      "templates",
 		Extension: ".html",

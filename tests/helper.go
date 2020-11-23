@@ -7,9 +7,11 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	"github.com/gutakk/go-google-scraper/config"
 )
 
 // Helper function to create a router during testing
@@ -19,7 +21,7 @@ func GetRouter(withTemplates bool) *gin.Engine {
 	router.Use(sessions.Sessions("mysession", store))
 
 	if withTemplates {
-		router.LoadHTMLGlob("templates/*")
+		router.HTMLRender = ginview.New(config.GoviewConfig())
 		router.Static("/dist", "./dist")
 	}
 
