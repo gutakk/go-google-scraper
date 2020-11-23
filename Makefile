@@ -1,5 +1,9 @@
 .PHONY: test env-setup
 
+build-dependencies:
+	go get github.com/ddollar/forego
+	go get github.com/cosmtrek/air
+
 env-setup:
 	docker-compose -f docker-compose.dev.yml up -d
 

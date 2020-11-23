@@ -17,15 +17,22 @@
   - `.env.test`
 - Add values from `.env.example` (for env dependent variables eg. `DB_NAME` must add to dependent env  files)
 ## Usage
-#### Run the Go application for development
+
+### Start development server steps
 [**`.env` and `.env.debug` files are required**](#create-necessary-dot-env-files)
 
-This command will hot reload both assets build and app build
+#### Build development dependencies
+This project using `air` for hot reloading and `forego` to have nice terminal colors and process separations.
 ```sh
-make start-dev
+make build-dependencies
 ```
+#### Run the Go application for development
+  ```sh
+  make start-dev
+  ```
 To visit app locally: `localhost:8080`
 
+---
 #### Build assets
 ```sh
 npm run build
