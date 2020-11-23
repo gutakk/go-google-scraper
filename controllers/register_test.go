@@ -93,9 +93,11 @@ func (s *DBTestSuite) TestRegisterWithBlankPassword() {
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 	p, err := ioutil.ReadAll(response.Body)
 	pageError := err == nil && strings.Index(string(p), "Password is required") > 0
+	isEmailFieldValueExist := err == nil && strings.Index(string(p), "test@hello.com") > 0
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, pageError)
+	assert.Equal(s.T(), true, isEmailFieldValueExist)
 }
 
 func (s *DBTestSuite) TestRegisterWithPasswordNotMatch() {
@@ -104,9 +106,11 @@ func (s *DBTestSuite) TestRegisterWithPasswordNotMatch() {
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 	p, err := ioutil.ReadAll(response.Body)
 	pageError := err == nil && strings.Index(string(p), "Passwords do not match") > 0
+	isEmailFieldValueExist := err == nil && strings.Index(string(p), "test@hello.com") > 0
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, pageError)
+	assert.Equal(s.T(), true, isEmailFieldValueExist)
 }
 
 func (s *DBTestSuite) TestRegisterWithTooShortPassword() {
@@ -116,9 +120,11 @@ func (s *DBTestSuite) TestRegisterWithTooShortPassword() {
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 	p, err := ioutil.ReadAll(response.Body)
 	pageError := err == nil && strings.Index(string(p), "Password must be longer than 6") > 0
+	isEmailFieldValueExist := err == nil && strings.Index(string(p), "test@hello.com") > 0
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, pageError)
+	assert.Equal(s.T(), true, isEmailFieldValueExist)
 }
 
 func (s *DBTestSuite) TestRegisterWithDuplicateEmail() {
@@ -127,7 +133,9 @@ func (s *DBTestSuite) TestRegisterWithDuplicateEmail() {
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 	p, err := ioutil.ReadAll(response.Body)
 	pageError := err == nil && strings.Index(string(p), "Email already exists") > 0
+	isEmailFieldValueExist := err == nil && strings.Index(string(p), "test@hello.com") > 0
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, pageError)
+	assert.Equal(s.T(), true, isEmailFieldValueExist)
 }

@@ -37,6 +37,7 @@ func (r *RegisterController) register(c *gin.Context) {
 			c.HTML(http.StatusBadRequest, "register.html", gin.H{
 				"title": "Register",
 				"error": errorHandler.ValidationErrorToText(fieldErr),
+				"email": form.Email,
 			})
 			return
 		}
@@ -54,6 +55,7 @@ func (r *RegisterController) register(c *gin.Context) {
 		c.HTML(http.StatusBadRequest, "register.html", gin.H{
 			"title": "Register",
 			"error": errorHandler.DatabaseErrorToText(err),
+			"email": form.Email,
 		})
 		return
 	}
