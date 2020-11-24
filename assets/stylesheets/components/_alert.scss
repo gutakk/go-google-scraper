@@ -1,5 +1,7 @@
 .alert {
+  @apply mt-8 py-2 rounded-md text-center font-semibold;
+
   &--danger {
-    @apply mt-8 bg-red-200 py-2 rounded-md text-center text-red-800 font-semibold;
+    @apply bg-red-200 text-red-800;
   }
 }
