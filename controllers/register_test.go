@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
@@ -34,6 +35,8 @@ type DBTestSuite struct {
 	engine   *gin.Engine
 	formData url.Values
 	headers  http.Header
+	email    string
+	password string
 }
 
 func (s *DBTestSuite) SetupTest() {
@@ -51,10 +54,13 @@ func (s *DBTestSuite) SetupTest() {
 	s.headers = http.Header{}
 	s.headers.Set("Content-Type", "application/x-www-form-urlencoded")
 
+	s.email = faker.Email()
+	s.password = faker.Password()
+
 	s.formData = url.Values{}
-	s.formData.Set("email", "test@hello.com")
-	s.formData.Set("password", "123456")
-	s.formData.Set("confirm-password", "123456")
+	s.formData.Set("email", s.email)
+	s.formData.Set("password", s.password)
+	s.formData.Set("confirm-password", s.password)
 }
 
 func (s *DBTestSuite) TearDownTest() {
@@ -68,15 +74,11 @@ func TestDBTestSuite(t *testing.T) {
 func (s *DBTestSuite) TestRegisterWithValidParameters() {
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
-	user := models.User{}
-	db.GetDB().First(&user)
-
 	assert.Equal(s.T(), http.StatusFound, response.Code)
 	assert.Equal(s.T(), "/", response.Header().Get("Location"))
-	assert.Equal(s.T(), "test@hello.com", user.Email)
 }
 
-func (s *DBTestSuite) TestRegisterWithBlankEmail() {
+func (s *DBTestSuite) TestRegisterWithBlankEmailValidation() {
 	s.formData.Del("email")
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
@@ -87,26 +89,26 @@ func (s *DBTestSuite) TestRegisterWithBlankEmail() {
 	assert.Equal(s.T(), true, pageError)
 }
 
-func (s *DBTestSuite) TestRegisterWithBlankPassword() {
+func (s *DBTestSuite) TestRegisterWithBlankPasswordValidation() {
 	s.formData.Del("password")
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 	p, err := ioutil.ReadAll(response.Body)
 	pageError := err == nil && strings.Index(string(p), "Password is required") > 0
-	isEmailFieldValueExist := err == nil && strings.Index(string(p), "test@hello.com") > 0
+	isEmailFieldValueExist := err == nil && strings.Index(string(p), s.email) > 0
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, pageError)
 	assert.Equal(s.T(), true, isEmailFieldValueExist)
 }
 
-func (s *DBTestSuite) TestRegisterWithPasswordNotMatch() {
+func (s *DBTestSuite) TestRegisterWithPasswordNotMatchValidation() {
 	s.formData.Set("confirm-password", "1234567")
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 	p, err := ioutil.ReadAll(response.Body)
 	pageError := err == nil && strings.Index(string(p), "Passwords do not match") > 0
-	isEmailFieldValueExist := err == nil && strings.Index(string(p), "test@hello.com") > 0
+	isEmailFieldValueExist := err == nil && strings.Index(string(p), s.email) > 0
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, pageError)
@@ -120,20 +122,7 @@ func (s *DBTestSuite) TestRegisterWithTooShortPassword() {
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 	p, err := ioutil.ReadAll(response.Body)
 	pageError := err == nil && strings.Index(string(p), "Password must be longer than 6") > 0
-	isEmailFieldValueExist := err == nil && strings.Index(string(p), "test@hello.com") > 0
-
-	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
-	assert.Equal(s.T(), true, pageError)
-	assert.Equal(s.T(), true, isEmailFieldValueExist)
-}
-
-func (s *DBTestSuite) TestRegisterWithDuplicateEmail() {
-	db.GetDB().Create(&models.User{Email: "test@hello.com", Password: "123456"})
-
-	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
-	p, err := ioutil.ReadAll(response.Body)
-	pageError := err == nil && strings.Index(string(p), "Email already exists") > 0
-	isEmailFieldValueExist := err == nil && strings.Index(string(p), "test@hello.com") > 0
+	isEmailFieldValueExist := err == nil && strings.Index(string(p), s.email) > 0
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, pageError)
