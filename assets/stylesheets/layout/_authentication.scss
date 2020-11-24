@@ -1,20 +1,22 @@
-.auth-main {
-  @apply min-h-screen flex justify-center pt-20;
-
-  &__content {
-    width: 26rem;
-  }
-
-  &__content--small {
-    @apply text-center text-sm mt-4;
-  }
-
-  &__image {
-    @apply mx-auto;
-    height: 6rem;
-  }
-
-  &__title {
-    @apply mt-10 text-center;
+.layout-default {
+  .auth-main {
+    @apply min-h-screen flex justify-center pt-20;
+  
+    &__content {
+      width: 26rem;
+    }
+  
+    &__content--small {
+      @apply text-center text-sm mt-4;
+    }
+  
+    &__image {
+      @apply mx-auto;
+      height: 6rem;
+    }
+  
+    &__title {
+      @apply mt-10 text-center;
+    }
   }
 }
