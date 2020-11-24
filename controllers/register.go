@@ -48,6 +48,7 @@ func (r *RegisterController) register(c *gin.Context) {
 		c.HTML(http.StatusUnprocessableEntity, "register", gin.H{
 			"title": "Register",
 			"error": "Something went wrong, please try again.",
+			"email": form.Email,
 		})
 	}
 
