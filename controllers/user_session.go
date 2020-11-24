@@ -8,8 +8,6 @@ import (
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 const (
@@ -19,9 +17,7 @@ const (
 	invalidUsernameOrPassword = "Username or password is invalid"
 )
 
-type UserSessionController struct {
-	DB *gorm.DB
-}
+type UserSessionController struct{}
 
 type LoginForm struct {
 	Email    string `form:"email" binding:"email,required"`
@@ -50,13 +46,13 @@ func (us *UserSessionController) login(c *gin.Context) {
 		}
 	}
 
-	user := &models.User{Email: form.Email}
-	if result := us.DB.Where(user).First(user); result.Error != nil {
+	user, err := models.FindOneUser(&models.User{Email: form.Email})
+	if err != nil {
 		renderLoginWithError(c, http.StatusUnauthorized, invalidUsernameOrPassword, form)
 		return
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(form.Password)); err != nil {
+	if err := models.CheckPassword(user.Password, form.Password); err != nil {
 		renderLoginWithError(c, http.StatusUnauthorized, invalidUsernameOrPassword, form)
 		return
 	}
@@ -66,7 +62,7 @@ func (us *UserSessionController) login(c *gin.Context) {
 }
 
 func renderLoginWithError(c *gin.Context, status int, errorMsg string, form *LoginForm) {
-	c.HTML(status, registerView, gin.H{
+	c.HTML(status, loginView, gin.H{
 		"title":  loginTitle,
 		"errors": errorMsg,
 		"email":  form.Email,

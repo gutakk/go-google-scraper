@@ -31,3 +31,14 @@ func SaveUser(email string, password string) error {
 	}
 	return nil
 }
+
+func FindOneUser(condition interface{}) (User, error) {
+	user := User{}
+	result := db.GetDB().Where(condition).First(&user)
+
+	return user, result.Error
+}
+
+func CheckPassword(hashedPassword string, password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+}
