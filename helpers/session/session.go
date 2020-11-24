@@ -19,6 +19,11 @@ func Flashes(c *gin.Context) []interface{} {
 	return flashes
 }
 
+func Get(c *gin.Context, key string) interface{} {
+	session := sessions.Default(c)
+	return session.Get(key)
+}
+
 func Set(c *gin.Context, key string, value interface{}) {
 	session := sessions.Default(c)
 	session.Set(key, value)
