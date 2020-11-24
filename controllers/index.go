@@ -8,9 +8,13 @@ import (
 func CombineRoutes(engine *gin.Engine) {
 	new(HomeController).applyRoutes(engine)
 
+	new(RegisterController).applyRoutes(AuthenticatedUserNotAllowedGroup(engine))
+	new(UserSessionController).applyRoutes(AuthenticatedUserNotAllowedGroup(engine))
+}
+
+func AuthenticatedUserNotAllowedGroup(engine *gin.Engine) *gin.RouterGroup {
 	authenticatedUserNotAllowedGroup := engine.Group("")
 	authenticatedUserNotAllowedGroup.Use(middlewares.AuthenticatedUserNotAllowed)
 
-	new(RegisterController).applyRoutes(authenticatedUserNotAllowedGroup)
-	new(UserSessionController).applyRoutes(authenticatedUserNotAllowedGroup)
+	return authenticatedUserNotAllowedGroup
 }
