@@ -15,15 +15,17 @@
           Login to your account
         </h2>
 
-        {{ if .notice }}
-          <div class="alert-success">
-            {{ .notice }}
+        {{ if .notices }}
+          <div class="alert alert--success">
+            {{ range $notice := .notices }}
+              {{ $notice }}
+            {{ end }}
           </div>
         {{ end }}
         
-        {{ if .error }}
-          <div class="alert-danger">
-            {{ .error }}
+        {{ if .errors }}
+          <div class="alert alert--danger">
+            {{ .errors }}
           </div>
         {{ end }}
         

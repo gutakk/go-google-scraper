@@ -4,4 +4,8 @@
   &--danger {
     @apply bg-red-200 text-red-800;
   }
+
+  &--success {
+    @apply bg-green-200 text-green-800;
+  }
 }
