@@ -115,7 +115,7 @@ func (s *DBTestSuite) TestRegisterWithPasswordNotMatchValidation() {
 	assert.Equal(s.T(), true, isEmailFieldValueExist)
 }
 
-func (s *DBTestSuite) TestRegisterWithTooShortPassword() {
+func (s *DBTestSuite) TestRegisterWithTooShortPasswordValidation() {
 	s.formData.Set("password", "12345")
 	s.formData.Set("confirm-password", "12345")
 
