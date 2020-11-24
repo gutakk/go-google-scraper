@@ -3,6 +3,7 @@ package helpers
 import (
 	"testing"
 
+	"github.com/jackc/pgconn"
 	"gopkg.in/go-playground/assert.v1"
 )
 
@@ -67,4 +68,22 @@ func TestValidationErrorToTextForDefaultCaseTag(t *testing.T) {
 	result := ValidationErrorToText(fieldError)
 
 	assert.Equal(t, "password is not valid", result)
+}
+
+func TestDatabaseErrorToTextForDuplicateEmail(t *testing.T) {
+	pgErr := &pgconn.PgError{Code: "23505"}
+	result := DatabaseErrorToText(pgErr)
+
+	assert.Equal(t, "Email already exists", result)
+}
+
+func TestDatabaseErrorToTextForDefaultCode(t *testing.T) {
+	pgErr := &pgconn.PgError{
+		Code:     "23506",
+		Severity: "ERROR",
+		Message:  "Test",
+	}
+	result := DatabaseErrorToText(pgErr)
+
+	assert.Equal(t, "ERROR: Test (SQLSTATE 23506)", result)
 }
