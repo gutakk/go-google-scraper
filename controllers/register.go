@@ -43,16 +43,7 @@ func (r *RegisterController) register(c *gin.Context) {
 		}
 	}
 
-	hashedPassword, hashError := models.HashPassword(form.Password)
-	if hashError != nil {
-		c.HTML(http.StatusUnprocessableEntity, "register", gin.H{
-			"title": "Register",
-			"error": "Something went wrong, please try again.",
-			"email": form.Email,
-		})
-	}
-
-	if err := models.SaveUser(form.Email, hashedPassword); err != nil {
+	if err := models.SaveUser(form.Email, form.Password); err != nil {
 		c.HTML(http.StatusBadRequest, "register", gin.H{
 			"title": "Register",
 			"error": errorHandler.DatabaseErrorToText(err),

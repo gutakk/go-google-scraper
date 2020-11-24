@@ -12,11 +12,13 @@ type User struct {
 	Password string `gorm:"notNull"`
 }
 
-func HashPassword(password string) ([]byte, error) {
+func hashPassword(password string) ([]byte, error) {
 	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 }
 
-func SaveUser(email string, hashedPassword []byte) error {
+func SaveUser(email string, password string) error {
+	hashedPassword, _ := hashPassword(password)
+
 	if result := db.GetDB().Create(&User{Email: email, Password: string(hashedPassword)}); result.Error != nil {
 		return result.Error
 	}
