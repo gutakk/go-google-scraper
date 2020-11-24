@@ -25,7 +25,7 @@ type RegisterForm struct {
 	ConfirmPassword string `form:"confirm-password" binding:"eqfield=Password,required"`
 }
 
-func (r *RegisterController) applyRoutes(engine *gin.Engine) {
+func (r *RegisterController) applyRoutes(engine *gin.RouterGroup) {
 	engine.GET("/register", r.displayRegister)
 	engine.POST("/register", r.register)
 }

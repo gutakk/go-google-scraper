@@ -24,7 +24,7 @@ type LoginForm struct {
 	Password string `form:"password" binding:"required,min=6"`
 }
 
-func (us *UserSessionController) applyRoutes(engine *gin.Engine) {
+func (us *UserSessionController) applyRoutes(engine *gin.RouterGroup) {
 	engine.GET("/login", us.displayLogin)
 	engine.POST("/login", us.login)
 }
