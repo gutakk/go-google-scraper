@@ -28,7 +28,8 @@ func (us *UserSessionController) applyRoutes(engine *gin.Engine) {
 
 func (us *UserSessionController) displayLogin(c *gin.Context) {
 	c.HTML(http.StatusOK, "login.html", gin.H{
-		"title": "Login",
+		"title":  "Login",
+		"notice": session.GetAndDelete(c, "notice"),
 	})
 }
 

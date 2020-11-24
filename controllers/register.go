@@ -53,5 +53,5 @@ func (r *RegisterController) register(c *gin.Context) {
 	}
 
 	session.AddFlash(c, "Register successfully")
-	c.Redirect(http.StatusFound, "/")
+	c.Redirect(http.StatusFound, "/login")
 }
