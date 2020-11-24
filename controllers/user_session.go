@@ -35,7 +35,7 @@ func (us *UserSessionController) applyRoutes(engine *gin.Engine) {
 }
 
 func (us *UserSessionController) displayLogin(c *gin.Context) {
-	render.HtmlWithNotice(c, loginTitle, loginView, http.StatusOK, session.GetAndDelete(c, "notice"))
+	render.HtmlWithNotice(c, loginTitle, loginView, http.StatusOK, session.Flashes(c))
 }
 
 func (us *UserSessionController) login(c *gin.Context) {

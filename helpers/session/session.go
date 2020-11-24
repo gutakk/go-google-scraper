@@ -18,3 +18,9 @@ func Flashes(c *gin.Context) []interface{} {
 
 	return flashes
 }
+
+func Set(c *gin.Context, key string, value interface{}) {
+	session := sessions.Default(c)
+	session.Set(key, value)
+	_ = session.Save()
+}
