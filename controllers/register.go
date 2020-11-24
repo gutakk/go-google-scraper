@@ -6,8 +6,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	render "github.com/gutakk/go-google-scraper/helpers/render"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
+)
+
+const (
+	registerTitle = "Register"
+	registerView  = "register"
+
+	registerSuccessfully = "Register successfully"
 )
 
 type RegisterController struct{}
@@ -24,8 +32,8 @@ func (r *RegisterController) applyRoutes(engine *gin.Engine) {
 }
 
 func (r *RegisterController) displayRegister(c *gin.Context) {
-	c.HTML(http.StatusOK, "register", gin.H{
-		"title": "Register",
+	c.HTML(http.StatusOK, registerView, gin.H{
+		"title": registerTitle,
 	})
 }
 
@@ -52,6 +60,10 @@ func (r *RegisterController) register(c *gin.Context) {
 		return
 	}
 
-	session.AddFlash(c, "Register successfully")
+	session.AddFlash(c, registerSuccessfully)
 	c.Redirect(http.StatusFound, "/login")
+}
+
+func renderRegisterWithError(c *gin.Context, status int, errorMsg string) {
+	render.HtmlWithError(c, registerTitle, registerView, status, errorMsg)
 }

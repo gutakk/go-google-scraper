@@ -13,16 +13,16 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserSessionController struct {
-	DB *gorm.DB
-}
-
 const (
 	loginTitle = "Login"
 	loginView  = "login.html"
 
 	invalidUsernameOrPassword = "Username or password is invalid"
 )
+
+type UserSessionController struct {
+	DB *gorm.DB
+}
 
 type LoginForm struct {
 	Email    string `form:"email" binding:"email,required"`
