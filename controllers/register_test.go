@@ -75,7 +75,7 @@ func (s *DBTestSuite) TestRegisterWithValidParameters() {
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
 	assert.Equal(s.T(), http.StatusFound, response.Code)
-	assert.Equal(s.T(), "/", response.Header().Get("Location"))
+	assert.Equal(s.T(), "/login", response.Header().Get("Location"))
 }
 
 func (s *DBTestSuite) TestRegisterWithBlankEmailValidation() {
