@@ -103,19 +103,19 @@ func (s *DBTestSuite) TestSaveUserWithEmptyStringPassword() {
 	assert.Equal(s.T(), int64(0), result.RowsAffected)
 }
 
-func (s *DBTestSuite) TestFindOneUserWithValidParams() {
+func (s *DBTestSuite) TestFindOneUserByConditionWithValidParams() {
 	db.GetDB().Create(&User{Email: s.email, Password: s.password})
 
-	user, err := FindOneUser(&User{Email: s.email})
+	user, err := FindOneUserByCondition(&User{Email: s.email})
 
 	assert.Equal(s.T(), nil, err)
 	assert.Equal(s.T(), s.email, user.Email)
 }
 
-func (s *DBTestSuite) TestFindOneUserWithInvalidParams() {
+func (s *DBTestSuite) TestFindOneUserByConditionWithInvalidParams() {
 	db.GetDB().Create(&User{Email: s.email, Password: s.password})
 
-	user, err := FindOneUser(&User{Email: "test"})
+	user, err := FindOneUserByCondition(&User{Email: "test"})
 
 	assert.NotEqual(s.T(), nil, err)
 	assert.Equal(s.T(), &User{}, user)
