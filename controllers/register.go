@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
-	render "github.com/gutakk/go-google-scraper/helpers/render"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
 )
@@ -42,21 +41,13 @@ func (r *RegisterController) register(c *gin.Context) {
 
 	if err := c.ShouldBind(form); err != nil {
 		for _, fieldErr := range err.(validator.ValidationErrors) {
-			c.HTML(http.StatusBadRequest, "register", gin.H{
-				"title": "Register",
-				"error": errorHandler.ValidationErrorMessage(fieldErr).Error(),
-				"email": form.Email,
-			})
+			renderRegisterWithError(c, http.StatusBadRequest, errorHandler.ValidationErrorMessage(fieldErr), form)
 			return
 		}
 	}
 
 	if err := models.SaveUser(form.Email, form.Password); err != nil {
-		c.HTML(http.StatusBadRequest, "register", gin.H{
-			"title": "Register",
-			"error": err.Error(),
-			"email": form.Email,
-		})
+		renderRegisterWithError(c, http.StatusBadRequest, err, form)
 		return
 	}
 
@@ -64,6 +55,10 @@ func (r *RegisterController) register(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/login")
 }
 
-func renderRegisterWithError(c *gin.Context, status int, errorMsg string) {
-	render.HtmlWithError(c, registerTitle, registerView, status, errorMsg)
+func renderRegisterWithError(c *gin.Context, status int, error error, form *RegisterForm) {
+	c.HTML(status, registerView, gin.H{
+		"title":  registerTitle,
+		"errors": error,
+		"email":  form.Email,
+	})
 }

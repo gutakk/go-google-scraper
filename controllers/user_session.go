@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
-	render "github.com/gutakk/go-google-scraper/helpers/render"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
 	"golang.org/x/crypto/bcrypt"
@@ -15,7 +14,7 @@ import (
 
 const (
 	loginTitle = "Login"
-	loginView  = "login.html"
+	loginView  = "login"
 
 	invalidUsernameOrPassword = "Username or password is invalid"
 )
@@ -35,7 +34,10 @@ func (us *UserSessionController) applyRoutes(engine *gin.Engine) {
 }
 
 func (us *UserSessionController) displayLogin(c *gin.Context) {
-	render.HtmlWithNotice(c, loginTitle, loginView, http.StatusOK, session.Flashes(c))
+	c.HTML(http.StatusOK, loginView, gin.H{
+		"title":   loginTitle,
+		"notices": session.Flashes(c),
+	})
 }
 
 func (us *UserSessionController) login(c *gin.Context) {
@@ -43,19 +45,19 @@ func (us *UserSessionController) login(c *gin.Context) {
 
 	if err := c.ShouldBind(form); err != nil {
 		for _, fieldErr := range err.(validator.ValidationErrors) {
-			renderLoginWithError(c, http.StatusBadRequest, errorHandler.ValidationErrorToText(fieldErr))
+			renderLoginWithError(c, http.StatusBadRequest, errorHandler.ValidationErrorToText(fieldErr), form)
 			return
 		}
 	}
 
 	user := &models.User{Email: form.Email}
 	if result := us.DB.Where(user).First(user); result.Error != nil {
-		renderLoginWithError(c, http.StatusUnauthorized, invalidUsernameOrPassword)
+		renderLoginWithError(c, http.StatusUnauthorized, invalidUsernameOrPassword, form)
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(form.Password)); err != nil {
-		renderLoginWithError(c, http.StatusUnauthorized, invalidUsernameOrPassword)
+		renderLoginWithError(c, http.StatusUnauthorized, invalidUsernameOrPassword, form)
 		return
 	}
 
@@ -63,6 +65,10 @@ func (us *UserSessionController) login(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/")
 }
 
-func renderLoginWithError(c *gin.Context, status int, errorMsg string) {
-	render.HtmlWithError(c, loginTitle, loginView, status, errorMsg)
+func renderLoginWithError(c *gin.Context, status int, errorMsg string, form *LoginForm) {
+	c.HTML(status, registerView, gin.H{
+		"title":  loginTitle,
+		"errors": errorMsg,
+		"email":  form.Email,
+	})
 }
