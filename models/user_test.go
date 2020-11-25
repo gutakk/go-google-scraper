@@ -44,6 +44,7 @@ func TestCheckPasswordWithInvalidPassword(t *testing.T) {
 
 type DBTestSuite struct {
 	suite.Suite
+	userID   uint
 	email    string
 	password string
 }
@@ -58,6 +59,11 @@ func (s *DBTestSuite) SetupTest() {
 
 	s.email = faker.Email()
 	s.password = faker.Password()
+
+	user := &User{Email: s.email, Password: s.password}
+	db.GetDB().Create(user)
+
+	s.userID = user.ID
 }
 
 func (s *DBTestSuite) TearDownTest() {
@@ -69,6 +75,7 @@ func TestDBTestSuite(t *testing.T) {
 }
 
 func (s *DBTestSuite) TestSaveUserWithValidParams() {
+	db.GetDB().Exec("DELETE FROM users")
 	err := SaveUser(s.email, s.password)
 	assert.Equal(s.T(), nil, err)
 
@@ -78,8 +85,6 @@ func (s *DBTestSuite) TestSaveUserWithValidParams() {
 }
 
 func (s *DBTestSuite) TestSaveUserWithDuplicateEmail() {
-	db.GetDB().Create(&User{Email: s.email, Password: s.password})
-
 	err := SaveUser(s.email, s.password)
 	assert.NotEqual(s.T(), nil, err)
 
@@ -104,8 +109,6 @@ func (s *DBTestSuite) TestSaveUserWithEmptyStringPassword() {
 }
 
 func (s *DBTestSuite) TestFindOneUserByConditionWithValidParams() {
-	db.GetDB().Create(&User{Email: s.email, Password: s.password})
-
 	user, err := FindOneUserByCondition(&User{Email: s.email})
 
 	assert.Equal(s.T(), nil, err)
@@ -113,9 +116,21 @@ func (s *DBTestSuite) TestFindOneUserByConditionWithValidParams() {
 }
 
 func (s *DBTestSuite) TestFindOneUserByConditionWithInvalidParams() {
-	db.GetDB().Create(&User{Email: s.email, Password: s.password})
-
 	user, err := FindOneUserByCondition(&User{Email: "test"})
+
+	assert.NotEqual(s.T(), nil, err)
+	assert.Equal(s.T(), &User{}, user)
+}
+
+func (s *DBTestSuite) TestFindOneUserByIDWithValidID() {
+	user, err := FindOneUserByID(s.userID)
+
+	assert.Equal(s.T(), nil, err)
+	assert.Equal(s.T(), s.email, user.Email)
+}
+
+func (s *DBTestSuite) TestFindOneUserByIDWithInvalidID() {
+	user, err := FindOneUserByID("testID")
 
 	assert.NotEqual(s.T(), nil, err)
 	assert.Equal(s.T(), &User{}, user)

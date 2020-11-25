@@ -39,6 +39,13 @@ func FindOneUserByCondition(condition interface{}) (User, error) {
 	return user, result.Error
 }
 
+func FindOneUserByID(id interface{}) (User, error) {
+	user := User{}
+	result := db.GetDB().First(&user, id)
+
+	return user, result.Error
+}
+
 func CheckPassword(hashedPassword string, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
