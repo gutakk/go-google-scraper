@@ -21,15 +21,9 @@ func TestDisplayHomeWithoutUserSession(t *testing.T) {
 	w := tests.PerformRequest(engine, "GET", "/", nil, nil)
 	p, err := ioutil.ReadAll(w.Body)
 	isHomePage := err == nil && strings.Index(string(p), "<title>Home</title>") > 0
-	isDisplayGreeting := err == nil && strings.Index(string(p), "<h2 class=\"greeting\">") > 0
-	isDisplayLogin := err == nil && strings.Index(string(p), "<a href=\"/login\">Login</a>") > 0
-	isDisplayRegister := err == nil && strings.Index(string(p), "<a href=\"/register\">Register</a>") > 0
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, true, isHomePage)
-	assert.Equal(t, true, isDisplayLogin)
-	assert.Equal(t, true, isDisplayRegister)
-	assert.Equal(t, false, isDisplayGreeting)
 }
 
 func TestDisplayHomeWithUserSession(t *testing.T) {
@@ -51,13 +45,7 @@ func TestDisplayHomeWithUserSession(t *testing.T) {
 	response := tests.PerformRequest(engine, "GET", "/", headers, nil)
 	p, err := ioutil.ReadAll(response.Body)
 	isHomePage := err == nil && strings.Index(string(p), "<title>Home</title>") > 0
-	isDisplayGreeting := err == nil && strings.Index(string(p), "<h2 class=\"greeting\">") > 0
-	isDisplayLogin := err == nil && strings.Index(string(p), "<a href=\"/login\">Login</a>") > 0
-	isDisplayRegister := err == nil && strings.Index(string(p), "<a href=\"/register\">Register</a>") > 0
 
 	assert.Equal(t, http.StatusOK, response.Code)
 	assert.Equal(t, true, isHomePage)
-	assert.Equal(t, true, isDisplayGreeting)
-	assert.Equal(t, false, isDisplayLogin)
-	assert.Equal(t, false, isDisplayRegister)
 }
