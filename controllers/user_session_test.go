@@ -81,16 +81,13 @@ func (s *UserSessionDbTestSuite) TestLoginWithValidParameters() {
 }
 
 func (s *UserSessionDbTestSuite) TestDisplayLoginWithUserSession() {
-	response := tests.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
+	// Cookie from login API Set-Cookie header
+	cookie := "mysession=MTYwNjI3ODk0NHxEdi1CQkFFQ180SUFBUkFCRUFBQUlmLUNBQUVHYzNSeWFXNW5EQWtBQjNWelpYSmZhV1FFZFdsdWRBWUVBUDRCR0E9PXxa_dKXde8j6m4z_kPgaiPYuDGHj79HxhCMNw3zIoeM6g=="
+	s.headers.Set("Cookie", cookie)
+
+	response := tests.PerformRequest(s.engine, "GET", "/login", s.headers, nil)
 
 	assert.Equal(s.T(), http.StatusFound, response.Code)
-	assert.Equal(s.T(), "/", response.Header().Get("Location"))
-
-	s.headers.Set("Cookie", response.Header().Get("Set-Cookie"))
-
-	displayResponse := tests.PerformRequest(s.engine, "GET", "/login", s.headers, nil)
-
-	assert.Equal(s.T(), http.StatusFound, displayResponse.Code)
 	assert.Equal(s.T(), "/", response.Header().Get("Location"))
 }
 

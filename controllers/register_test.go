@@ -127,3 +127,14 @@ func (s *RegisterDbTestSuite) TestRegisterWithTooShortPasswordValidation() {
 	assert.Equal(s.T(), true, pageError)
 	assert.Equal(s.T(), true, isEmailFieldValueExist)
 }
+
+func (s *RegisterDbTestSuite) TestDisplayRegisterWithUserSession() {
+	// Cookie from login API Set-Cookie header
+	cookie := "mysession=MTYwNjI3ODk0NHxEdi1CQkFFQ180SUFBUkFCRUFBQUlmLUNBQUVHYzNSeWFXNW5EQWtBQjNWelpYSmZhV1FFZFdsdWRBWUVBUDRCR0E9PXxa_dKXde8j6m4z_kPgaiPYuDGHj79HxhCMNw3zIoeM6g=="
+	s.headers.Set("Cookie", cookie)
+
+	response := tests.PerformRequest(s.engine, "GET", "/register", s.headers, nil)
+
+	assert.Equal(s.T(), http.StatusFound, response.Code)
+	assert.Equal(s.T(), "/", response.Header().Get("Location"))
+}
