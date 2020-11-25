@@ -103,7 +103,7 @@ func (s *DBTestSuite) TestRegisterWithBlankPasswordValidation() {
 }
 
 func (s *DBTestSuite) TestRegisterWithPasswordNotMatchValidation() {
-	s.formData.Set("confirm-password", "1234567")
+	s.formData.Set("confirm-password", "invalid")
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 	p, err := ioutil.ReadAll(response.Body)
