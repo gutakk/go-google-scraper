@@ -28,6 +28,20 @@ func TestHashPassword(t *testing.T) {
 	assert.Equal(t, nil, result)
 }
 
+func TestCheckPasswordWithCorrectPassword(t *testing.T) {
+	hashedPassword, _ := hashPassword("password")
+	result := CheckPassword(string(hashedPassword), "password")
+
+	assert.Equal(t, nil, result)
+}
+
+func TestCheckPasswordWithIncorrectPassword(t *testing.T) {
+	hashedPassword, _ := hashPassword("password")
+	result := CheckPassword(string(hashedPassword), "drowssap")
+
+	assert.NotEqual(t, nil, result)
+}
+
 type DBTestSuite struct {
 	suite.Suite
 	email    string
@@ -87,4 +101,22 @@ func (s *DBTestSuite) TestSaveUserWithEmptyStringPassword() {
 
 	result := db.GetDB().First(&User{})
 	assert.Equal(s.T(), int64(0), result.RowsAffected)
+}
+
+func (s *DBTestSuite) TestFindOneUserWithValidParams() {
+	db.GetDB().Create(&User{Email: s.email, Password: s.password})
+
+	user, err := FindOneUser(&User{Email: s.email})
+
+	assert.Equal(s.T(), nil, err)
+	assert.Equal(s.T(), s.email, user.Email)
+}
+
+func (s *DBTestSuite) TestFindOneUserWithInvalidParams() {
+	db.GetDB().Create(&User{Email: s.email, Password: s.password})
+
+	user, err := FindOneUser(&User{Email: "test"})
+
+	assert.NotEqual(s.T(), nil, err)
+	assert.Equal(s.T(), &User{}, user)
 }
