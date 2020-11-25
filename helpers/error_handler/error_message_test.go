@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"errors"
 	"os"
 	"testing"
 
@@ -37,14 +36,14 @@ func TestValidationErrorMessageForEmailTag(t *testing.T) {
 	fieldError := &mockFieldError{tag: "email"}
 	result := ValidationErrorMessage(fieldError)
 
-	assert.Equal(t, errors.New("Invalid email format"), result)
+	assert.Equal(t, "Invalid email format", result.Error())
 }
 
 func TestValidationErrorMessageForEqfieldTag(t *testing.T) {
 	fieldError := &mockFieldError{tag: "eqfield"}
 	result := ValidationErrorMessage(fieldError)
 
-	assert.Equal(t, errors.New("Passwords do not match"), result)
+	assert.Equal(t, "Passwords do not match", result.Error())
 }
 
 func TestValidationErrorMessageForMinTag(t *testing.T) {
@@ -55,7 +54,7 @@ func TestValidationErrorMessageForMinTag(t *testing.T) {
 	}
 	result := ValidationErrorMessage(fieldError)
 
-	assert.Equal(t, errors.New("password must be longer than 6"), result)
+	assert.Equal(t, "password must be longer than 6", result.Error())
 }
 
 func TestValidationErrorMessageForRequiredTag(t *testing.T) {
@@ -65,7 +64,7 @@ func TestValidationErrorMessageForRequiredTag(t *testing.T) {
 	}
 	result := ValidationErrorMessage(fieldError)
 
-	assert.Equal(t, errors.New("password is required"), result)
+	assert.Equal(t, "password is required", result.Error())
 }
 
 func TestValidationErrorMessageForDefaultCaseTag(t *testing.T) {
@@ -75,14 +74,14 @@ func TestValidationErrorMessageForDefaultCaseTag(t *testing.T) {
 	}
 	result := ValidationErrorMessage(fieldError)
 
-	assert.Equal(t, errors.New("password is not valid"), result)
+	assert.Equal(t, "password is not valid", result.Error())
 }
 
 func TestDatabaseErrorMessageForDuplicateEmail(t *testing.T) {
 	pgErr := &pgconn.PgError{Code: "23505"}
 	result := DatabaseErrorMessage(pgErr)
 
-	assert.Equal(t, errors.New("Email already exists"), result)
+	assert.Equal(t, "Email already exists", result.Error())
 }
 
 func TestDatabaseErrorMessageForDefaultCode(t *testing.T) {
@@ -93,5 +92,5 @@ func TestDatabaseErrorMessageForDefaultCode(t *testing.T) {
 	}
 	result := DatabaseErrorMessage(pgErr)
 
-	assert.Equal(t, errors.New("ERROR: Test (SQLSTATE 23506)"), result)
+	assert.Equal(t, "ERROR: Test (SQLSTATE 23506)", result.Error())
 }

@@ -36,7 +36,7 @@ func (r *RegisterController) register(c *gin.Context) {
 		for _, fieldErr := range err.(validator.ValidationErrors) {
 			c.HTML(http.StatusBadRequest, "register", gin.H{
 				"title": "Register",
-				"error": errorHandler.ValidationErrorMessage(fieldErr),
+				"error": errorHandler.ValidationErrorMessage(fieldErr).Error(),
 				"email": form.Email,
 			})
 			return
@@ -46,7 +46,7 @@ func (r *RegisterController) register(c *gin.Context) {
 	if err := models.SaveUser(form.Email, form.Password); err != nil {
 		c.HTML(http.StatusBadRequest, "register", gin.H{
 			"title": "Register",
-			"error": err,
+			"error": err.Error(),
 			"email": form.Email,
 		})
 		return
