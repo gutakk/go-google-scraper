@@ -66,7 +66,7 @@ func (us *UserSessionController) login(c *gin.Context) {
 func renderLoginWithError(c *gin.Context, status int, err error, form *LoginForm) {
 	ginview.HTML(c, status, loginView, gin.H{
 		"title":  loginTitle,
-		"errors": err,
+		"errors": err.Error(),
 		"email":  form.Email,
 	})
 }

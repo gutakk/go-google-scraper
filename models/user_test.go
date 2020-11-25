@@ -1,7 +1,6 @@
 package models
 
 import (
-	"errors"
 	"os"
 	"testing"
 
@@ -95,7 +94,7 @@ func (s *DBTestSuite) TestSaveUserWithDuplicateEmail() {
 func (s *DBTestSuite) TestSaveUserWithEmptyStringEmail() {
 	db.GetDB().Exec("DELETE FROM users")
 	err := SaveUser("", "password")
-	assert.Equal(s.T(), errors.New("Email or password cannot be blank"), err)
+	assert.Equal(s.T(), "Email or password cannot be blank", err.Error())
 
 	result := db.GetDB().First(&User{})
 	assert.Equal(s.T(), int64(0), result.RowsAffected)
@@ -104,7 +103,7 @@ func (s *DBTestSuite) TestSaveUserWithEmptyStringEmail() {
 func (s *DBTestSuite) TestSaveUserWithEmptyStringPassword() {
 	db.GetDB().Exec("DELETE FROM users")
 	err := SaveUser("email@email.com", "")
-	assert.Equal(s.T(), errors.New("Email or password cannot be blank"), err)
+	assert.Equal(s.T(), "Email or password cannot be blank", err.Error())
 
 	result := db.GetDB().First(&User{})
 	assert.Equal(s.T(), int64(0), result.RowsAffected)
