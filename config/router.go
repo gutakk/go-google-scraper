@@ -13,7 +13,7 @@ func SetupRouter() *gin.Engine {
 	store := cookie.NewStore([]byte("secret"))
 	router.Use(sessions.Sessions("mysession", store))
 
-	router.HTMLRender = ginview.New(GoviewConfig())
+	router.HTMLRender = ginview.New(AppGoviewConfig())
 	router.Static("/dist", "./dist")
 
 	return router

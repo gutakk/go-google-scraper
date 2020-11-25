@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-gonic/gin"
+	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/middlewares"
 )
 
@@ -13,7 +15,9 @@ func CombineRoutes(engine *gin.Engine) {
 }
 
 func AuthenticatedUserNotAllowedGroup(engine *gin.Engine) *gin.RouterGroup {
-	authenticatedUserNotAllowedGroup := engine.Group("")
+	mw := ginview.NewMiddleware(config.AuthenticationGoviewConfig())
+
+	authenticatedUserNotAllowedGroup := engine.Group("", mw)
 	authenticatedUserNotAllowedGroup.Use(middlewares.AuthenticatedUserNotAllowed)
 
 	return authenticatedUserNotAllowedGroup

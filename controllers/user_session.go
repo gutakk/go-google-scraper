@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
@@ -31,7 +32,7 @@ func (us *UserSessionController) applyRoutes(engine *gin.RouterGroup) {
 }
 
 func (us *UserSessionController) displayLogin(c *gin.Context) {
-	c.HTML(http.StatusOK, loginView, gin.H{
+	ginview.HTML(c, http.StatusOK, loginView, gin.H{
 		"title":   loginTitle,
 		"notices": session.Flashes(c),
 	})
@@ -63,7 +64,7 @@ func (us *UserSessionController) login(c *gin.Context) {
 }
 
 func renderLoginWithError(c *gin.Context, status int, err error, form *LoginForm) {
-	c.HTML(status, loginView, gin.H{
+	ginview.HTML(c, status, loginView, gin.H{
 		"title":  loginTitle,
 		"errors": err,
 		"email":  form.Email,

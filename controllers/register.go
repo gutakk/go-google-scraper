@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 
+	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
@@ -31,7 +32,7 @@ func (r *RegisterController) applyRoutes(engine *gin.RouterGroup) {
 }
 
 func (r *RegisterController) displayRegister(c *gin.Context) {
-	c.HTML(http.StatusOK, registerView, gin.H{
+	ginview.HTML(c, http.StatusOK, registerView, gin.H{
 		"title": registerTitle,
 	})
 }
@@ -56,7 +57,7 @@ func (r *RegisterController) register(c *gin.Context) {
 }
 
 func renderRegisterWithError(c *gin.Context, status int, err error, form *RegisterForm) {
-	c.HTML(status, registerView, gin.H{
+	ginview.HTML(c, status, registerView, gin.H{
 		"title":  registerTitle,
 		"errors": err,
 		"email":  form.Email,

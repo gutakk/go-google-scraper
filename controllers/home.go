@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 
+	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-gonic/gin"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
@@ -22,7 +23,7 @@ func (h *HomeController) displayHome(c *gin.Context) {
 		user, _ = models.FindOneUserByID(userID)
 	}
 
-	c.HTML(http.StatusOK, "home", gin.H{
+	ginview.HTML(c, http.StatusOK, "home", gin.H{
 		"title":  "Home",
 		"userID": userID,
 		"email":  user.Email,

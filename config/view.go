@@ -6,7 +6,22 @@ import (
 	"github.com/foolin/goview"
 )
 
-func GoviewConfig() goview.Config {
+func AppGoviewConfig() goview.Config {
+	return goview.Config{
+		Root:      "templates",
+		Extension: ".html",
+		Master:    "layouts/application",
+		Partials:  []string{},
+		Funcs: template.FuncMap{
+			"sub": func(a, b int) int {
+				return a - b
+			},
+		},
+		DisableCache: false,
+	}
+}
+
+func AuthenticationGoviewConfig() goview.Config {
 	return goview.Config{
 		Root:      "templates",
 		Extension: ".html",
