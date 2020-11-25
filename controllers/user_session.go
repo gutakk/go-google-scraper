@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -41,19 +42,19 @@ func (us *UserSessionController) login(c *gin.Context) {
 
 	if err := c.ShouldBind(form); err != nil {
 		for _, fieldErr := range err.(validator.ValidationErrors) {
-			renderLoginWithError(c, http.StatusBadRequest, errorHandler.ValidationErrorToText(fieldErr), form)
+			renderLoginWithError(c, http.StatusBadRequest, errorHandler.ValidationErrorMessage(fieldErr), form)
 			return
 		}
 	}
 
 	user, err := models.FindOneUserByCondition(&models.User{Email: form.Email})
 	if err != nil {
-		renderLoginWithError(c, http.StatusUnauthorized, invalidUsernameOrPassword, form)
+		renderLoginWithError(c, http.StatusUnauthorized, errors.New(invalidUsernameOrPassword), form)
 		return
 	}
 
 	if err := models.CheckPassword(user.Password, form.Password); err != nil {
-		renderLoginWithError(c, http.StatusUnauthorized, invalidUsernameOrPassword, form)
+		renderLoginWithError(c, http.StatusUnauthorized, errors.New(invalidUsernameOrPassword), form)
 		return
 	}
 
@@ -61,10 +62,10 @@ func (us *UserSessionController) login(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/")
 }
 
-func renderLoginWithError(c *gin.Context, status int, errorMsg string, form *LoginForm) {
+func renderLoginWithError(c *gin.Context, status int, err error, form *LoginForm) {
 	c.HTML(status, loginView, gin.H{
 		"title":  loginTitle,
-		"errors": errorMsg,
+		"errors": err,
 		"email":  form.Email,
 	})
 }

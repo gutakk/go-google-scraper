@@ -93,6 +93,7 @@ func (s *DBTestSuite) TestSaveUserWithDuplicateEmail() {
 }
 
 func (s *DBTestSuite) TestSaveUserWithEmptyStringEmail() {
+	db.GetDB().Exec("DELETE FROM users")
 	err := SaveUser("", "password")
 	assert.Equal(s.T(), errors.New("Email or password cannot be blank"), err)
 
@@ -101,6 +102,7 @@ func (s *DBTestSuite) TestSaveUserWithEmptyStringEmail() {
 }
 
 func (s *DBTestSuite) TestSaveUserWithEmptyStringPassword() {
+	db.GetDB().Exec("DELETE FROM users")
 	err := SaveUser("email@email.com", "")
 	assert.Equal(s.T(), errors.New("Email or password cannot be blank"), err)
 

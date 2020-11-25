@@ -55,10 +55,10 @@ func (r *RegisterController) register(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/login")
 }
 
-func renderRegisterWithError(c *gin.Context, status int, error error, form *RegisterForm) {
+func renderRegisterWithError(c *gin.Context, status int, err error, form *RegisterForm) {
 	c.HTML(status, registerView, gin.H{
 		"title":  registerTitle,
-		"errors": error,
+		"errors": err,
 		"email":  form.Email,
 	})
 }
