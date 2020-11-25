@@ -21,7 +21,7 @@ func GetRouter(withTemplates bool) *gin.Engine {
 	router.Use(sessions.Sessions("mysession", store))
 
 	if withTemplates {
-		router.HTMLRender = ginview.New(config.GoviewConfig())
+		router.HTMLRender = ginview.New(config.AppGoviewConfig())
 		router.Static("/dist", "./dist")
 	}
 
