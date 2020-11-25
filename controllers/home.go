@@ -23,7 +23,8 @@ func (h *HomeController) displayHome(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "home", gin.H{
-		"title": "Home",
-		"email": user.Email,
+		"title":  "Home",
+		"userID": userID,
+		"email":  user.Email,
 	})
 }
