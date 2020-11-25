@@ -20,7 +20,7 @@ import (
 
 func TestDisplayRegister(t *testing.T) {
 	engine := tests.GetRouter(true)
-	new(RegisterController).applyRoutes(AuthenticatedUserNotAllowedGroup(engine))
+	new(RegisterController).applyRoutes(EnsureNoAuthenticationGroup(engine))
 
 	response := tests.PerformRequest(engine, "GET", "/register", nil, nil)
 	p, err := ioutil.ReadAll(response.Body)
@@ -48,7 +48,7 @@ func (s *RegisterDbTestSuite) SetupTest() {
 	_ = db.GetDB().AutoMigrate(&models.User{})
 
 	s.engine = tests.GetRouter(true)
-	new(RegisterController).applyRoutes(AuthenticatedUserNotAllowedGroup(s.engine))
+	new(RegisterController).applyRoutes(EnsureNoAuthenticationGroup(s.engine))
 
 	s.headers = http.Header{}
 	s.headers.Set("Content-Type", "application/x-www-form-urlencoded")

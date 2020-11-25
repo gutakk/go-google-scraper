@@ -7,10 +7,10 @@ import (
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 )
 
-func AuthenticatedUserNotAllowed(c *gin.Context) {
-	user := session.Get(c, "user_id")
+func EnsureNoAuthentiction(c *gin.Context) {
+	userID := session.Get(c, "user_id")
 
-	if user != nil {
+	if userID != nil {
 		c.Redirect(http.StatusFound, "/")
 		return
 	}

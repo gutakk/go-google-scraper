@@ -10,15 +10,15 @@ import (
 func CombineRoutes(engine *gin.Engine) {
 	new(HomeController).applyRoutes(engine)
 
-	new(RegisterController).applyRoutes(AuthenticatedUserNotAllowedGroup(engine))
-	new(UserSessionController).applyRoutes(AuthenticatedUserNotAllowedGroup(engine))
+	new(RegisterController).applyRoutes(EnsureNoAuthenticationGroup(engine))
+	new(UserSessionController).applyRoutes(EnsureNoAuthenticationGroup(engine))
 }
 
-func AuthenticatedUserNotAllowedGroup(engine *gin.Engine) *gin.RouterGroup {
+func EnsureNoAuthenticationGroup(engine *gin.Engine) *gin.RouterGroup {
 	mw := ginview.NewMiddleware(config.AuthenticationGoviewConfig())
 
-	authenticatedUserNotAllowedGroup := engine.Group("", mw)
-	authenticatedUserNotAllowedGroup.Use(middlewares.AuthenticatedUserNotAllowed)
+	ensureNoAuthenticationGroup := engine.Group("", mw)
+	ensureNoAuthenticationGroup.Use(middlewares.EnsureNoAuthentiction)
 
-	return authenticatedUserNotAllowedGroup
+	return ensureNoAuthenticationGroup
 }
