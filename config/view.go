@@ -10,7 +10,7 @@ func GoviewConfig() goview.Config {
 	return goview.Config{
 		Root:      "templates",
 		Extension: ".html",
-		Master:    "layouts/master",
+		Master:    "layouts/authentication",
 		Partials:  []string{},
 		Funcs: template.FuncMap{
 			"sub": func(a, b int) int {

@@ -9,7 +9,12 @@
   </head>
 
   <body>
-    {{ template "content" . }}
+    <main class="auth-main">
+      <div class="auth-main__content">
+        <img class="auth-main__image" src="dist/images/google-go.jpg">
+        {{ template "content" . }}
+      </div>
+    </main>
     <script src="dist/javascripts/index.js"></script>
   </body>
 </html>
