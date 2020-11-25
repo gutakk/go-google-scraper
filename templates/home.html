@@ -1,8 +1,11 @@
 {{ define "content" }}
 
 <h1 class="text-primary">HELLO GOLANG</h1>
-{{ range $flash := .flashes }}
-  <h2>{{ $flash }}</h2>
+{{ if .email  }}
+  <h2>Welcome {{ .email }}</h2>
+{{ else }}
+  <h2><a href="/login">Login</a></h2>
+  <h2><a href="/register">Register</a></h2>
 {{ end }}
 
 {{ end }}
