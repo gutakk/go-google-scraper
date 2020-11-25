@@ -59,7 +59,7 @@ func (r *RegisterController) register(c *gin.Context) {
 func renderRegisterWithError(c *gin.Context, status int, err error, form *RegisterForm) {
 	ginview.HTML(c, status, registerView, gin.H{
 		"title":  registerTitle,
-		"errors": err,
+		"errors": err.Error(),
 		"email":  form.Email,
 	})
 }
