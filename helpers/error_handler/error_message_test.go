@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"errors"
 	"os"
 	"testing"
 
@@ -32,65 +33,65 @@ func (m *mockFieldError) Param() string {
 	return m.param
 }
 
-func TestValidationErrorToTextForEmailTag(t *testing.T) {
+func TestValidationErrorMessageForEmailTag(t *testing.T) {
 	fieldError := &mockFieldError{tag: "email"}
-	result := ValidationErrorToText(fieldError)
+	result := ValidationErrorMessage(fieldError)
 
-	assert.Equal(t, "Invalid email format", result)
+	assert.Equal(t, errors.New("Invalid email format"), result)
 }
 
-func TestValidationErrorToTextForEqfieldTag(t *testing.T) {
+func TestValidationErrorMessageForEqfieldTag(t *testing.T) {
 	fieldError := &mockFieldError{tag: "eqfield"}
-	result := ValidationErrorToText(fieldError)
+	result := ValidationErrorMessage(fieldError)
 
-	assert.Equal(t, "Passwords do not match", result)
+	assert.Equal(t, errors.New("Passwords do not match"), result)
 }
 
-func TestValidationErrorToTextForMinTag(t *testing.T) {
+func TestValidationErrorMessageForMinTag(t *testing.T) {
 	fieldError := &mockFieldError{
 		tag:   "min",
 		field: "password",
 		param: "6",
 	}
-	result := ValidationErrorToText(fieldError)
+	result := ValidationErrorMessage(fieldError)
 
-	assert.Equal(t, "password must be longer than 6", result)
+	assert.Equal(t, errors.New("password must be longer than 6"), result)
 }
 
-func TestValidationErrorToTextForRequiredTag(t *testing.T) {
+func TestValidationErrorMessageForRequiredTag(t *testing.T) {
 	fieldError := &mockFieldError{
 		tag:   "required",
 		field: "password",
 	}
-	result := ValidationErrorToText(fieldError)
+	result := ValidationErrorMessage(fieldError)
 
-	assert.Equal(t, "password is required", result)
+	assert.Equal(t, errors.New("password is required"), result)
 }
 
-func TestValidationErrorToTextForDefaultCaseTag(t *testing.T) {
+func TestValidationErrorMessageForDefaultCaseTag(t *testing.T) {
 	fieldError := &mockFieldError{
 		tag:   "test",
 		field: "password",
 	}
-	result := ValidationErrorToText(fieldError)
+	result := ValidationErrorMessage(fieldError)
 
-	assert.Equal(t, "password is not valid", result)
+	assert.Equal(t, errors.New("password is not valid"), result)
 }
 
-func TestDatabaseErrorToTextForDuplicateEmail(t *testing.T) {
+func TestDatabaseErrorMessageForDuplicateEmail(t *testing.T) {
 	pgErr := &pgconn.PgError{Code: "23505"}
-	result := DatabaseErrorToText(pgErr)
+	result := DatabaseErrorMessage(pgErr)
 
-	assert.Equal(t, "Email already exists", result)
+	assert.Equal(t, errors.New("Email already exists"), result)
 }
 
-func TestDatabaseErrorToTextForDefaultCode(t *testing.T) {
+func TestDatabaseErrorMessageForDefaultCode(t *testing.T) {
 	pgErr := &pgconn.PgError{
 		Code:     "23506",
 		Severity: "ERROR",
 		Message:  "Test",
 	}
-	result := DatabaseErrorToText(pgErr)
+	result := DatabaseErrorMessage(pgErr)
 
-	assert.Equal(t, "ERROR: Test (SQLSTATE 23506)", result)
+	assert.Equal(t, errors.New("ERROR: Test (SQLSTATE 23506)"), result)
 }
