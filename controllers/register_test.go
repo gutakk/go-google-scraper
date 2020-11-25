@@ -30,7 +30,7 @@ func TestDisplayRegister(t *testing.T) {
 	assert.Equal(t, true, pageOK)
 }
 
-type DBTestSuite struct {
+type RegisterDbTestSuite struct {
 	suite.Suite
 	engine   *gin.Engine
 	formData url.Values
@@ -39,7 +39,7 @@ type DBTestSuite struct {
 	password string
 }
 
-func (s *DBTestSuite) SetupTest() {
+func (s *RegisterDbTestSuite) SetupTest() {
 	testDB, _ := gorm.Open(postgres.Open(tests.ConstructTestDsn()), &gorm.Config{})
 	db.GetDB = func() *gorm.DB {
 		return testDB
@@ -62,22 +62,22 @@ func (s *DBTestSuite) SetupTest() {
 	s.formData.Set("confirm-password", s.password)
 }
 
-func (s *DBTestSuite) TearDownTest() {
+func (s *RegisterDbTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM users")
 }
 
-func TestDBTestSuite(t *testing.T) {
-	suite.Run(t, new(DBTestSuite))
+func TestRegisterDbTestSuite(t *testing.T) {
+	suite.Run(t, new(RegisterDbTestSuite))
 }
 
-func (s *DBTestSuite) TestRegisterWithValidParameters() {
+func (s *RegisterDbTestSuite) TestRegisterWithValidParameters() {
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
 	assert.Equal(s.T(), http.StatusFound, response.Code)
 	assert.Equal(s.T(), "/login", response.Header().Get("Location"))
 }
 
-func (s *DBTestSuite) TestRegisterWithBlankEmailValidation() {
+func (s *RegisterDbTestSuite) TestRegisterWithBlankEmailValidation() {
 	s.formData.Del("email")
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
@@ -88,7 +88,7 @@ func (s *DBTestSuite) TestRegisterWithBlankEmailValidation() {
 	assert.Equal(s.T(), true, pageError)
 }
 
-func (s *DBTestSuite) TestRegisterWithBlankPasswordValidation() {
+func (s *RegisterDbTestSuite) TestRegisterWithBlankPasswordValidation() {
 	s.formData.Del("password")
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
@@ -101,7 +101,7 @@ func (s *DBTestSuite) TestRegisterWithBlankPasswordValidation() {
 	assert.Equal(s.T(), true, isEmailFieldValueExist)
 }
 
-func (s *DBTestSuite) TestRegisterWithPasswordNotMatchValidation() {
+func (s *RegisterDbTestSuite) TestRegisterWithPasswordNotMatchValidation() {
 	s.formData.Set("confirm-password", "invalid")
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
@@ -114,7 +114,7 @@ func (s *DBTestSuite) TestRegisterWithPasswordNotMatchValidation() {
 	assert.Equal(s.T(), true, isEmailFieldValueExist)
 }
 
-func (s *DBTestSuite) TestRegisterWithTooShortPasswordValidation() {
+func (s *RegisterDbTestSuite) TestRegisterWithTooShortPasswordValidation() {
 	s.formData.Set("password", "12345")
 	s.formData.Set("confirm-password", "12345")
 

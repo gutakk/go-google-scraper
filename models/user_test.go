@@ -28,14 +28,14 @@ func TestHashPassword(t *testing.T) {
 	assert.Equal(t, nil, result)
 }
 
-func TestCheckPasswordWithCorrectPassword(t *testing.T) {
+func TestCheckPasswordWithValidPassword(t *testing.T) {
 	hashedPassword, _ := hashPassword("password")
 	result := CheckPassword(string(hashedPassword), "password")
 
 	assert.Equal(t, nil, result)
 }
 
-func TestCheckPasswordWithIncorrectPassword(t *testing.T) {
+func TestCheckPasswordWithInvalidPassword(t *testing.T) {
 	hashedPassword, _ := hashPassword("password")
 	result := CheckPassword(string(hashedPassword), "drowssap")
 
