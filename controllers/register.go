@@ -46,7 +46,7 @@ func (r *RegisterController) register(c *gin.Context) {
 	if err := models.SaveUser(form.Email, form.Password); err != nil {
 		c.HTML(http.StatusBadRequest, "register", gin.H{
 			"title": "Register",
-			"error": errorHandler.DatabaseErrorMessage(err),
+			"error": err,
 			"email": form.Email,
 		})
 		return
