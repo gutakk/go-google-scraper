@@ -85,7 +85,7 @@ func (s *DBTestSuite) TestSaveUserWithValidParams() {
 
 func (s *DBTestSuite) TestSaveUserWithDuplicateEmail() {
 	err := SaveUser(s.email, s.password)
-	assert.NotEqual(s.T(), nil, err)
+	assert.Equal(s.T(), nil, err)
 
 	result := db.GetDB().First(&User{})
 	assert.Equal(s.T(), int64(1), result.RowsAffected)
