@@ -14,7 +14,7 @@ const (
 
 type LogoutController struct{}
 
-func (l *LogoutController) applyRoutes(engine *gin.Engine) {
+func (l *LogoutController) applyRoutes(engine *gin.RouterGroup) {
 	engine.POST("/logout", l.logout)
 }
 

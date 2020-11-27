@@ -12,8 +12,6 @@ func EnsureGuestUser(c *gin.Context) {
 
 	if userID != nil {
 		c.Redirect(http.StatusFound, "/")
-		return
+		c.Abort()
 	}
-
-	c.Next()
 }
