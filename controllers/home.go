@@ -24,8 +24,8 @@ func (h *HomeController) displayHome(c *gin.Context) {
 	}
 
 	ginview.HTML(c, http.StatusOK, "home", gin.H{
-		"title":  "Home",
-		"userID": userID,
-		"email":  user.Email,
+		"title":             "Home",
+		"authenticatedUser": userID,
+		"email":             user.Email,
 	})
 }

@@ -1,7 +1,7 @@
 {{ define "content" }}
 
 <h1 class="text-primary">HELLO GOLANG</h1>
-{{ if .userID  }}
+{{ if .authenticatedUser  }}
   <h2 class="greeting">Welcome {{ .email }}</h2>
 {{ else }}
   <h2><a href="/login">Login</a></h2>
