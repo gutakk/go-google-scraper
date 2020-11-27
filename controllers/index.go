@@ -11,7 +11,7 @@ func CombineRoutes(engine *gin.Engine) {
 	new(HomeController).applyRoutes(engine)
 
 	new(RegisterController).applyRoutes(EnsureNoAuthenticationGroup(engine))
-	new(UserSessionController).applyRoutes(EnsureNoAuthenticationGroup(engine))
+	new(LoginController).applyRoutes(EnsureNoAuthenticationGroup(engine))
 }
 
 func EnsureNoAuthenticationGroup(engine *gin.Engine) *gin.RouterGroup {

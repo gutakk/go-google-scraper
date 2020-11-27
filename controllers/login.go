@@ -19,26 +19,26 @@ const (
 	invalidUsernameOrPassword = "Username or password is invalid"
 )
 
-type UserSessionController struct{}
+type LoginController struct{}
 
 type LoginForm struct {
 	Email    string `form:"email" binding:"email,required"`
 	Password string `form:"password" binding:"required,min=6"`
 }
 
-func (us *UserSessionController) applyRoutes(engine *gin.RouterGroup) {
-	engine.GET("/login", us.displayLogin)
-	engine.POST("/login", us.login)
+func (l *LoginController) applyRoutes(engine *gin.RouterGroup) {
+	engine.GET("/login", l.displayLogin)
+	engine.POST("/login", l.login)
 }
 
-func (us *UserSessionController) displayLogin(c *gin.Context) {
+func (l *LoginController) displayLogin(c *gin.Context) {
 	ginview.HTML(c, http.StatusOK, loginView, gin.H{
 		"title":   loginTitle,
 		"notices": session.Flashes(c),
 	})
 }
 
-func (us *UserSessionController) login(c *gin.Context) {
+func (l *LoginController) login(c *gin.Context) {
 	form := &LoginForm{}
 
 	if err := c.ShouldBind(form); err != nil {

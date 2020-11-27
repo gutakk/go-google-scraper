@@ -21,7 +21,7 @@ import (
 
 func TestDisplayLogin(t *testing.T) {
 	engine := tests.GetRouter(true)
-	new(UserSessionController).applyRoutes(EnsureNoAuthenticationGroup(engine))
+	new(LoginController).applyRoutes(EnsureNoAuthenticationGroup(engine))
 
 	response := tests.PerformRequest(engine, "GET", "/login", nil, nil)
 	p, err := ioutil.ReadAll(response.Body)
@@ -31,7 +31,7 @@ func TestDisplayLogin(t *testing.T) {
 	assert.Equal(t, true, pageOK)
 }
 
-type UserSessionDbTestSuite struct {
+type LoginDbTestSuite struct {
 	suite.Suite
 	engine   *gin.Engine
 	formData url.Values
@@ -40,7 +40,7 @@ type UserSessionDbTestSuite struct {
 	password string
 }
 
-func (s *UserSessionDbTestSuite) SetupTest() {
+func (s *LoginDbTestSuite) SetupTest() {
 	testDB, _ := gorm.Open(postgres.Open(tests.ConstructTestDsn()), &gorm.Config{})
 	db.GetDB = func() *gorm.DB {
 		return testDB
@@ -49,7 +49,7 @@ func (s *UserSessionDbTestSuite) SetupTest() {
 	_ = db.GetDB().AutoMigrate(&models.User{})
 
 	s.engine = tests.GetRouter(true)
-	new(UserSessionController).applyRoutes(EnsureNoAuthenticationGroup(s.engine))
+	new(LoginController).applyRoutes(EnsureNoAuthenticationGroup(s.engine))
 
 	s.headers = http.Header{}
 	s.headers.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -65,22 +65,22 @@ func (s *UserSessionDbTestSuite) SetupTest() {
 	db.GetDB().Create(&models.User{Email: s.email, Password: string(hashedPassword)})
 }
 
-func (s *UserSessionDbTestSuite) TearDownTest() {
+func (s *LoginDbTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM users")
 }
 
-func TestUserSessionDbTestSuite(t *testing.T) {
-	suite.Run(t, new(UserSessionDbTestSuite))
+func TestLoginDbTestSuite(t *testing.T) {
+	suite.Run(t, new(LoginDbTestSuite))
 }
 
-func (s *UserSessionDbTestSuite) TestLoginWithValidParameters() {
+func (s *LoginDbTestSuite) TestLoginWithValidParameters() {
 	response := tests.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
 
 	assert.Equal(s.T(), http.StatusFound, response.Code)
 	assert.Equal(s.T(), "/", response.Header().Get("Location"))
 }
 
-func (s *UserSessionDbTestSuite) TestDisplayLoginWithUserSession() {
+func (s *LoginDbTestSuite) TestDisplayLoginWithLogin() {
 	// Cookie from login API Set-Cookie header
 	cookie := "mysession=MTYwNjI3ODk0NHxEdi1CQkFFQ180SUFBUkFCRUFBQUlmLUNBQUVHYzNSeWFXNW5EQWtBQjNWelpYSmZhV1FFZFdsdWRBWUVBUDRCR0E9PXxa_dKXde8j6m4z_kPgaiPYuDGHj79HxhCMNw3zIoeM6g=="
 	s.headers.Set("Cookie", cookie)
@@ -91,7 +91,7 @@ func (s *UserSessionDbTestSuite) TestDisplayLoginWithUserSession() {
 	assert.Equal(s.T(), "/", response.Header().Get("Location"))
 }
 
-func (s *UserSessionDbTestSuite) TestLoginWithBlankEmailValidation() {
+func (s *LoginDbTestSuite) TestLoginWithBlankEmailValidation() {
 	s.formData.Del("email")
 
 	response := tests.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
@@ -102,7 +102,7 @@ func (s *UserSessionDbTestSuite) TestLoginWithBlankEmailValidation() {
 	assert.Equal(s.T(), true, pageError)
 }
 
-func (s *UserSessionDbTestSuite) TestLoginWithBlankPasswordValidation() {
+func (s *LoginDbTestSuite) TestLoginWithBlankPasswordValidation() {
 	s.formData.Del("password")
 
 	response := tests.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
@@ -115,7 +115,7 @@ func (s *UserSessionDbTestSuite) TestLoginWithBlankPasswordValidation() {
 	assert.Equal(s.T(), true, isEmailFieldValueExist)
 }
 
-func (s *UserSessionDbTestSuite) TestLoginWithTooShortPasswordValidation() {
+func (s *LoginDbTestSuite) TestLoginWithTooShortPasswordValidation() {
 	s.formData.Set("password", "12345")
 
 	response := tests.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
@@ -128,7 +128,7 @@ func (s *UserSessionDbTestSuite) TestLoginWithTooShortPasswordValidation() {
 	assert.Equal(s.T(), true, isEmailFieldValueExist)
 }
 
-func (s *UserSessionDbTestSuite) TestLoginWithInvalidEmail() {
+func (s *LoginDbTestSuite) TestLoginWithInvalidEmail() {
 	s.formData.Set("email", "test@email.com")
 
 	response := tests.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
@@ -141,7 +141,7 @@ func (s *UserSessionDbTestSuite) TestLoginWithInvalidEmail() {
 	assert.Equal(s.T(), true, isEmailFieldValueExist)
 }
 
-func (s *UserSessionDbTestSuite) TestLoginWithInvalidPassword() {
+func (s *LoginDbTestSuite) TestLoginWithInvalidPassword() {
 	s.formData.Set("password", "123456789")
 
 	response := tests.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
