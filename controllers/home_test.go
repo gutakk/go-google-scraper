@@ -14,7 +14,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestDisplayHomeWithoutUserSession(t *testing.T) {
+func TestDisplayHomeWithGuestUser(t *testing.T) {
 	engine := tests.GetRouter(true)
 	new(HomeController).applyRoutes(engine)
 
@@ -26,7 +26,7 @@ func TestDisplayHomeWithoutUserSession(t *testing.T) {
 	assert.Equal(t, true, isHomePage)
 }
 
-func TestDisplayHomeWithUserSession(t *testing.T) {
+func TestDisplayHomeWithAuthenticatedUser(t *testing.T) {
 	testDB, _ := gorm.Open(postgres.Open(tests.ConstructTestDsn()), &gorm.Config{})
 	db.GetDB = func() *gorm.DB {
 		return testDB

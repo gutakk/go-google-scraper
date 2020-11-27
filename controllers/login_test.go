@@ -80,7 +80,7 @@ func (s *LoginDbTestSuite) TestLoginWithValidParameters() {
 	assert.Equal(s.T(), "/", response.Header().Get("Location"))
 }
 
-func (s *LoginDbTestSuite) TestDisplayLoginWithLogin() {
+func (s *LoginDbTestSuite) TestDisplayLoginWithAuthenticatedUser() {
 	// Cookie from login API Set-Cookie header
 	cookie := "mysession=MTYwNjI3ODk0NHxEdi1CQkFFQ180SUFBUkFCRUFBQUlmLUNBQUVHYzNSeWFXNW5EQWtBQjNWelpYSmZhV1FFZFdsdWRBWUVBUDRCR0E9PXxa_dKXde8j6m4z_kPgaiPYuDGHj79HxhCMNw3zIoeM6g=="
 	s.headers.Set("Cookie", cookie)

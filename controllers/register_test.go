@@ -128,7 +128,7 @@ func (s *RegisterDbTestSuite) TestRegisterWithTooShortPasswordValidation() {
 	assert.Equal(s.T(), true, isEmailFieldValueExist)
 }
 
-func (s *RegisterDbTestSuite) TestDisplayRegisterWithUserSession() {
+func (s *RegisterDbTestSuite) TestDisplayRegisterWithAuthenticatedUser() {
 	// Cookie from login API Set-Cookie header
 	cookie := "mysession=MTYwNjI3ODk0NHxEdi1CQkFFQ180SUFBUkFCRUFBQUlmLUNBQUVHYzNSeWFXNW5EQWtBQjNWelpYSmZhV1FFZFdsdWRBWUVBUDRCR0E9PXxa_dKXde8j6m4z_kPgaiPYuDGHj79HxhCMNw3zIoeM6g=="
 	s.headers.Set("Cookie", cookie)
