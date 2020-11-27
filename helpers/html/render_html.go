@@ -29,13 +29,6 @@ func RenderWithFlash(c *gin.Context, status int, view string, title string, data
 	})
 }
 
-func Render(c *gin.Context, status int, view string, title string, data map[string]interface{}) {
-	ginview.HTML(c, status, view, gin.H{
-		"title": title,
-		"data":  data,
-	})
-}
-
 func getFlashMessage(c *gin.Context) (string, interface{}) {
 	flashNotices := session.Flashes(c, FlashNoticeKey)
 	if flashNotices != nil {
