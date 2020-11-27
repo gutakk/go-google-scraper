@@ -3,10 +3,15 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-gonic/gin"
+	html "github.com/gutakk/go-google-scraper/helpers/html"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
+)
+
+const (
+	homeTitle = "Home"
+	homeView  = "home"
 )
 
 type HomeController struct{}
@@ -23,9 +28,10 @@ func (h *HomeController) displayHome(c *gin.Context) {
 		user, _ = models.FindOneUserByID(userID)
 	}
 
-	ginview.HTML(c, http.StatusOK, "home", gin.H{
-		"title":             "Home",
+	data := map[string]interface{}{
 		"authenticatedUser": userID,
 		"email":             user.Email,
-	})
+	}
+
+	html.Render(c, http.StatusOK, homeView, homeTitle, data)
 }
