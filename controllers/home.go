@@ -33,5 +33,5 @@ func (h *HomeController) displayHome(c *gin.Context) {
 		"email":             user.Email,
 	}
 
-	html.Render(c, http.StatusOK, homeView, homeTitle, data)
+	html.RenderWithFlash(c, http.StatusOK, homeView, homeTitle, data)
 }
