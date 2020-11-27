@@ -37,3 +37,9 @@ func Set(c *gin.Context, key string, value interface{}) {
 	session.Set(key, value)
 	_ = session.Save()
 }
+
+func Delete(c *gin.Context, key string) {
+	session := sessions.Default(c)
+	session.Delete(key)
+	_ = session.Save()
+}

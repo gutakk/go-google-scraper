@@ -9,6 +9,7 @@ import (
 
 func CombineRoutes(engine *gin.Engine) {
 	new(HomeController).applyRoutes(engine)
+	new(LogoutController).applyRoutes(engine)
 
 	new(RegisterController).applyRoutes(EnsureGuestUserGroup(engine))
 	new(LoginController).applyRoutes(EnsureGuestUserGroup(engine))
