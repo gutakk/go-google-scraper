@@ -5,22 +5,29 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func InitDB() {
-	_, err := gorm.Open(postgres.Open(constructDsn()), &gorm.Config{})
+var DB *gorm.DB
+
+func ConnectDB() (db *gorm.DB) {
+	db, err := gorm.Open(postgres.Open(constructDsn()), &gorm.Config{})
 
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Failed to connect to database %v", err))
 	} else {
 		log.Print("Connect to database successfully")
 	}
+
+	DB = db
+
+	return db
 }
 
 func constructDsn() string {
-	if os.Getenv("APP_ENV") == "release" {
+	if gin.Mode() == gin.ReleaseMode {
 		return os.Getenv("DATABASE_URL")
 	}
 
@@ -37,4 +44,8 @@ func constructDsn() string {
 		username,
 		password,
 	)
+}
+
+var GetDB = func() *gorm.DB {
+	return DB
 }

@@ -7,21 +7,37 @@
 * [Go - 1.15](https://golang.org/doc/go1.15)
 * [Docker](https://docs.docker.com/get-docker/)
 * [Docker Compose](https://docs.docker.com/compose/install/)
+* [NodeJS](https://nodejs.org/en/download/package-manager/)
+
+## Create necessary dot env files
+- Create `.env` file
+- Create env dependent files (depend on your env)
+  - `.env.release`
+  - `.env.debug` (for development)
+  - `.env.test`
+- Add values from `.env.example` (env dependent variables eg. `DB_NAME` must be added to each dependent env file)
 
 ## Usage
-#### Setup and boot the Docker containers
+### Start development server steps
+[**`.env` and `.env.debug` files are required**](#create-necessary-dot-env-files)
+#### Build development dependencies
+This project using `air` for hot reloading and `forego` to have nice terminal colors and process separations.
 ```sh
-make env-setup
+make build-dependencies
 ```
-
 #### Run the Go application for development
-```go
-go run main.go
-```
+  ```sh
+  make start-dev
+  ```
 To visit app locally: `localhost:8080`
 
-#### Run tests
-```go
+### Build assets
+```sh
+npm run build
+```
+
+### Run tests
+```sh
 make test
 ```
 

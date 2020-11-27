@@ -1,27 +1,18 @@
 package config
 
 import (
-	"os"
-
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
-const (
-	DevMode     = "dev"
-	ReleaseMode = "release"
-	TestMode    = "test"
-)
-
 func LoadEnv() {
-	env := os.Getenv("APP_ENV")
-
-	switch env {
-	case ReleaseMode:
-		_ = godotenv.Load(".env." + ReleaseMode)
-	case TestMode:
-		_ = godotenv.Load(".env." + TestMode)
+	switch gin.Mode() {
+	case gin.ReleaseMode:
+		_ = godotenv.Load(".env." + gin.ReleaseMode)
+	case gin.TestMode:
+		_ = godotenv.Load(".env." + gin.TestMode)
 	default:
-		_ = godotenv.Load(".env." + DevMode)
+		_ = godotenv.Load(".env." + gin.DebugMode)
 	}
 
 	_ = godotenv.Load()

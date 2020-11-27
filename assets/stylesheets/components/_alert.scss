@@ -1,0 +1,7 @@
+.alert {
+  @apply mt-8 py-2 rounded-md text-center font-semibold;
+
+  &--danger {
+    @apply bg-red-200 text-red-800;
+  }
+}

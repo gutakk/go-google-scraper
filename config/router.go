@@ -1,16 +1,20 @@
 package config
 
 import (
+	"github.com/foolin/goview/supports/ginview"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"github.com/gutakk/go-google-scraper/controllers"
 )
 
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
 
-	health := new(controllers.HealthController)
+	store := cookie.NewStore([]byte("secret"))
+	router.Use(sessions.Sessions("mysession", store))
 
-	router.GET("/health", health.Status)
+	router.HTMLRender = ginview.New(GoviewConfig())
+	router.Static("/dist", "./dist")
 
 	return router
 }

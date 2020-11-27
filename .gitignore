@@ -13,3 +13,9 @@
 
 .env*
 !.env.example
+
+node_modules
+.cache
+dist
+gin-bin
+tmp

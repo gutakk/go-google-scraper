@@ -1,0 +1,15 @@
+// Dependencies
+@import 'node_modules/tailwindcss/base';
+@import 'node_modules/tailwindcss/components';
+@import 'node_modules/tailwindcss/utilities';
+
+// Base
+@import 'base/form';
+@import 'base/button';
+@import 'base/typography';
+
+// Components
+@import 'components/alert';
+
+// Layouts
+@import 'layouts/authentication';

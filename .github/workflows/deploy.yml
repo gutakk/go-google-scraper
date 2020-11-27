@@ -50,7 +50,7 @@ jobs:
 
       - name: Docker build
         run: |
-          docker-compose pull
+          docker-compose pull || true
           docker-compose build
           docker-compose push app
 
