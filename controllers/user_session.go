@@ -54,7 +54,7 @@ func (us *UserSessionController) login(c *gin.Context) {
 		return
 	}
 
-	if err := models.CheckPassword(user.Password, form.Password); err != nil {
+	if err := models.ValidatePassword(user.Password, form.Password); err != nil {
 		renderLoginWithError(c, http.StatusUnauthorized, errors.New(invalidUsernameOrPassword), form)
 		return
 	}

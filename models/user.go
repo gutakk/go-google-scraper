@@ -46,6 +46,6 @@ func FindOneUserByID(id interface{}) (User, error) {
 	return user, result.Error
 }
 
-func CheckPassword(hashedPassword string, password string) error {
+func ValidatePassword(hashedPassword string, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }

@@ -27,16 +27,16 @@ func TestHashPassword(t *testing.T) {
 	assert.Equal(t, nil, result)
 }
 
-func TestCheckPasswordWithValidPassword(t *testing.T) {
+func TestValidatePasswordWithValidPassword(t *testing.T) {
 	hashedPassword, _ := hashPassword("password")
-	result := CheckPassword(string(hashedPassword), "password")
+	result := ValidatePassword(string(hashedPassword), "password")
 
 	assert.Equal(t, nil, result)
 }
 
-func TestCheckPasswordWithInvalidPassword(t *testing.T) {
+func TestValidatePasswordWithInvalidPassword(t *testing.T) {
 	hashedPassword, _ := hashPassword("password")
-	result := CheckPassword(string(hashedPassword), "drowssap")
+	result := ValidatePassword(string(hashedPassword), "drowssap")
 
 	assert.NotEqual(t, nil, result)
 }
