@@ -15,7 +15,7 @@ const (
 	registerTitle = "Register"
 	registerView  = "register"
 
-	registerSuccessfully = "Register successfully"
+	registerSuccessFlash = "Registration completed successfully"
 )
 
 type RegisterController struct{}
