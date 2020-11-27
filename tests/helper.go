@@ -18,7 +18,7 @@ import (
 func GetRouter(withTemplates bool) *gin.Engine {
 	router := gin.Default()
 	store := cookie.NewStore([]byte("secret"))
-	router.Use(sessions.Sessions("mysession", store))
+	router.Use(sessions.Sessions("go-google-scraper", store))
 
 	if withTemplates {
 		router.HTMLRender = ginview.New(config.AppGoviewConfig())

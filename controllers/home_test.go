@@ -39,7 +39,7 @@ func TestDisplayHomeWithAuthenticatedUser(t *testing.T) {
 
 	// Cookie from login API Set-Cookie header
 	headers := http.Header{}
-	cookie := "mysession=MTYwNjI3ODk0NHxEdi1CQkFFQ180SUFBUkFCRUFBQUlmLUNBQUVHYzNSeWFXNW5EQWtBQjNWelpYSmZhV1FFZFdsdWRBWUVBUDRCR0E9PXxa_dKXde8j6m4z_kPgaiPYuDGHj79HxhCMNw3zIoeM6g=="
+	cookie := "go-google-scraper=MTYwNjQ2Mjk3MXxEdi1CQkFFQ180SUFBUkFCRUFBQUlmLUNBQUVHYzNSeWFXNW5EQWtBQjNWelpYSmZhV1FFZFdsdWRBWUVBUDRFdFE9PXzl6APqAQw3gAQqlHoXMYrPpnqPFkEP8SRHJZEpl-_LDQ=="
 	headers.Set("Cookie", cookie)
 
 	response := tests.PerformRequest(engine, "GET", "/", headers, nil)

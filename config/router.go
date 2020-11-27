@@ -11,7 +11,7 @@ func SetupRouter() *gin.Engine {
 	router := gin.Default()
 
 	store := cookie.NewStore([]byte("secret"))
-	router.Use(sessions.Sessions("mysession", store))
+	router.Use(sessions.Sessions("go-google-scraper", store))
 
 	router.HTMLRender = ginview.New(AppGoviewConfig())
 	router.Static("/dist", "./dist")

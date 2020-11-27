@@ -130,7 +130,7 @@ func (s *RegisterDbTestSuite) TestRegisterWithTooShortPasswordValidation() {
 
 func (s *RegisterDbTestSuite) TestDisplayRegisterWithAuthenticatedUser() {
 	// Cookie from login API Set-Cookie header
-	cookie := "mysession=MTYwNjI3ODk0NHxEdi1CQkFFQ180SUFBUkFCRUFBQUlmLUNBQUVHYzNSeWFXNW5EQWtBQjNWelpYSmZhV1FFZFdsdWRBWUVBUDRCR0E9PXxa_dKXde8j6m4z_kPgaiPYuDGHj79HxhCMNw3zIoeM6g=="
+	cookie := "go-google-scraper=MTYwNjQ2Mjk3MXxEdi1CQkFFQ180SUFBUkFCRUFBQUlmLUNBQUVHYzNSeWFXNW5EQWtBQjNWelpYSmZhV1FFZFdsdWRBWUVBUDRFdFE9PXzl6APqAQw3gAQqlHoXMYrPpnqPFkEP8SRHJZEpl-_LDQ=="
 	s.headers.Set("Cookie", cookie)
 
 	response := tests.PerformRequest(s.engine, "GET", "/register", s.headers, nil)
