@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	html "github.com/gutakk/go-google-scraper/helpers/html"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
 )
@@ -57,9 +58,9 @@ func (r *RegisterController) register(c *gin.Context) {
 }
 
 func renderRegisterWithError(c *gin.Context, status int, err error, form *RegisterForm) {
-	ginview.HTML(c, status, registerView, gin.H{
-		"title":  registerTitle,
-		"errors": err.Error(),
-		"email":  form.Email,
-	})
+	data := map[string]interface{}{
+		"email": form.Email,
+	}
+
+	html.RenderWithError(c, status, registerView, registerTitle, err, data)
 }
