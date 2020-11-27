@@ -48,7 +48,7 @@ func (us *UserSessionController) login(c *gin.Context) {
 		}
 	}
 
-	user, err := models.FindOneUserByCondition(&models.User{Email: form.Email})
+	user, err := models.FindOneUserBy(&models.User{Email: form.Email})
 	if err != nil {
 		renderLoginWithError(c, http.StatusUnauthorized, errors.New(invalidUsernameOrPassword), form)
 		return
