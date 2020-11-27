@@ -18,7 +18,7 @@ func EnsureNoAuthenticationGroup(engine *gin.Engine) *gin.RouterGroup {
 	mw := ginview.NewMiddleware(config.AuthenticationGoviewConfig())
 
 	ensureNoAuthenticationGroup := engine.Group("", mw)
-	ensureNoAuthenticationGroup.Use(middlewares.EnsureNoAuthentiction)
+	ensureNoAuthenticationGroup.Use(middlewares.EnsureNoAuthentication)
 
 	return ensureNoAuthenticationGroup
 }

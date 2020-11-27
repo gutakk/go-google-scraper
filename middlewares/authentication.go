@@ -7,7 +7,7 @@ import (
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 )
 
-func EnsureNoAuthentiction(c *gin.Context) {
+func EnsureNoAuthentication(c *gin.Context) {
 	userID := session.Get(c, "user_id")
 
 	if userID != nil {
