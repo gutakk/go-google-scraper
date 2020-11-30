@@ -7,7 +7,6 @@ import (
 )
 
 const (
-	blankFileError  = "CSV file can't be blank"
 	fileFormatError = "File must be CSV format"
 	fileLengthError = "CSV file must contain between 1 to 1000 keywords"
 )
@@ -17,7 +16,7 @@ type Keyword struct {
 	Keyword string `gorm:"notNull;index"`
 }
 
-func ValidateFileFormat(fileType string) error {
+func ValidateFileType(fileType string) error {
 	if fileType != "text/csv" {
 		return errors.New(fileFormatError)
 	}
@@ -25,9 +24,7 @@ func ValidateFileFormat(fileType string) error {
 }
 
 func ValidateCSVLength(row int) error {
-	if row <= 0 {
-		return errors.New(blankFileError)
-	} else if row > 1000 {
+	if row <= 0 || row > 1000 {
 		return errors.New(fileLengthError)
 	}
 	return nil

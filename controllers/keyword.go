@@ -31,7 +31,7 @@ func (k *KeywordController) displayKeyword(c *gin.Context) {
 func (k *KeywordController) uploadKeyword(c *gin.Context) {
 	file, _ := c.FormFile("file")
 
-	if err := models.ValidateFileFormat(file.Header["Content-Type"][0]); err != nil {
+	if err := models.ValidateFileType(file.Header["Content-Type"][0]); err != nil {
 		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, err, nil)
 	}
 

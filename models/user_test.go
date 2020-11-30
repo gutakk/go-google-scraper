@@ -1,11 +1,9 @@
 package models
 
 import (
-	"os"
 	"testing"
 
 	"github.com/bxcodec/faker/v3"
-	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/tests"
 	"github.com/stretchr/testify/suite"
@@ -14,11 +12,6 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
-
-func TestMain(m *testing.M) {
-	gin.SetMode(gin.TestMode)
-	os.Exit(m.Run())
-}
 
 func TestHashPassword(t *testing.T) {
 	hashedPassword, _ := hashPassword("password")
