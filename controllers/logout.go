@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	html "github.com/gutakk/go-google-scraper/helpers/html"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 )
 
@@ -21,6 +20,6 @@ func (l *LogoutController) applyRoutes(engine *gin.RouterGroup) {
 func (l *LogoutController) logout(c *gin.Context) {
 	session.Delete(c, "user_id")
 
-	session.AddFlash(c, logoutSuccessFlash, html.FlashNoticeKey)
+	session.AddFlash(c, logoutSuccessFlash, "notice")
 	c.Redirect(http.StatusFound, "/")
 }
