@@ -25,7 +25,7 @@ func (h *HomeController) displayHome(c *gin.Context) {
 
 	var user models.User
 	if userID != nil {
-		user, _ = models.FindOneUserByID(userID)
+		user, _ = models.FindUserByID(userID)
 	}
 
 	data := map[string]interface{}{
