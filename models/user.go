@@ -32,14 +32,14 @@ func SaveUser(email string, password string) error {
 	return nil
 }
 
-func FindOneUserBy(condition interface{}) (User, error) {
+func FindUserBy(condition interface{}) (User, error) {
 	user := User{}
 	result := db.GetDB().Where(condition).First(&user)
 
 	return user, result.Error
 }
 
-func FindOneUserByID(id interface{}) (User, error) {
+func FindUserByID(id interface{}) (User, error) {
 	user := User{}
 	result := db.GetDB().First(&user, id)
 
