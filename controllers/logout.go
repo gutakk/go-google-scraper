@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	logoutSuccessFlash = "You've been logged out"
+	logoutSuccessFlash = "You have been logged out"
 )
 
 type LogoutController struct{}
