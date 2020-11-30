@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/csv"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -31,23 +30,25 @@ func (k *KeywordController) displayKeyword(c *gin.Context) {
 func (k *KeywordController) uploadKeyword(c *gin.Context) {
 	file, _ := c.FormFile("file")
 
+	// Validate if file is CSV type
 	if err := models.ValidateFileType(file.Header["Content-Type"][0]); err != nil {
 		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, err, nil)
 	}
 
 	filename := "dist/" + filepath.Base(file.Filename)
 	_ = c.SaveUploadedFile(file, filename)
-
 	csvfile, _ := os.Open(filename)
-
 	r := csv.NewReader(csvfile)
 	record, _ := r.ReadAll()
+
+	// Validate if CSV has row between 1 and 1,000
 	if err := models.ValidateCSVLength(len(record)); err != nil {
 		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, err, nil)
 	}
 
-	for i, v := range record {
-		log.Printf("################## %v", i)
-		log.Printf("################## %v", v[0])
+	// Save keywords to database
+	_, err := models.SaveKeywords(record)
+	if err != nil {
+		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, err, nil)
 	}
 }

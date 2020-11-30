@@ -3,6 +3,8 @@ package models
 import (
 	"errors"
 
+	"github.com/gutakk/go-google-scraper/db"
+	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"gorm.io/gorm"
 )
 
@@ -28,4 +30,20 @@ func ValidateCSVLength(row int) error {
 		return errors.New(fileLengthError)
 	}
 	return nil
+}
+
+func SaveKeywords(record [][]string) ([]Keyword, error) {
+	var keywords = []Keyword{}
+
+	// Create bulk data
+	for _, v := range record {
+		keywords = append(keywords, Keyword{Keyword: v[0]})
+	}
+
+	// Insert bulk data
+	if result := db.GetDB().Create(&keywords); result.Error != nil {
+		return nil, errorHandler.DatabaseErrorMessage(result.Error)
+	}
+
+	return keywords, nil
 }
