@@ -1,7 +1,15 @@
-{{ if .notices }}
+{{ if .flashNotices }}
   <div class="alert alert--success">
-    {{ range $notice := .notices }}
+    {{ range $notice := .flashNotices }}
       {{ $notice }}
+    {{ end }}
+  </div>
+{{ end }}
+
+{{ if .flashErrors }}
+  <div class="alert alert--danger">
+    {{ range $error := .flashErrors }}
+      {{ $error }}
     {{ end }}
   </div>
 {{ end }}

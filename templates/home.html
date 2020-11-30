@@ -1,7 +1,7 @@
 {{ define "content" }}
 
 <h1 class="text-primary">HELLO GOLANG</h1>
-{{ if .data.authenticatedUser  }}
+{{ if .data.authenticatedUser }}
   <h2 class="greeting">Welcome {{ .data.email }}</h2>
   <form class="mt-8 space-y-6" action="/logout" method="POST">
     <button type="submit">Logout</button>

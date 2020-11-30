@@ -9,15 +9,15 @@ const (
 	sessionTimeoutInSec = 60 * 60 * 24 // 24 hours
 )
 
-func AddFlash(c *gin.Context, value interface{}) {
+func AddFlash(c *gin.Context, value interface{}, key string) {
 	session := sessions.Default(c)
-	session.AddFlash(value)
+	session.AddFlash(value, key)
 	_ = session.Save()
 }
 
-func Flashes(c *gin.Context) []interface{} {
+func Flashes(c *gin.Context, key string) []interface{} {
 	session := sessions.Default(c)
-	flashes := session.Flashes()
+	flashes := session.Flashes(key)
 	_ = session.Save()
 
 	return flashes

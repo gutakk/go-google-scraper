@@ -50,7 +50,7 @@ func (r *RegisterController) register(c *gin.Context) {
 		return
 	}
 
-	session.AddFlash(c, registerSuccessFlash)
+	session.AddFlash(c, registerSuccessFlash, html.FlashNoticeKey)
 	c.Redirect(http.StatusFound, "/login")
 }
 
