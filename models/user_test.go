@@ -116,7 +116,7 @@ func (s *DBTestSuite) TestFindOneUserByConditionWithValidParams() {
 	assert.Equal(s.T(), s.email, user.Email)
 }
 
-func (s *DBTestSuite) TestFindOneUserByConditionWithInvalidParams() {
+func (s *DBTestSuite) TestFindOneUserByConditionWithInvalidEmail() {
 	user, err := FindOneUserBy(&User{Email: "test"})
 
 	assert.NotEqual(s.T(), nil, err)
