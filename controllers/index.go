@@ -10,6 +10,7 @@ import (
 func CombineRoutes(engine *gin.Engine) {
 	// No group
 	new(HomeController).applyRoutes(engine)
+	new(KeywordController).applyRoutes(engine)
 
 	// Ensure authenticated user group
 	new(LogoutController).applyRoutes(EnsureAuthenticatedUserGroup(engine))
