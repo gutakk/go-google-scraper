@@ -14,4 +14,10 @@ func Migrate(db *gorm.DB) {
 	} else {
 		log.Print("Migrate user schema successfully")
 	}
+
+	if err := db.AutoMigrate(&models.Keyword{}); err != nil {
+		log.Fatal(fmt.Sprintf("Failed to migrate %v", err))
+	} else {
+		log.Print("Migrate keyword schema successfully")
+	}
 }

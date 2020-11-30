@@ -30,7 +30,6 @@ func (k *KeywordController) displayKeyword(c *gin.Context) {
 func (k *KeywordController) uploadKeyword(c *gin.Context) {
 	file, _ := c.FormFile("file")
 	filename := "dist/" + filepath.Base(file.Filename)
-
 	_ = c.SaveUploadedFile(file, filename)
 
 	csvfile, _ := os.Open(filename)
