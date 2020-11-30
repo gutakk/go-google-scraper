@@ -5,6 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	sessionTimeoutInSec = 60 * 60 * 24 // 24 hours
+)
+
 func AddFlash(c *gin.Context, value interface{}) {
 	session := sessions.Default(c)
 	session.AddFlash(value)
@@ -27,7 +31,7 @@ func Get(c *gin.Context, key string) interface{} {
 func Set(c *gin.Context, key string, value interface{}) {
 	session := sessions.Default(c)
 	session.Options(sessions.Options{
-		MaxAge: 3600 * 24, // 24 hours
+		MaxAge: sessionTimeoutInSec,
 	})
 
 	session.Set(key, value)
