@@ -23,7 +23,7 @@ type UploadFileForm struct {
 	File *multipart.FileHeader `form:"file" binding:"required"`
 }
 
-func (k *KeywordController) applyRoutes(engine *gin.Engine) {
+func (k *KeywordController) applyRoutes(engine *gin.RouterGroup) {
 	engine.GET("/keyword", k.displayKeyword)
 	engine.POST("/keyword", k.uploadKeyword)
 }
