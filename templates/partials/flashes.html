@@ -1,3 +1,9 @@
+{{ if .notice }}
+  <div class="alert alert--success">
+    {{ .notice }}
+  </div>
+{{ end }}
+
 {{ if .noticeFlashes }}
   <div class="alert alert--success">
     {{ range $notice := .noticeFlashes }}

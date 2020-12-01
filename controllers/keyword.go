@@ -68,4 +68,6 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, err, nil)
 		return
 	}
+
+	html.RenderWithNotice(c, http.StatusOK, keywordView, keywordTitle, "Upload file successfully", nil)
 }
