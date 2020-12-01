@@ -1,8 +1,13 @@
 package models
 
 import (
+	"encoding/csv"
 	"errors"
+	"mime/multipart"
+	"os"
+	"path/filepath"
 
+	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/db"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"gorm.io/gorm"
@@ -17,6 +22,15 @@ const (
 type Keyword struct {
 	gorm.Model
 	Keyword string `gorm:"notNull;index"`
+}
+
+func UploadFile(c *gin.Context, file *multipart.FileHeader) [][]string {
+	filename := "dist/" + filepath.Base(file.Filename)
+	_ = c.SaveUploadedFile(file, filename)
+	csvfile, _ := os.Open(filename)
+	r := csv.NewReader(csvfile)
+	record, _ := r.ReadAll()
+	return record
 }
 
 func ValidateFileType(fileType string) error {

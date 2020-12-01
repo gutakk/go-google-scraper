@@ -1,11 +1,8 @@
 package controllers
 
 import (
-	"encoding/csv"
 	"mime/multipart"
 	"net/http"
-	"os"
-	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -49,11 +46,7 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 		return
 	}
 
-	filename := "dist/" + filepath.Base(form.File.Filename)
-	_ = c.SaveUploadedFile(form.File, filename)
-	csvfile, _ := os.Open(filename)
-	r := csv.NewReader(csvfile)
-	record, _ := r.ReadAll()
+	record := models.UploadFile(c, form.File)
 
 	// Validate if CSV has row between 1 and 1,000
 	if err := models.ValidateCSVLength(len(record)); err != nil {
