@@ -41,12 +41,6 @@ func TestValidateCSVLengthWithZeroRow(t *testing.T) {
 	assert.Equal(t, "CSV file must contain between 1 to 1000 keywords", result.Error())
 }
 
-func TestValidateCSVLengthWithMinusOneRow(t *testing.T) {
-	result := ValidateCSVLength(-1)
-
-	assert.Equal(t, "CSV file must contain between 1 to 1000 keywords", result.Error())
-}
-
 func TestValidateCSVLengthWithOneThoudsandOneRow(t *testing.T) {
 	result := ValidateCSVLength(1001)
 
