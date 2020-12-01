@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/csv"
 	"errors"
+	"log"
 	"mime/multipart"
 	"os"
 	"path/filepath"
@@ -31,7 +32,8 @@ func UploadFile(c *gin.Context, file *multipart.FileHeader) [][]string {
 	_ = c.SaveUploadedFile(file, filename)
 	csvfile, _ := os.Open(filename)
 	r := csv.NewReader(csvfile)
-	record, _ := r.ReadAll()
+	record, err := r.ReadAll()
+	log.Printf("((((((((((((((((((((((((((((((( %v", err)
 	return record
 }
 
