@@ -23,13 +23,13 @@ func TestValidateFileTypeWithInvalidFileType(t *testing.T) {
 	assert.Equal(t, "File must be CSV format", result.Error())
 }
 
-func TestValidateCSVLengthWithOneRow(t *testing.T) {
+func TestValidateCSVLengthWithMinRowAllowed(t *testing.T) {
 	result := ValidateCSVLength(1)
 
 	assert.Equal(t, nil, result)
 }
 
-func TestValidateCSVLengthWithOneThoudsandRow(t *testing.T) {
+func TestValidateCSVLengthWithMaxRowAllowed(t *testing.T) {
 	result := ValidateCSVLength(1000)
 
 	assert.Equal(t, nil, result)
@@ -41,7 +41,7 @@ func TestValidateCSVLengthWithZeroRow(t *testing.T) {
 	assert.Equal(t, "CSV file must contain between 1 to 1000 keywords", result.Error())
 }
 
-func TestValidateCSVLengthWithOneThoudsandOneRow(t *testing.T) {
+func TestValidateCSVLengthWithGreaterThanMaxRowAllowed(t *testing.T) {
 	result := ValidateCSVLength(1001)
 
 	assert.Equal(t, "CSV file must contain between 1 to 1000 keywords", result.Error())
