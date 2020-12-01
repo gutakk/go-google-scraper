@@ -38,6 +38,7 @@ func (s *LogoutTestSuite) TestLogoutWithAuthenticatedUser() {
 func (s *LogoutTestSuite) TestLogoutWithGuestUser() {
 	response := tests.PerformRequest(s.engine, "POST", "/logout", nil, nil)
 
+	// TODO: Research the flash messge assertion solution
 	assert.Equal(s.T(), http.StatusFound, response.Code)
 	assert.Equal(s.T(), "/login", response.Header().Get("Location"))
 }
