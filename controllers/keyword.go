@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"mime/multipart"
 	"net/http"
 
@@ -50,6 +51,8 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 	}
 
 	record := models.UploadFile(c, form.File)
+	log.Printf("^^^^^^^^^^^^^^^^^^^^^^^^^ %v", form.File)
+	log.Printf("^^^^^^^^^^^^^^^^^^^^^^^^^ %v", record)
 
 	// Validate if CSV has row between 1 and 1,000
 	if err := models.ValidateCSVLength(len(record)); err != nil {
