@@ -120,6 +120,7 @@ func (s *KeywordDbTestSuite) TestUploadKeywordWithValidParams() {
 	headers.Set("Cookie", s.cookie)
 
 	response := performRequest(s.engine, "POST", "/keyword", headers, payload)
+	log.Printf("******************** %v", response)
 
 	p, err := ioutil.ReadAll(response.Body)
 	isKeywordPage := err == nil && strings.Index(string(p), "<title>Keyword</title>") > 0
