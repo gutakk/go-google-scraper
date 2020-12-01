@@ -1,23 +1,23 @@
 {{ define "content" }}
 
-<h2 class="auth-main__title">
-  Login to your account
-</h2>
+  <h2 class="auth-main__title">
+    Login to your account
+  </h2>
 
-{{ include "partials/flashes"}}
+  {{ include "partials/flashes"}}
 
-<form class="mt-8 space-y-6" action="/login" method="POST">
-  <input name="email" type="email" required placeholder="Email address" value={{.data.email}}>
-  <input name="password" type="password" required placeholder="Password">
+  <form class="mt-8 space-y-6" action="/login" method="POST">
+    <input name="email" type="email" required placeholder="Email address" value={{.data.email}}>
+    <input name="password" type="password" required placeholder="Password">
 
-  <button type="submit">
-    Login
-  </button>
-</form>
+    <button type="submit">
+      Login
+    </button>
+  </form>
 
-<p class="auth-main__content--small">
-  Do not have an account yet?
-  <a href="/register">Register for free</a>
-</p>
+  <p class="auth-main__content--small">
+    Do not have an account yet?
+    <a href="/register">Register for free</a>
+  </p>
 
 {{ end }}
