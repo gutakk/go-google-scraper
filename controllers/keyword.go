@@ -2,11 +2,14 @@ package controllers
 
 import (
 	"encoding/csv"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	html "github.com/gutakk/go-google-scraper/helpers/html"
 	"github.com/gutakk/go-google-scraper/models"
 )
@@ -18,6 +21,10 @@ const (
 
 type KeywordController struct{}
 
+type UploadFileForm struct {
+	File *multipart.FileHeader `form:"file" binding:"required"`
+}
+
 func (k *KeywordController) applyRoutes(engine *gin.Engine) {
 	engine.GET("/keyword", k.displayKeyword)
 	engine.POST("/keyword", k.uploadKeyword)
@@ -28,16 +35,22 @@ func (k *KeywordController) displayKeyword(c *gin.Context) {
 }
 
 func (k *KeywordController) uploadKeyword(c *gin.Context) {
-	file, _ := c.FormFile("file")
+	form := &UploadFileForm{}
+	if err := c.ShouldBind(form); err != nil {
+		for _, fieldErr := range err.(validator.ValidationErrors) {
+			html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, errorHandler.ValidationErrorMessage(fieldErr), nil)
+			return
+		}
+	}
 
 	// Validate if file is CSV type
-	if err := models.ValidateFileType(file.Header["Content-Type"][0]); err != nil {
+	if err := models.ValidateFileType(form.File.Header["Content-Type"][0]); err != nil {
 		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, err, nil)
 		return
 	}
 
-	filename := "dist/" + filepath.Base(file.Filename)
-	_ = c.SaveUploadedFile(file, filename)
+	filename := "dist/" + filepath.Base(form.File.Filename)
+	_ = c.SaveUploadedFile(form.File, filename)
 	csvfile, _ := os.Open(filename)
 	r := csv.NewReader(csvfile)
 	record, _ := r.ReadAll()
