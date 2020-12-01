@@ -6,11 +6,19 @@ import (
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 )
 
-func RenderWithError(c *gin.Context, status int, view string, title string, err error, data map[string]interface{}) {
+func RenderWithNotice(c *gin.Context, status int, view string, title string, notice string, data map[string]interface{}) {
 	ginview.HTML(c, status, view, gin.H{
 		"title":  title,
-		"errors": err.Error(),
+		"notice": notice,
 		"data":   data,
+	})
+}
+
+func RenderWithError(c *gin.Context, status int, view string, title string, err error, data map[string]interface{}) {
+	ginview.HTML(c, status, view, gin.H{
+		"title": title,
+		"error": err.Error(),
+		"data":  data,
 	})
 }
 
