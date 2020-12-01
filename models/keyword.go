@@ -28,6 +28,7 @@ type Keyword struct {
 }
 
 func UploadFile(c *gin.Context, file *multipart.FileHeader) [][]string {
+	_ = os.Mkdir("dist/", 0755)
 	filename := "dist/" + filepath.Base(file.Filename)
 	_ = c.SaveUploadedFile(file, filename)
 	csvfile, _ := os.Open(filename)
