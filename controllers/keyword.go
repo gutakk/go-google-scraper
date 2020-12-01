@@ -15,6 +15,8 @@ import (
 const (
 	keywordTitle = "Keyword"
 	keywordView  = "keyword"
+
+	uploadSuccessFlash = "CSV uploaded successfully"
 )
 
 type KeywordController struct{}
@@ -69,5 +71,5 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 		return
 	}
 
-	html.RenderWithNotice(c, http.StatusOK, keywordView, keywordTitle, "Upload file successfully", nil)
+	html.RenderWithNotice(c, http.StatusOK, keywordView, keywordTitle, uploadSuccessFlash, nil)
 }
