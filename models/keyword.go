@@ -36,15 +36,15 @@ func ValidateCSVLength(row int) error {
 func SaveKeywords(record [][]string) ([]Keyword, error) {
 	var keywords = []Keyword{}
 
-	// Check if record more than 0
-	if len(record) <= 0 {
+	// Check if record is empty slice
+	if len(record) == 0 {
 		return nil, errors.New(invalidDataError)
 	}
 
 	// Create bulk data
 	for _, v := range record {
 		// Check if nested slice is empty slice
-		if len(v) <= 0 {
+		if len(v) == 0 {
 			return nil, errors.New(invalidDataError)
 		}
 		keywords = append(keywords, Keyword{Keyword: v[0]})
