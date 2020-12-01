@@ -33,6 +33,7 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 	// Validate if file is CSV type
 	if err := models.ValidateFileType(file.Header["Content-Type"][0]); err != nil {
 		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, err, nil)
+		return
 	}
 
 	filename := "dist/" + filepath.Base(file.Filename)
@@ -44,11 +45,13 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 	// Validate if CSV has row between 1 and 1,000
 	if err := models.ValidateCSVLength(len(record)); err != nil {
 		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, err, nil)
+		return
 	}
 
 	// Save keywords to database
 	_, err := models.SaveKeywords(record)
 	if err != nil {
 		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, err, nil)
+		return
 	}
 }
