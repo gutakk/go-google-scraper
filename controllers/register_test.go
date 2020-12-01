@@ -18,18 +18,6 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestDisplayRegister(t *testing.T) {
-	engine := tests.GetRouter(true)
-	new(RegisterController).applyRoutes(EnsureGuestUserGroup(engine))
-
-	response := tests.PerformRequest(engine, "GET", "/register", nil, nil)
-	p, err := ioutil.ReadAll(response.Body)
-	pageOK := err == nil && strings.Index(string(p), "<title>Register</title>") > 0
-
-	assert.Equal(t, http.StatusOK, response.Code)
-	assert.Equal(t, true, pageOK)
-}
-
 type RegisterDbTestSuite struct {
 	suite.Suite
 	engine   *gin.Engine
@@ -137,4 +125,16 @@ func (s *RegisterDbTestSuite) TestDisplayRegisterWithAuthenticatedUser() {
 
 	assert.Equal(s.T(), http.StatusFound, response.Code)
 	assert.Equal(s.T(), "/", response.Header().Get("Location"))
+}
+
+func TestDisplayRegister(t *testing.T) {
+	engine := tests.GetRouter(true)
+	new(RegisterController).applyRoutes(EnsureGuestUserGroup(engine))
+
+	response := tests.PerformRequest(engine, "GET", "/register", nil, nil)
+	p, err := ioutil.ReadAll(response.Body)
+	pageOK := err == nil && strings.Index(string(p), "<title>Register</title>") > 0
+
+	assert.Equal(t, http.StatusOK, response.Code)
+	assert.Equal(t, true, pageOK)
 }

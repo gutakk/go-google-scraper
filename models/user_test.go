@@ -13,27 +13,6 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestHashPassword(t *testing.T) {
-	hashedPassword, _ := hashPassword("password")
-	result := bcrypt.CompareHashAndPassword(hashedPassword, []byte("password"))
-
-	assert.Equal(t, nil, result)
-}
-
-func TestValidatePasswordWithValidPassword(t *testing.T) {
-	hashedPassword, _ := hashPassword("password")
-	result := ValidatePassword(string(hashedPassword), "password")
-
-	assert.Equal(t, nil, result)
-}
-
-func TestValidatePasswordWithInvalidPassword(t *testing.T) {
-	hashedPassword, _ := hashPassword("password")
-	result := ValidatePassword(string(hashedPassword), "drowssap")
-
-	assert.NotEqual(t, nil, result)
-}
-
 type UserDBTestSuite struct {
 	suite.Suite
 	userID   uint
@@ -128,4 +107,25 @@ func (s *UserDBTestSuite) TestFindUserByIDWithInvalidID() {
 
 	assert.NotEqual(s.T(), nil, err)
 	assert.Equal(s.T(), &User{}, user)
+}
+
+func TestHashPassword(t *testing.T) {
+	hashedPassword, _ := hashPassword("password")
+	result := bcrypt.CompareHashAndPassword(hashedPassword, []byte("password"))
+
+	assert.Equal(t, nil, result)
+}
+
+func TestValidatePasswordWithValidPassword(t *testing.T) {
+	hashedPassword, _ := hashPassword("password")
+	result := ValidatePassword(string(hashedPassword), "password")
+
+	assert.Equal(t, nil, result)
+}
+
+func TestValidatePasswordWithInvalidPassword(t *testing.T) {
+	hashedPassword, _ := hashPassword("password")
+	result := ValidatePassword(string(hashedPassword), "drowssap")
+
+	assert.NotEqual(t, nil, result)
 }

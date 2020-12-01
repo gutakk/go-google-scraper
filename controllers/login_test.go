@@ -19,18 +19,6 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestDisplayLogin(t *testing.T) {
-	engine := tests.GetRouter(true)
-	new(LoginController).applyRoutes(EnsureGuestUserGroup(engine))
-
-	response := tests.PerformRequest(engine, "GET", "/login", nil, nil)
-	p, err := ioutil.ReadAll(response.Body)
-	pageOK := err == nil && strings.Index(string(p), "<title>Login</title>") > 0
-
-	assert.Equal(t, http.StatusOK, response.Code)
-	assert.Equal(t, true, pageOK)
-}
-
 type LoginDbTestSuite struct {
 	suite.Suite
 	engine   *gin.Engine
@@ -152,4 +140,16 @@ func (s *LoginDbTestSuite) TestLoginWithInvalidPassword() {
 	assert.Equal(s.T(), http.StatusUnauthorized, response.Code)
 	assert.Equal(s.T(), true, pageError)
 	assert.Equal(s.T(), true, isEmailFieldValueExist)
+}
+
+func TestDisplayLogin(t *testing.T) {
+	engine := tests.GetRouter(true)
+	new(LoginController).applyRoutes(EnsureGuestUserGroup(engine))
+
+	response := tests.PerformRequest(engine, "GET", "/login", nil, nil)
+	p, err := ioutil.ReadAll(response.Body)
+	pageOK := err == nil && strings.Index(string(p), "<title>Login</title>") > 0
+
+	assert.Equal(t, http.StatusOK, response.Code)
+	assert.Equal(t, true, pageOK)
 }

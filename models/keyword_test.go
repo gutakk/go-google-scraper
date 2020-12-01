@@ -13,42 +13,6 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestValidateFileTypeWithValidFileType(t *testing.T) {
-	result := ValidateFileType("text/csv")
-
-	assert.Equal(t, nil, result)
-}
-
-func TestValidateFileTypeWithInvalidFileType(t *testing.T) {
-	result := ValidateFileType("test")
-
-	assert.Equal(t, "File must be CSV format", result.Error())
-}
-
-func TestValidateCSVLengthWithMinRowAllowed(t *testing.T) {
-	result := ValidateCSVLength(1)
-
-	assert.Equal(t, nil, result)
-}
-
-func TestValidateCSVLengthWithMaxRowAllowed(t *testing.T) {
-	result := ValidateCSVLength(1000)
-
-	assert.Equal(t, nil, result)
-}
-
-func TestValidateCSVLengthWithZeroRow(t *testing.T) {
-	result := ValidateCSVLength(0)
-
-	assert.Equal(t, "CSV file must contain between 1 to 1000 keywords", result.Error())
-}
-
-func TestValidateCSVLengthWithGreaterThanMaxRowAllowed(t *testing.T) {
-	result := ValidateCSVLength(1001)
-
-	assert.Equal(t, "CSV file must contain between 1 to 1000 keywords", result.Error())
-}
-
 type KeywordDBTestSuite struct {
 	suite.Suite
 	userID uint
@@ -131,4 +95,40 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidUserID() {
 
 	assert.Equal(s.T(), "Something went wrong, please try again", err.Error())
 	assert.Equal(s.T(), nil, result)
+}
+
+func TestValidateFileTypeWithValidFileType(t *testing.T) {
+	result := ValidateFileType("text/csv")
+
+	assert.Equal(t, nil, result)
+}
+
+func TestValidateFileTypeWithInvalidFileType(t *testing.T) {
+	result := ValidateFileType("test")
+
+	assert.Equal(t, "File must be CSV format", result.Error())
+}
+
+func TestValidateCSVLengthWithMinRowAllowed(t *testing.T) {
+	result := ValidateCSVLength(1)
+
+	assert.Equal(t, nil, result)
+}
+
+func TestValidateCSVLengthWithMaxRowAllowed(t *testing.T) {
+	result := ValidateCSVLength(1000)
+
+	assert.Equal(t, nil, result)
+}
+
+func TestValidateCSVLengthWithZeroRow(t *testing.T) {
+	result := ValidateCSVLength(0)
+
+	assert.Equal(t, "CSV file must contain between 1 to 1000 keywords", result.Error())
+}
+
+func TestValidateCSVLengthWithGreaterThanMaxRowAllowed(t *testing.T) {
+	result := ValidateCSVLength(1001)
+
+	assert.Equal(t, "CSV file must contain between 1 to 1000 keywords", result.Error())
 }
