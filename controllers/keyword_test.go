@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -37,10 +36,7 @@ func createFormFile(w *multipart.Writer, fieldname, filename string) (io.Writer,
 
 func createMultipartPayload(filename string) (http.Header, *bytes.Buffer) {
 	path := filename
-	file, err := os.Open(path)
-	log.Printf("##################### %v", file)
-	log.Printf("&&&&&&&&&&&&&&&&&&&&& %v", err)
-
+	file, _ := os.Open(path)
 	defer file.Close()
 
 	body := &bytes.Buffer{}
@@ -112,15 +108,10 @@ func TestKeywordDbTestSuite(t *testing.T) {
 }
 
 func (s *KeywordDbTestSuite) TestUploadKeywordWithValidParams() {
-	curPath, _ := os.Getwd()
-	log.Printf("===================== %v", curPath)
-
 	headers, payload := createMultipartPayload("tests/csv/adword_keywords.csv")
-	log.Printf("@@@@@@@@@@@@@@@@@@@@@ %v", payload)
 	headers.Set("Cookie", s.cookie)
 
 	response := performRequest(s.engine, "POST", "/keyword", headers, payload)
-	log.Printf("******************** %v", response)
 
 	p, err := ioutil.ReadAll(response.Body)
 	isKeywordPage := err == nil && strings.Index(string(p), "<title>Keyword</title>") > 0
