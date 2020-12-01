@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	fileFormatError = "File must be CSV format"
-	fileLengthError = "CSV file must contain between 1 to 1000 keywords"
+	fileFormatError  = "File must be CSV format"
+	fileLengthError  = "CSV file must contain between 1 to 1000 keywords"
+	invalidDataError = "Invalid data"
 )
 
 type Keyword struct {
@@ -35,8 +36,17 @@ func ValidateCSVLength(row int) error {
 func SaveKeywords(record [][]string) ([]Keyword, error) {
 	var keywords = []Keyword{}
 
+	// Check if record more than 0
+	if len(record) <= 0 {
+		return nil, errors.New(invalidDataError)
+	}
+
 	// Create bulk data
 	for _, v := range record {
+		// Check if nested slice is empty slice
+		if len(v) <= 0 {
+			return nil, errors.New(invalidDataError)
+		}
 		keywords = append(keywords, Keyword{Keyword: v[0]})
 	}
 
