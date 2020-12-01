@@ -6,8 +6,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	html "github.com/gutakk/go-google-scraper/helpers/html"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
+)
+
+const (
+	registerTitle = "Register"
+	registerView  = "register"
+
+	registerSuccessFlash = "Registration completed successfully"
 )
 
 type RegisterController struct{}
@@ -18,15 +26,13 @@ type RegisterForm struct {
 	ConfirmPassword string `form:"confirm-password" binding:"eqfield=Password,required"`
 }
 
-func (r *RegisterController) applyRoutes(engine *gin.Engine) {
+func (r *RegisterController) applyRoutes(engine *gin.RouterGroup) {
 	engine.GET("/register", r.displayRegister)
 	engine.POST("/register", r.register)
 }
 
 func (r *RegisterController) displayRegister(c *gin.Context) {
-	c.HTML(http.StatusOK, "register", gin.H{
-		"title": "Register",
-	})
+	html.Render(c, http.StatusOK, registerView, registerTitle, nil)
 }
 
 func (r *RegisterController) register(c *gin.Context) {
@@ -34,24 +40,24 @@ func (r *RegisterController) register(c *gin.Context) {
 
 	if err := c.ShouldBind(form); err != nil {
 		for _, fieldErr := range err.(validator.ValidationErrors) {
-			c.HTML(http.StatusBadRequest, "register", gin.H{
-				"title": "Register",
-				"error": errorHandler.ValidationErrorMessage(fieldErr).Error(),
-				"email": form.Email,
-			})
+			renderRegisterWithError(c, http.StatusBadRequest, errorHandler.ValidationErrorMessage(fieldErr), form)
 			return
 		}
 	}
 
 	if err := models.SaveUser(form.Email, form.Password); err != nil {
-		c.HTML(http.StatusBadRequest, "register", gin.H{
-			"title": "Register",
-			"error": err.Error(),
-			"email": form.Email,
-		})
+		renderRegisterWithError(c, http.StatusBadRequest, err, form)
 		return
 	}
 
-	session.AddFlash(c, "Register successfully")
-	c.Redirect(http.StatusFound, "/")
+	session.AddFlash(c, registerSuccessFlash)
+	c.Redirect(http.StatusFound, "/login")
+}
+
+func renderRegisterWithError(c *gin.Context, status int, err error, form *RegisterForm) {
+	data := map[string]interface{}{
+		"email": form.Email,
+	}
+
+	html.RenderWithError(c, status, registerView, registerTitle, err, data)
 }

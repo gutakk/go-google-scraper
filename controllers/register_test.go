@@ -20,7 +20,7 @@ import (
 
 func TestDisplayRegister(t *testing.T) {
 	engine := tests.GetRouter(true)
-	new(RegisterController).applyRoutes(engine)
+	new(RegisterController).applyRoutes(EnsureGuestUserGroup(engine))
 
 	response := tests.PerformRequest(engine, "GET", "/register", nil, nil)
 	p, err := ioutil.ReadAll(response.Body)
@@ -30,7 +30,7 @@ func TestDisplayRegister(t *testing.T) {
 	assert.Equal(t, true, pageOK)
 }
 
-type DBTestSuite struct {
+type RegisterDbTestSuite struct {
 	suite.Suite
 	engine   *gin.Engine
 	formData url.Values
@@ -39,7 +39,7 @@ type DBTestSuite struct {
 	password string
 }
 
-func (s *DBTestSuite) SetupTest() {
+func (s *RegisterDbTestSuite) SetupTest() {
 	testDB, _ := gorm.Open(postgres.Open(tests.ConstructTestDsn()), &gorm.Config{})
 	db.GetDB = func() *gorm.DB {
 		return testDB
@@ -48,8 +48,7 @@ func (s *DBTestSuite) SetupTest() {
 	_ = db.GetDB().AutoMigrate(&models.User{})
 
 	s.engine = tests.GetRouter(true)
-	registerController := &RegisterController{}
-	registerController.applyRoutes(s.engine)
+	new(RegisterController).applyRoutes(EnsureGuestUserGroup(s.engine))
 
 	s.headers = http.Header{}
 	s.headers.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -63,22 +62,22 @@ func (s *DBTestSuite) SetupTest() {
 	s.formData.Set("confirm-password", s.password)
 }
 
-func (s *DBTestSuite) TearDownTest() {
+func (s *RegisterDbTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM users")
 }
 
-func TestDBTestSuite(t *testing.T) {
-	suite.Run(t, new(DBTestSuite))
+func TestRegisterDbTestSuite(t *testing.T) {
+	suite.Run(t, new(RegisterDbTestSuite))
 }
 
-func (s *DBTestSuite) TestRegisterWithValidParameters() {
+func (s *RegisterDbTestSuite) TestRegisterWithValidParameters() {
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
 	assert.Equal(s.T(), http.StatusFound, response.Code)
-	assert.Equal(s.T(), "/", response.Header().Get("Location"))
+	assert.Equal(s.T(), "/login", response.Header().Get("Location"))
 }
 
-func (s *DBTestSuite) TestRegisterWithBlankEmailValidation() {
+func (s *RegisterDbTestSuite) TestRegisterWithBlankEmailValidation() {
 	s.formData.Del("email")
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
@@ -89,7 +88,7 @@ func (s *DBTestSuite) TestRegisterWithBlankEmailValidation() {
 	assert.Equal(s.T(), true, pageError)
 }
 
-func (s *DBTestSuite) TestRegisterWithBlankPasswordValidation() {
+func (s *RegisterDbTestSuite) TestRegisterWithBlankPasswordValidation() {
 	s.formData.Del("password")
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
@@ -102,7 +101,7 @@ func (s *DBTestSuite) TestRegisterWithBlankPasswordValidation() {
 	assert.Equal(s.T(), true, isEmailFieldValueExist)
 }
 
-func (s *DBTestSuite) TestRegisterWithPasswordNotMatchValidation() {
+func (s *RegisterDbTestSuite) TestRegisterWithPasswordNotMatchValidation() {
 	s.formData.Set("confirm-password", "invalid")
 
 	response := tests.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
@@ -115,7 +114,7 @@ func (s *DBTestSuite) TestRegisterWithPasswordNotMatchValidation() {
 	assert.Equal(s.T(), true, isEmailFieldValueExist)
 }
 
-func (s *DBTestSuite) TestRegisterWithTooShortPasswordValidation() {
+func (s *RegisterDbTestSuite) TestRegisterWithTooShortPasswordValidation() {
 	s.formData.Set("password", "12345")
 	s.formData.Set("confirm-password", "12345")
 
@@ -127,4 +126,15 @@ func (s *DBTestSuite) TestRegisterWithTooShortPasswordValidation() {
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, pageError)
 	assert.Equal(s.T(), true, isEmailFieldValueExist)
+}
+
+func (s *RegisterDbTestSuite) TestDisplayRegisterWithAuthenticatedUser() {
+	// Cookie from login API Set-Cookie header
+	cookie := "go-google-scraper=MTYwNjQ2Mjk3MXxEdi1CQkFFQ180SUFBUkFCRUFBQUlmLUNBQUVHYzNSeWFXNW5EQWtBQjNWelpYSmZhV1FFZFdsdWRBWUVBUDRFdFE9PXzl6APqAQw3gAQqlHoXMYrPpnqPFkEP8SRHJZEpl-_LDQ=="
+	s.headers.Set("Cookie", cookie)
+
+	response := tests.PerformRequest(s.engine, "GET", "/register", s.headers, nil)
+
+	assert.Equal(s.T(), http.StatusFound, response.Code)
+	assert.Equal(s.T(), "/", response.Header().Get("Location"))
 }
