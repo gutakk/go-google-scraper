@@ -8,6 +8,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	html "github.com/gutakk/go-google-scraper/helpers/html"
+	session "github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
 )
 
@@ -54,8 +55,15 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 		return
 	}
 
+	userID := session.Get(c, "user_id")
+
+	var user models.User
+	if userID != nil {
+		user, _ = models.FindUserByID(userID)
+	}
+
 	// Save keywords to database
-	_, err := models.SaveKeywords(record)
+	_, err := models.SaveKeywords(user.ID, record)
 	if err != nil {
 		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, err, nil)
 		return

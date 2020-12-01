@@ -3,9 +3,11 @@ package models
 import (
 	"testing"
 
+	"github.com/bxcodec/faker/v3"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/tests"
 	"github.com/stretchr/testify/suite"
+	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -49,6 +51,7 @@ func TestValidateCSVLengthWithGreaterThanMaxRowAllowed(t *testing.T) {
 
 type KeywordDBTestSuite struct {
 	suite.Suite
+	userID uint
 }
 
 func (s *KeywordDBTestSuite) SetupTest() {
@@ -58,6 +61,11 @@ func (s *KeywordDBTestSuite) SetupTest() {
 	}
 
 	_ = db.GetDB().AutoMigrate(&User{}, &Keyword{})
+
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
+	user := User{Email: faker.Email(), Password: string(hashedPassword)}
+	db.GetDB().Create(&user)
+	s.userID = user.ID
 }
 
 func (s *KeywordDBTestSuite) TearDownTest() {
@@ -77,7 +85,7 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 		[]string{"Mbappe"},
 	}
 
-	result, err := SaveKeywords(keywords)
+	result, err := SaveKeywords(s.userID, keywords)
 
 	assert.Equal(s.T(), nil, err)
 	assert.Equal(s.T(), 5, len(result))
@@ -91,7 +99,7 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptyStringSlice() {
 	keywords := [][]string{[]string{""}}
 
-	result, err := SaveKeywords(keywords)
+	result, err := SaveKeywords(s.userID, keywords)
 
 	assert.Equal(s.T(), nil, err)
 	assert.Equal(s.T(), 1, len(result))
@@ -101,7 +109,7 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptyStringSlice() {
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptyNestedSlice() {
 	keywords := [][]string{[]string{}}
 
-	result, err := SaveKeywords(keywords)
+	result, err := SaveKeywords(s.userID, keywords)
 
 	assert.Equal(s.T(), "Invalid data", err.Error())
 	assert.Equal(s.T(), nil, result)
@@ -110,8 +118,17 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptyNestedSlice() {
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptySlice() {
 	keywords := [][]string{}
 
-	result, err := SaveKeywords(keywords)
+	result, err := SaveKeywords(s.userID, keywords)
 
 	assert.Equal(s.T(), "Invalid data", err.Error())
+	assert.Equal(s.T(), nil, result)
+}
+
+func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidUserID() {
+	keywords := [][]string{[]string{"Hazard"}}
+
+	result, err := SaveKeywords(9999999999, keywords)
+
+	assert.Equal(s.T(), "Something went wrong, please try again", err.Error())
 	assert.Equal(s.T(), nil, result)
 }

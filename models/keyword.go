@@ -22,6 +22,8 @@ const (
 type Keyword struct {
 	gorm.Model
 	Keyword string `gorm:"notNull;index"`
+	UserID  uint
+	User    User
 }
 
 func UploadFile(c *gin.Context, file *multipart.FileHeader) [][]string {
@@ -47,7 +49,7 @@ func ValidateCSVLength(row int) error {
 	return nil
 }
 
-func SaveKeywords(record [][]string) ([]Keyword, error) {
+func SaveKeywords(userID uint, record [][]string) ([]Keyword, error) {
 	var keywords = []Keyword{}
 
 	// Check if record is empty slice
@@ -61,7 +63,7 @@ func SaveKeywords(record [][]string) ([]Keyword, error) {
 		if len(v) == 0 {
 			return nil, errors.New(invalidDataError)
 		}
-		keywords = append(keywords, Keyword{Keyword: v[0]})
+		keywords = append(keywords, Keyword{Keyword: v[0], UserID: userID})
 	}
 
 	// Insert bulk data

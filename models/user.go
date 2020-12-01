@@ -13,6 +13,7 @@ type User struct {
 	gorm.Model
 	Email    string `gorm:"unique;notNull;index"`
 	Password string `gorm:"notNull"`
+	Keywords []Keyword
 }
 
 func hashPassword(password string) ([]byte, error) {
