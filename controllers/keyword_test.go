@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -108,6 +109,9 @@ func TestKeywordDbTestSuite(t *testing.T) {
 }
 
 func (s *KeywordDbTestSuite) TestUploadKeywordWithValidParams() {
+	curPath, _ := os.Getwd()
+	log.Printf("===================== %v", curPath)
+
 	headers, payload := createMultipartPayload("tests/csv/adword_keywords.csv")
 	headers.Set("Cookie", s.cookie)
 
