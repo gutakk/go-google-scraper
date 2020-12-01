@@ -37,7 +37,10 @@ func createFormFile(w *multipart.Writer, fieldname, filename string) (io.Writer,
 
 func createMultipartPayload(filename string) (http.Header, *bytes.Buffer) {
 	path := filename
-	file, _ := os.Open(path)
+	file, err := os.Open(path)
+	log.Printf("##################### %v", file)
+	log.Printf("&&&&&&&&&&&&&&&&&&&&& %v", err)
+
 	defer file.Close()
 
 	body := &bytes.Buffer{}
@@ -113,6 +116,7 @@ func (s *KeywordDbTestSuite) TestUploadKeywordWithValidParams() {
 	log.Printf("===================== %v", curPath)
 
 	headers, payload := createMultipartPayload("tests/csv/adword_keywords.csv")
+	log.Printf("@@@@@@@@@@@@@@@@@@@@@ %v", payload)
 	headers.Set("Cookie", s.cookie)
 
 	response := performRequest(s.engine, "POST", "/keyword", headers, payload)
