@@ -69,7 +69,7 @@ func TestKeywordDbTestSuite(t *testing.T) {
 }
 
 func (s *KeywordDbTestSuite) TestUploadKeywordWithValidParams() {
-	headers, payload := testFile.CreateMultipartPayload("tests/csv/adword_keywords.csv")
+	headers, payload := testFile.CreateMultipartPayload("tests/fixture/adword_keywords.csv")
 	headers.Set("Cookie", s.cookie)
 
 	response := testHttp.PerformFileUploadRequest(s.engine, "POST", "/keyword", headers, payload)

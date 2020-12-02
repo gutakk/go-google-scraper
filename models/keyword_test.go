@@ -119,7 +119,7 @@ func TestValidateCSVLengthWithGreaterThanMaxRowAllowed(t *testing.T) {
 }
 
 func TestReadFileWithValidFile(t *testing.T) {
-	result, err := ReadFile("../tests/csv/adword_keywords.csv")
+	result, err := ReadFile("../tests/fixture/adword_keywords.csv")
 
 	assert.Equal(t, []string{"AWS"}, result)
 	assert.Equal(t, nil, err)
