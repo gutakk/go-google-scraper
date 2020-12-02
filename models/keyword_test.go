@@ -41,13 +41,7 @@ func TestKeywordDBTestSuite(t *testing.T) {
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
-	keywords := [][]string{
-		[]string{"Hazard"},
-		[]string{"Ronaldo"},
-		[]string{"Neymar"},
-		[]string{"Messi"},
-		[]string{"Mbappe"},
-	}
+	keywords := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
 
 	result, err := SaveKeywords(s.userID, keywords)
 
@@ -61,7 +55,7 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptyStringSlice() {
-	keywords := [][]string{[]string{""}}
+	keywords := []string{""}
 
 	result, err := SaveKeywords(s.userID, keywords)
 
@@ -70,17 +64,8 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptyStringSlice() {
 	assert.Equal(s.T(), "", result[0].Keyword)
 }
 
-func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptyNestedSlice() {
-	keywords := [][]string{[]string{}}
-
-	result, err := SaveKeywords(s.userID, keywords)
-
-	assert.Equal(s.T(), "Invalid data", err.Error())
-	assert.Equal(s.T(), nil, result)
-}
-
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptySlice() {
-	keywords := [][]string{}
+	keywords := []string{}
 
 	result, err := SaveKeywords(s.userID, keywords)
 
@@ -89,7 +74,7 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptySlice() {
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidUserID() {
-	keywords := [][]string{[]string{"Hazard"}}
+	keywords := []string{"Hazard"}
 
 	result, err := SaveKeywords(9999999999, keywords)
 
@@ -131,4 +116,18 @@ func TestValidateCSVLengthWithGreaterThanMaxRowAllowed(t *testing.T) {
 	result := ValidateCSVLength(1001)
 
 	assert.Equal(t, "CSV file must contain between 1 to 1000 keywords", result.Error())
+}
+
+func TestReadFileWithValidFile(t *testing.T) {
+	result, err := ReadFile("../tests/csv/adword_keywords.csv")
+
+	assert.Equal(t, []string{"AWS"}, result)
+	assert.Equal(t, nil, err)
+}
+
+func TestReadFileWithFileNotFound(t *testing.T) {
+	result, err := ReadFile("")
+
+	assert.Equal(t, nil, result)
+	assert.Equal(t, "Something went wrong, please try again", err.Error())
 }

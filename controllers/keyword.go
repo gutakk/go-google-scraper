@@ -49,7 +49,11 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 		return
 	}
 
-	record := models.UploadFile(c, form.File)
+	filename := models.UploadFile(c, form.File)
+	record, readFileErr := models.ReadFile(filename)
+	if readFileErr != nil {
+		html.RenderWithError(c, http.StatusUnprocessableEntity, keywordView, keywordTitle, readFileErr, nil)
+	}
 
 	// Validate if CSV has row between 1 and 1,000
 	if err := models.ValidateCSVLength(len(record)); err != nil {
@@ -59,9 +63,9 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 
 	currentUser := helpers.GetCurrentUser(c)
 	// Save keywords to database
-	_, err := models.SaveKeywords(currentUser.ID, record)
-	if err != nil {
-		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, err, nil)
+	_, saveKeywordsErr := models.SaveKeywords(currentUser.ID, record)
+	if saveKeywordsErr != nil {
+		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, saveKeywordsErr, nil)
 		return
 	}
 

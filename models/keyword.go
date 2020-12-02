@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/csv"
 	"errors"
+	"io"
 	"mime/multipart"
 	"os"
 	"path/filepath"
@@ -14,9 +15,10 @@ import (
 )
 
 const (
-	fileFormatError  = "File must be CSV format"
-	fileLengthError  = "CSV file must contain between 1 to 1000 keywords"
-	invalidDataError = "Invalid data"
+	fileFormatError         = "File must be CSV format"
+	fileLengthError         = "CSV file must contain between 1 to 1000 keywords"
+	invalidDataError        = "Invalid data"
+	somethingWentWrongError = "Something went wrong, please try again"
 )
 
 type Keyword struct {
@@ -26,14 +28,33 @@ type Keyword struct {
 	User    User
 }
 
-func UploadFile(c *gin.Context, file *multipart.FileHeader) [][]string {
-	_ = os.Mkdir("dist/", 0755)
-	filename := "dist/" + filepath.Base(file.Filename)
+func UploadFile(c *gin.Context, file *multipart.FileHeader) string {
+	path := "dist/"
+	_ = os.Mkdir(path, 0755)
+	filename := filepath.Join(path, filepath.Base(file.Filename))
 	_ = c.SaveUploadedFile(file, filename)
-	csvfile, _ := os.Open(filename)
+	return filename
+}
+
+func ReadFile(filename string) ([]string, error) {
+	csvfile, openErr := os.Open(filename)
+	if openErr != nil {
+		return nil, errors.New(somethingWentWrongError)
+	}
+
 	r := csv.NewReader(csvfile)
-	record, _ := r.ReadAll()
-	return record
+	var record []string
+	for {
+		row, err := r.Read()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return nil, errors.New(somethingWentWrongError)
+		}
+		record = append(record, row[0])
+	}
+
+	return record, nil
 }
 
 func ValidateFileType(fileType string) error {
@@ -50,21 +71,16 @@ func ValidateCSVLength(row int) error {
 	return nil
 }
 
-func SaveKeywords(userID uint, record [][]string) ([]Keyword, error) {
-	var keywords = []Keyword{}
-
-	// Check if record is empty slice
+func SaveKeywords(userID uint, record []string) ([]Keyword, error) {
+	// Check if record is empty slices
 	if len(record) == 0 {
 		return nil, errors.New(invalidDataError)
 	}
 
+	var keywords = []Keyword{}
 	// Create bulk data
-	for _, v := range record {
-		// Check if nested slice is empty slice
-		if len(v) == 0 {
-			return nil, errors.New(invalidDataError)
-		}
-		keywords = append(keywords, Keyword{Keyword: v[0], UserID: userID})
+	for _, value := range record {
+		keywords = append(keywords, Keyword{Keyword: value, UserID: userID})
 	}
 
 	// Insert bulk data
