@@ -5,7 +5,7 @@ import (
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gutakk/go-google-scraper/db"
-	"github.com/gutakk/go-google-scraper/tests"
+	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -21,7 +21,7 @@ type UserDBTestSuite struct {
 }
 
 func (s *UserDBTestSuite) SetupTest() {
-	testDB, _ := gorm.Open(postgres.Open(tests.ConstructTestDsn()), &gorm.Config{})
+	testDB, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	db.GetDB = func() *gorm.DB {
 		return testDB
 	}
