@@ -31,9 +31,9 @@ type LoginDbTestSuite struct {
 }
 
 func (s *LoginDbTestSuite) SetupTest() {
-	testDB, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	db.GetDB = func() *gorm.DB {
-		return testDB
+		return database
 	}
 
 	_ = db.GetDB().AutoMigrate(&models.User{})
