@@ -2,16 +2,9 @@ package controllers
 
 import (
 	"bytes"
-	"fmt"
-	"io"
 	"io/ioutil"
-	"mime/multipart"
 	"net/http"
-	"net/http/httptest"
-	"net/textproto"
 	"net/url"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -21,6 +14,7 @@ import (
 	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	testFile "github.com/gutakk/go-google-scraper/tests/file"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
@@ -28,41 +22,6 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
-
-func createFormFile(w *multipart.Writer, fieldname, filename string) (io.Writer, error) {
-	h := make(textproto.MIMEHeader)
-	h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldname, filename))
-	h.Set("Content-Type", "text/csv")
-	return w.CreatePart(h)
-}
-
-func createMultipartPayload(filename string) (http.Header, *bytes.Buffer) {
-	path := filename
-	file, _ := os.Open(path)
-	defer file.Close()
-
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
-	part, _ := createFormFile(writer, "file", filepath.Base(path))
-	_, _ = io.Copy(part, file)
-	writer.Close()
-
-	headers := http.Header{}
-	headers.Set("Content-Type", writer.FormDataContentType())
-
-	return headers, body
-}
-
-func performRequest(r http.Handler, method, path string, headers http.Header, payload *bytes.Buffer) *httptest.ResponseRecorder {
-	req, _ := http.NewRequest(method, path, payload)
-	req.Header = headers
-
-	response := httptest.NewRecorder()
-
-	r.ServeHTTP(response, req)
-
-	return response
-}
 
 type KeywordDbTestSuite struct {
 	suite.Suite
@@ -110,10 +69,10 @@ func TestKeywordDbTestSuite(t *testing.T) {
 }
 
 func (s *KeywordDbTestSuite) TestUploadKeywordWithValidParams() {
-	headers, payload := createMultipartPayload("tests/csv/adword_keywords.csv")
+	headers, payload := testFile.CreateMultipartPayload("tests/csv/adword_keywords.csv")
 	headers.Set("Cookie", s.cookie)
 
-	response := performRequest(s.engine, "POST", "/keyword", headers, payload)
+	response := testHttp.PerformFileUploadRequest(s.engine, "POST", "/keyword", headers, payload)
 
 	p, err := ioutil.ReadAll(response.Body)
 	isKeywordPage := err == nil && strings.Index(string(p), "<title>Keyword</title>") > 0
@@ -128,7 +87,7 @@ func (s *KeywordDbTestSuite) TestUploadKeywordWithBlankPayload() {
 	headers := http.Header{}
 	headers.Set("Cookie", s.cookie)
 
-	response := performRequest(s.engine, "POST", "/keyword", headers, &bytes.Buffer{})
+	response := testHttp.PerformFileUploadRequest(s.engine, "POST", "/keyword", headers, &bytes.Buffer{})
 
 	p, err := ioutil.ReadAll(response.Body)
 	isKeywordPage := err == nil && strings.Index(string(p), "<title>Keyword</title>") > 0
