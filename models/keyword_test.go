@@ -121,7 +121,7 @@ func (s *KeywordDBTestSuite) TestGetKeywordsWithFalsyCondition() {
 
 	result, err := GetKeywords(condition)
 
-	assert.Equal(s.T(), []Keyword{}, result)
+	assert.Equal(s.T(), 0, len(result))
 	assert.Equal(s.T(), nil, err)
 }
 

@@ -17,6 +17,7 @@ import (
 type KeywordServiceDbTestSuite struct {
 	suite.Suite
 	keywordService Keyword
+	userID         uint
 }
 
 func (s *KeywordServiceDbTestSuite) SetupTest() {
@@ -31,6 +32,7 @@ func (s *KeywordServiceDbTestSuite) SetupTest() {
 	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
 	db.GetDB().Create(&user)
 
+	s.userID = user.ID
 	s.keywordService = Keyword{CurrentUserID: user.ID}
 }
 
@@ -66,6 +68,28 @@ func (s *KeywordServiceDbTestSuite) TestSaveWithEmptyRecord() {
 
 	assert.Equal(s.T(), "Invalid data", err.Error())
 	assert.Equal(s.T(), nil, result)
+}
+
+func (s *KeywordServiceDbTestSuite) TestGetAllWithValidUser() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	result, err := s.keywordService.GetAll()
+
+	assert.Equal(s.T(), 1, len(result))
+	assert.Equal(s.T(), keyword.Keyword, result[0].Keyword)
+	assert.Equal(s.T(), nil, err)
+}
+
+func (s *KeywordServiceDbTestSuite) TestGetAllWithInvalidUser() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	keywordService := Keyword{}
+	result, err := keywordService.GetAll()
+
+	assert.Equal(s.T(), 0, len(result))
+	assert.Equal(s.T(), nil, err)
 }
 
 type KeywordServiceTestSuite struct {
