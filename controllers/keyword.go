@@ -34,7 +34,6 @@ func (k *KeywordController) applyRoutes(engine *gin.RouterGroup) {
 
 func (k *KeywordController) displayKeyword(c *gin.Context) {
 	currentUser := helpers.GetCurrentUser(c)
-
 	keywordService := keyword_service.Keyword{CurrentUserID: currentUser.ID}
 
 	keywords, err := keywordService.GetAll()

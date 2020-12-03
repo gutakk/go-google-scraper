@@ -12,4 +12,11 @@
   </button>
 </form>
 
+{{ if .data.keywords }}
+  {{ range $k := .data.keywords }}
+    <p>{{ $k.Keyword }}</p>
+    <p>{{ $k.CreatedAt }}</p>
+  {{ end }}
+{{ end }}
+
 {{ end }}
