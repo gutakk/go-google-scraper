@@ -74,13 +74,8 @@ func (s *KeywordDbTestSuite) TestUploadKeywordWithValidParams() {
 
 	response := testHttp.PerformFileUploadRequest(s.engine, "POST", "/keyword", headers, payload)
 
-	p, err := ioutil.ReadAll(response.Body)
-	isKeywordPage := err == nil && strings.Index(string(p), "<title>Keyword</title>") > 0
-	pageNotice := err == nil && strings.Index(string(p), "CSV uploaded successfully") > 0
-
-	assert.Equal(s.T(), http.StatusOK, response.Code)
-	assert.Equal(s.T(), true, isKeywordPage)
-	assert.Equal(s.T(), true, pageNotice)
+	assert.Equal(s.T(), http.StatusFound, response.Code)
+	assert.Equal(s.T(), "/keyword", response.Header().Get("Location"))
 }
 
 func (s *KeywordDbTestSuite) TestUploadKeywordWithBlankPayload() {

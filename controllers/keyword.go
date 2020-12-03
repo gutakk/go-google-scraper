@@ -8,6 +8,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	html "github.com/gutakk/go-google-scraper/helpers/html"
+	session "github.com/gutakk/go-google-scraper/helpers/session"
 	helpers "github.com/gutakk/go-google-scraper/helpers/user"
 	"github.com/gutakk/go-google-scraper/models"
 )
@@ -69,5 +70,6 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 		return
 	}
 
-	html.RenderWithNotice(c, http.StatusOK, keywordView, keywordTitle, uploadSuccessFlash, nil)
+	session.AddFlash(c, uploadSuccessFlash, "notice")
+	c.Redirect(http.StatusFound, "/keyword")
 }
