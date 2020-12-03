@@ -35,6 +35,7 @@ func (s *KeywordDBTestSuite) SetupTest() {
 
 func (s *KeywordDBTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM keywords")
+	db.GetDB().Exec("DELETE FROM users")
 }
 
 func TestKeywordDBTestSuite(t *testing.T) {
