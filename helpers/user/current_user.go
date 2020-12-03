@@ -9,7 +9,10 @@ func GetCurrentUser(c *gin.Context) models.User {
 	currentUser := c.MustGet("currentUser")
 
 	if currentUser != nil {
-		return currentUser.(models.User)
+		v, ok := currentUser.(models.User)
+		if ok {
+			return v
+		}
 	}
 	return models.User{}
 }
