@@ -3,6 +3,7 @@ package helpers
 import (
 	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-gonic/gin"
+	session "github.com/gutakk/go-google-scraper/helpers/session"
 )
 
 func RenderWithError(c *gin.Context, status int, view string, title string, err error, data map[string]interface{}) {
@@ -13,17 +14,11 @@ func RenderWithError(c *gin.Context, status int, view string, title string, err 
 	})
 }
 
-func RenderWithNotice(c *gin.Context, status int, view string, title string, notices []interface{}, data map[string]interface{}) {
+func RenderWithFlash(c *gin.Context, status int, view string, title string, data map[string]interface{}) {
 	ginview.HTML(c, status, view, gin.H{
-		"title":   title,
-		"notices": notices,
-		"data":    data,
-	})
-}
-
-func Render(c *gin.Context, status int, view string, title string, data map[string]interface{}) {
-	ginview.HTML(c, status, view, gin.H{
-		"title": title,
-		"data":  data,
+		"title":         title,
+		"noticeFlashes": session.Flashes(c, "notice"),
+		"errorFlashes":  session.Flashes(c, "error"),
+		"data":          data,
 	})
 }

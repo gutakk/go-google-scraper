@@ -32,7 +32,7 @@ func (l *LoginController) applyRoutes(engine *gin.RouterGroup) {
 }
 
 func (l *LoginController) displayLogin(c *gin.Context) {
-	html.RenderWithNotice(c, http.StatusOK, loginView, loginTitle, session.Flashes(c), nil)
+	html.RenderWithFlash(c, http.StatusOK, loginView, loginTitle, nil)
 }
 
 func (l *LoginController) login(c *gin.Context) {

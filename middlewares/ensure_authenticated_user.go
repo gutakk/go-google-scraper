@@ -7,11 +7,12 @@ import (
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 )
 
-func EnsureGuestUser(c *gin.Context) {
+func EnsureAuthenticatedUser(c *gin.Context) {
 	userID := session.Get(c, "user_id")
 
-	if userID != nil {
-		c.Redirect(http.StatusFound, "/")
+	if userID == nil {
+		session.AddFlash(c, "Login required", "error")
+		c.Redirect(http.StatusFound, "/login")
 		c.Abort()
 	}
 }

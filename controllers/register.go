@@ -32,7 +32,7 @@ func (r *RegisterController) applyRoutes(engine *gin.RouterGroup) {
 }
 
 func (r *RegisterController) displayRegister(c *gin.Context) {
-	html.Render(c, http.StatusOK, registerView, registerTitle, nil)
+	html.RenderWithFlash(c, http.StatusOK, registerView, registerTitle, nil)
 }
 
 func (r *RegisterController) register(c *gin.Context) {
@@ -50,7 +50,7 @@ func (r *RegisterController) register(c *gin.Context) {
 		return
 	}
 
-	session.AddFlash(c, registerSuccessFlash)
+	session.AddFlash(c, registerSuccessFlash, "notice")
 	c.Redirect(http.StatusFound, "/login")
 }
 
