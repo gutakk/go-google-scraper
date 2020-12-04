@@ -6,6 +6,7 @@
 // Base
 @import 'base/form';
 @import 'base/button';
+@import 'base/table';
 @import 'base/typography';
 
 // Components
@@ -15,3 +16,6 @@
 // Layouts
 @import 'layouts/application';
 @import 'layouts/authentication';
+
+// Screens
+@import 'screens/keyword.scss';
