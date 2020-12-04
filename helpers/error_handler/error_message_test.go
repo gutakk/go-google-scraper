@@ -100,5 +100,5 @@ func TestDatabaseErrorMessageForNonPgErrorType(t *testing.T) {
 	err := errors.New("custom error")
 	result := DatabaseErrorMessage(err)
 
-	assert.Equal(t, "Something went wrong, please try again", result.Error())
+	assert.Equal(t, "something went wrong, please try again", result.Error())
 }

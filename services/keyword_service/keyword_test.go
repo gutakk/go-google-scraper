@@ -58,7 +58,7 @@ func (s *KeywordServiceDbTestSuite) TestSaveWithValidInvalidUser() {
 	keywordService := Keyword{}
 	result, err := keywordService.Save(record)
 
-	assert.Equal(s.T(), "Something went wrong, please try again", err.Error())
+	assert.Equal(s.T(), "something went wrong, please try again", err.Error())
 	assert.Equal(s.T(), nil, result)
 }
 
@@ -66,7 +66,7 @@ func (s *KeywordServiceDbTestSuite) TestSaveWithEmptyRecord() {
 	record := []string{}
 	result, err := s.keywordService.Save(record)
 
-	assert.Equal(s.T(), "Invalid data", err.Error())
+	assert.Equal(s.T(), "invalid data", err.Error())
 	assert.Equal(s.T(), nil, result)
 }
 
@@ -114,7 +114,7 @@ func (s *KeywordServiceTestSuite) TestValidateFileTypeWithValidFileType() {
 func (s *KeywordServiceTestSuite) TestValidateFileTypeWithInvalidFileType() {
 	result := s.keywordService.ValidateFileType("test")
 
-	assert.Equal(s.T(), "File must be CSV format", result.Error())
+	assert.Equal(s.T(), "file must be CSV format", result.Error())
 }
 
 func (s *KeywordServiceTestSuite) TestValidateCSVLengthWithMinRowAllowed() {
@@ -152,5 +152,5 @@ func (s *KeywordServiceTestSuite) TestReadFileWithFileNotFound() {
 	result, err := s.keywordService.ReadFile("")
 
 	assert.Equal(s.T(), nil, result)
-	assert.Equal(s.T(), "Something went wrong, please try again", err.Error())
+	assert.Equal(s.T(), "something went wrong, please try again", err.Error())
 }
