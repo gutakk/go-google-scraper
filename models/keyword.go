@@ -12,7 +12,7 @@ type Keyword struct {
 	User    User
 }
 
-func GetKeywords(condition interface{}) ([]Keyword, error) {
+func GetKeywords(condition map[string]interface{}) ([]Keyword, error) {
 	var keywords []Keyword
 
 	err := db.GetDB().Where(condition).Find(&keywords).Error

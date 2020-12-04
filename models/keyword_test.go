@@ -96,3 +96,56 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidUserID() {
 	assert.Equal(s.T(), true, isPgError)
 	assert.Equal(s.T(), nil, result)
 }
+
+func (s *KeywordDBTestSuite) TestGetKeywordsWithTruthyCondition() {
+	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	condition := make(map[string]interface{})
+	condition["keyword"] = keyword.Keyword
+
+	result, err := GetKeywords(condition)
+
+	assert.Equal(s.T(), 1, len(result))
+	assert.Equal(s.T(), keyword.Keyword, result[0].Keyword)
+	assert.Equal(s.T(), nil, err)
+}
+
+func (s *KeywordDBTestSuite) TestGetKeywordsWithFalsyCondition() {
+	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	condition := make(map[string]interface{})
+	condition["keyword"] = keyword.Keyword + "test"
+
+	result, err := GetKeywords(condition)
+
+	assert.Equal(s.T(), []Keyword{}, result)
+	assert.Equal(s.T(), nil, err)
+}
+
+func (s *KeywordDBTestSuite) TestGetKeywordsWithNilCondition() {
+	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	result, err := GetKeywords(nil)
+
+	assert.Equal(s.T(), 1, len(result))
+	assert.Equal(s.T(), keyword.Keyword, result[0].Keyword)
+	assert.Equal(s.T(), nil, err)
+}
+
+func (s *KeywordDBTestSuite) TestGetKeywordsWithInvalidCondition() {
+	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	condition := make(map[string]interface{})
+	condition["unknown_column"] = keyword.Keyword
+
+	result, err := GetKeywords(condition)
+	_, isPgError := err.(*pgconn.PgError)
+
+	assert.Equal(s.T(), "ERROR: column \"unknown_column\" does not exist (SQLSTATE 42703)", err.Error())
+	assert.Equal(s.T(), true, isPgError)
+	assert.Equal(s.T(), nil, result)
+}
