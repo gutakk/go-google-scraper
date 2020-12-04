@@ -28,6 +28,15 @@ type Keyword struct {
 	User    User
 }
 
+func GetKeywords(condition interface{}) ([]Keyword, error) {
+	var keywords []Keyword
+
+	if err := db.GetDB().Where(condition).Find(&keywords).Error; err != nil {
+		return nil, errorHandler.DatabaseErrorMessage(err)
+	}
+	return keywords, nil
+}
+
 func ReadFile(filename string) ([]string, error) {
 	csvfile, openErr := os.Open(filename)
 	if openErr != nil {

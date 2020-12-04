@@ -11,6 +11,7 @@ import (
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	helpers "github.com/gutakk/go-google-scraper/helpers/user"
 	"github.com/gutakk/go-google-scraper/models"
+	"github.com/gutakk/go-google-scraper/services/keyword_service"
 )
 
 const (
@@ -32,7 +33,20 @@ func (k *KeywordController) applyRoutes(engine *gin.RouterGroup) {
 }
 
 func (k *KeywordController) displayKeyword(c *gin.Context) {
-	html.RenderWithFlash(c, http.StatusOK, keywordView, keywordTitle, nil)
+	currentUser := helpers.GetCurrentUser(c)
+
+	keywordService := keyword_service.Keyword{CurrentUserID: currentUser.ID}
+
+	keywords, err := keywordService.GetAll()
+	if err != nil {
+		html.RenderWithError(c, http.StatusUnprocessableEntity, keywordView, keywordTitle, err, nil)
+	}
+
+	data := map[string]interface{}{
+		"keywords": keywords,
+	}
+
+	html.RenderWithFlash(c, http.StatusOK, keywordView, keywordTitle, data)
 }
 
 func (k *KeywordController) uploadKeyword(c *gin.Context) {
