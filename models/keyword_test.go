@@ -98,6 +98,28 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidUserID() {
 	assert.Equal(s.T(), nil, result)
 }
 
+func (s *KeywordDBTestSuite) TestGetKeywordsWithMoreThanOneRows() {
+	bulkData := []Keyword{
+		{Keyword: "Hazard", UserID: s.userID},
+		{Keyword: "Ronaldo", UserID: s.userID},
+		{Keyword: "Neymar", UserID: s.userID},
+		{Keyword: "Messi", UserID: s.userID},
+		{Keyword: "Mbappe", UserID: s.userID},
+	}
+
+	db.GetDB().Create(&bulkData)
+
+	result, err := GetKeywords(nil)
+
+	assert.Equal(s.T(), 5, len(result))
+	assert.Equal(s.T(), "Hazard", result[0].Keyword)
+	assert.Equal(s.T(), "Mbappe", result[1].Keyword)
+	assert.Equal(s.T(), "Messi", result[2].Keyword)
+	assert.Equal(s.T(), "Neymar", result[3].Keyword)
+	assert.Equal(s.T(), "Ronaldo", result[4].Keyword)
+	assert.Equal(s.T(), nil, err)
+}
+
 func (s *KeywordDBTestSuite) TestGetKeywordsWithTruthyCondition() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)

@@ -15,7 +15,7 @@ type Keyword struct {
 func GetKeywords(condition map[string]interface{}) ([]Keyword, error) {
 	var keywords []Keyword
 
-	err := db.GetDB().Where(condition).Find(&keywords).Error
+	err := db.GetDB().Where(condition).Order("keyword").Find(&keywords).Error
 	if err != nil {
 		return nil, err
 	}
