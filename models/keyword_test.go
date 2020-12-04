@@ -93,7 +93,7 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidUserID() {
 	result, err := SaveKeywords(bulkData)
 	errVal, isPgError := err.(*pgconn.PgError)
 
-	assert.Equal(s.T(), "ERROR: insert or update on table \"keywords\" violates foreign key constraint \"fk_keywords_user\" (SQLSTATE 23503)", errVal.Error())
+	assert.Equal(s.T(), "23503", errVal.Code)
 	assert.Equal(s.T(), true, isPgError)
 	assert.Equal(s.T(), nil, result)
 }
