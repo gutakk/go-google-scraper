@@ -43,13 +43,17 @@ func ValidationErrorMessage(err FieldError) error {
 
 // TODO: Improve later as this feel brittle
 func DatabaseErrorMessage(err error) error {
-	pgErr := err.(*pgconn.PgError)
+	pgErr, isPgErr := err.(*pgconn.PgError)
 
-	switch pgErr.Code {
-	case foreignKeyErrorCode:
+	if isPgErr {
+		switch pgErr.Code {
+		case foreignKeyErrorCode:
+			return errors.New(somethingWentWrongError)
+		case duplicateErrorCode:
+			return errors.New(emailDuplicateError)
+		}
+		return errors.New(pgErr.Error())
+	} else {
 		return errors.New(somethingWentWrongError)
-	case duplicateErrorCode:
-		return errors.New(emailDuplicateError)
 	}
-	return errors.New(pgErr.Error())
 }

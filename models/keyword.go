@@ -2,7 +2,6 @@ package models
 
 import (
 	"github.com/gutakk/go-google-scraper/db"
-	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"gorm.io/gorm"
 )
 
@@ -16,8 +15,9 @@ type Keyword struct {
 func GetKeywords(condition interface{}) ([]Keyword, error) {
 	var keywords []Keyword
 
-	if err := db.GetDB().Where(condition).Find(&keywords).Error; err != nil {
-		return nil, errorHandler.DatabaseErrorMessage(err)
+	err := db.GetDB().Where(condition).Find(&keywords).Error
+	if err != nil {
+		return nil, err
 	}
 	return keywords, nil
 }

@@ -50,7 +50,7 @@ func (k *Keyword) GetAll() ([]models.Keyword, error) {
 
 	keywords, err := models.GetKeywords(condition)
 	if err != nil {
-		return nil, err
+		return nil, errorHandler.DatabaseErrorMessage(err)
 	}
 
 	return keywords, nil
