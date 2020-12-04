@@ -1,14 +1,23 @@
 package keyword_service
 
 import (
+	"encoding/csv"
 	"errors"
+	"io"
+	"mime/multipart"
+	"os"
+	"path/filepath"
 
+	"github.com/gin-gonic/gin"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/models"
 )
 
 const (
-	invalidDataError = "Invalid data"
+	fileFormatError         = "File must be CSV format"
+	fileLengthError         = "CSV file must contain between 1 to 1000 keywords"
+	invalidDataError        = "Invalid data"
+	somethingWentWrongError = "Something went wrong, please try again"
 )
 
 type Keyword struct {
@@ -45,4 +54,47 @@ func (k *Keyword) GetAll() ([]models.Keyword, error) {
 	}
 
 	return keywords, nil
+}
+
+func (k *Keyword) ValidateFileType(fileType string) error {
+	if fileType != "text/csv" {
+		return errors.New(fileFormatError)
+	}
+	return nil
+}
+
+func (k *Keyword) UploadFile(c *gin.Context, file *multipart.FileHeader) string {
+	path := "dist/"
+	_ = os.Mkdir(path, 0755)
+	filename := filepath.Join(path, filepath.Base(file.Filename))
+	_ = c.SaveUploadedFile(file, filename)
+	return filename
+}
+
+func (k *Keyword) ReadFile(filename string) ([]string, error) {
+	csvfile, openErr := os.Open(filename)
+	if openErr != nil {
+		return nil, errors.New(somethingWentWrongError)
+	}
+
+	r := csv.NewReader(csvfile)
+	var record []string
+	for {
+		row, err := r.Read()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return nil, errors.New(somethingWentWrongError)
+		}
+		record = append(record, row[0])
+	}
+
+	return record, nil
+}
+
+func (k *Keyword) ValidateCSVLength(row int) error {
+	if row <= 0 || row > 1000 {
+		return errors.New(fileLengthError)
+	}
+	return nil
 }

@@ -41,20 +41,6 @@ func TestKeywordDBTestSuite(t *testing.T) {
 	suite.Run(t, new(KeywordDBTestSuite))
 }
 
-func TestReadFileWithValidFile(t *testing.T) {
-	result, err := ReadFile("../tests/fixture/adword_keywords.csv")
-
-	assert.Equal(t, []string{"AWS"}, result)
-	assert.Equal(t, nil, err)
-}
-
-func TestReadFileWithFileNotFound(t *testing.T) {
-	result, err := ReadFile("")
-
-	assert.Equal(t, nil, result)
-	assert.Equal(t, "something went wrong, please try again", err.Error())
-}
-
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 	bulkData := []Keyword{
 		{Keyword: "Hazard", UserID: s.userID},
@@ -109,40 +95,4 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidUserID() {
 	assert.Equal(s.T(), "ERROR: insert or update on table \"keywords\" violates foreign key constraint \"fk_keywords_user\" (SQLSTATE 23503)", err.Error())
 	assert.Equal(s.T(), true, isPgError)
 	assert.Equal(s.T(), nil, result)
-}
-
-func TestValidateCSVLengthWithMinRowAllowed(t *testing.T) {
-	result := ValidateCSVLength(1)
-
-	assert.Equal(t, nil, result)
-}
-
-func TestValidateCSVLengthWithMaxRowAllowed(t *testing.T) {
-	result := ValidateCSVLength(1000)
-
-	assert.Equal(t, nil, result)
-}
-
-func TestValidateCSVLengthWithZeroRow(t *testing.T) {
-	result := ValidateCSVLength(0)
-
-	assert.Equal(t, "CSV file must contain between 1 to 1000 keywords", result.Error())
-}
-
-func TestValidateCSVLengthWithGreaterThanMaxRowAllowed(t *testing.T) {
-	result := ValidateCSVLength(1001)
-
-	assert.Equal(t, "CSV file must contain between 1 to 1000 keywords", result.Error())
-}
-
-func TestValidateFileTypeWithValidFileType(t *testing.T) {
-	result := ValidateFileType("text/csv")
-
-	assert.Equal(t, nil, result)
-}
-
-func TestValidateFileTypeWithInvalidFileType(t *testing.T) {
-	result := ValidateFileType("test")
-
-	assert.Equal(t, "file must be CSV format", result.Error())
 }
