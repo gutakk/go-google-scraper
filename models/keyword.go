@@ -31,3 +31,7 @@ func SaveKeywords(keywords []Keyword) ([]Keyword, error) {
 
 	return keywords, nil
 }
+
+func (k *Keyword) FormattedCreatedAt() string {
+	return k.CreatedAt.Format("December 2, 2006")
+}
