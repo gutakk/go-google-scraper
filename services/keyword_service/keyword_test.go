@@ -45,6 +45,28 @@ func TestKeywordServiceDbTestSuite(t *testing.T) {
 	suite.Run(t, new(KeywordServiceDbTestSuite))
 }
 
+func (s *KeywordServiceDbTestSuite) TestGetAllWithValidUser() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	result, err := s.keywordService.GetAll()
+
+	assert.Equal(s.T(), 1, len(result))
+	assert.Equal(s.T(), keyword.Keyword, result[0].Keyword)
+	assert.Equal(s.T(), nil, err)
+}
+
+func (s *KeywordServiceDbTestSuite) TestGetAllWithInvalidUser() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	keywordService := Keyword{}
+	result, err := keywordService.GetAll()
+
+	assert.Equal(s.T(), 0, len(result))
+	assert.Equal(s.T(), nil, err)
+}
+
 func (s *KeywordServiceDbTestSuite) TestSaveWithValidParams() {
 	record := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
 	result, err := s.keywordService.Save(record)
@@ -70,28 +92,6 @@ func (s *KeywordServiceDbTestSuite) TestSaveWithEmptyRecord() {
 	assert.Equal(s.T(), nil, result)
 }
 
-func (s *KeywordServiceDbTestSuite) TestGetAllWithValidUser() {
-	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
-	db.GetDB().Create(&keyword)
-
-	result, err := s.keywordService.GetAll()
-
-	assert.Equal(s.T(), 1, len(result))
-	assert.Equal(s.T(), keyword.Keyword, result[0].Keyword)
-	assert.Equal(s.T(), nil, err)
-}
-
-func (s *KeywordServiceDbTestSuite) TestGetAllWithInvalidUser() {
-	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
-	db.GetDB().Create(&keyword)
-
-	keywordService := Keyword{}
-	result, err := keywordService.GetAll()
-
-	assert.Equal(s.T(), 0, len(result))
-	assert.Equal(s.T(), nil, err)
-}
-
 type KeywordServiceTestSuite struct {
 	suite.Suite
 	keywordService Keyword
@@ -105,16 +105,18 @@ func TestKeywordServiceTestSuite(t *testing.T) {
 	suite.Run(t, new(KeywordServiceTestSuite))
 }
 
-func (s *KeywordServiceTestSuite) TestValidateFileTypeWithValidFileType() {
-	result := s.keywordService.ValidateFileType("text/csv")
+func (s *KeywordServiceTestSuite) TestReadFileWithValidFile() {
+	result, err := s.keywordService.ReadFile("../../tests/fixture/adword_keywords.csv")
 
-	assert.Equal(s.T(), nil, result)
+	assert.Equal(s.T(), []string{"AWS"}, result)
+	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordServiceTestSuite) TestValidateFileTypeWithInvalidFileType() {
-	result := s.keywordService.ValidateFileType("test")
+func (s *KeywordServiceTestSuite) TestReadFileWithFileNotFound() {
+	result, err := s.keywordService.ReadFile("")
 
-	assert.Equal(s.T(), "file must be CSV format", result.Error())
+	assert.Equal(s.T(), nil, result)
+	assert.Equal(s.T(), "something went wrong, please try again", err.Error())
 }
 
 func (s *KeywordServiceTestSuite) TestValidateCSVLengthWithMinRowAllowed() {
@@ -141,16 +143,14 @@ func (s *KeywordServiceTestSuite) TestValidateCSVLengthWithGreaterThanMaxRowAllo
 	assert.Equal(s.T(), "CSV file must contain between 1 to 1000 keywords", result.Error())
 }
 
-func (s *KeywordServiceTestSuite) TestReadFileWithValidFile() {
-	result, err := s.keywordService.ReadFile("../../tests/fixture/adword_keywords.csv")
-
-	assert.Equal(s.T(), []string{"AWS"}, result)
-	assert.Equal(s.T(), nil, err)
-}
-
-func (s *KeywordServiceTestSuite) TestReadFileWithFileNotFound() {
-	result, err := s.keywordService.ReadFile("")
+func (s *KeywordServiceTestSuite) TestValidateFileTypeWithValidFileType() {
+	result := s.keywordService.ValidateFileType("text/csv")
 
 	assert.Equal(s.T(), nil, result)
-	assert.Equal(s.T(), "something went wrong, please try again", err.Error())
+}
+
+func (s *KeywordServiceTestSuite) TestValidateFileTypeWithInvalidFileType() {
+	result := s.keywordService.ValidateFileType("test")
+
+	assert.Equal(s.T(), "file must be CSV format", result.Error())
 }
