@@ -69,7 +69,7 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptySlice() {
 
 	result, err := SaveKeywords(s.userID, keywords)
 
-	assert.Equal(s.T(), "Invalid data", err.Error())
+	assert.Equal(s.T(), "invalid data", err.Error())
 	assert.Equal(s.T(), nil, result)
 }
 
@@ -78,7 +78,7 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidUserID() {
 
 	result, err := SaveKeywords(9999999999, keywords)
 
-	assert.Equal(s.T(), "Something went wrong, please try again", err.Error())
+	assert.Equal(s.T(), "something went wrong, please try again", err.Error())
 	assert.Equal(s.T(), nil, result)
 }
 
@@ -91,7 +91,7 @@ func TestValidateFileTypeWithValidFileType(t *testing.T) {
 func TestValidateFileTypeWithInvalidFileType(t *testing.T) {
 	result := ValidateFileType("test")
 
-	assert.Equal(t, "File must be CSV format", result.Error())
+	assert.Equal(t, "file must be CSV format", result.Error())
 }
 
 func TestValidateCSVLengthWithMinRowAllowed(t *testing.T) {
@@ -129,5 +129,5 @@ func TestReadFileWithFileNotFound(t *testing.T) {
 	result, err := ReadFile("")
 
 	assert.Equal(t, nil, result)
-	assert.Equal(t, "Something went wrong, please try again", err.Error())
+	assert.Equal(t, "something went wrong, please try again", err.Error())
 }

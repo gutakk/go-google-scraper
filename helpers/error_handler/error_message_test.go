@@ -36,14 +36,14 @@ func TestValidationErrorMessageForEmailTag(t *testing.T) {
 	fieldError := &mockFieldError{tag: "email"}
 	result := ValidationErrorMessage(fieldError)
 
-	assert.Equal(t, "Invalid email format", result.Error())
+	assert.Equal(t, "invalid email format", result.Error())
 }
 
 func TestValidationErrorMessageForEqfieldTag(t *testing.T) {
 	fieldError := &mockFieldError{tag: "eqfield"}
 	result := ValidationErrorMessage(fieldError)
 
-	assert.Equal(t, "Passwords do not match", result.Error())
+	assert.Equal(t, "passwords do not match", result.Error())
 }
 
 func TestValidationErrorMessageForMinTag(t *testing.T) {
@@ -81,7 +81,7 @@ func TestDatabaseErrorMessageForDuplicateEmail(t *testing.T) {
 	pgErr := &pgconn.PgError{Code: "23505"}
 	result := DatabaseErrorMessage(pgErr)
 
-	assert.Equal(t, "Email already exists", result.Error())
+	assert.Equal(t, "email already exists", result.Error())
 }
 
 func TestDatabaseErrorMessageForDefaultCode(t *testing.T) {

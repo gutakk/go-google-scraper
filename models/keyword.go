@@ -15,10 +15,10 @@ import (
 )
 
 const (
-	fileFormatError         = "File must be CSV format"
+	fileFormatError         = "file must be CSV format"
 	fileLengthError         = "CSV file must contain between 1 to 1000 keywords"
-	invalidDataError        = "Invalid data"
-	somethingWentWrongError = "Something went wrong, please try again"
+	invalidDataError        = "invalid data"
+	somethingWentWrongError = "something went wrong, please try again"
 )
 
 type Keyword struct {

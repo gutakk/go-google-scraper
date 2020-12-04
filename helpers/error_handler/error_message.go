@@ -9,12 +9,12 @@ import (
 
 const (
 	commonFieldError        = "%s is not valid"
-	emailFormatError        = "Invalid email format"
-	emailDuplicateError     = "Email already exists"
+	emailFormatError        = "invalid email format"
+	emailDuplicateError     = "email already exists"
 	minError                = "%s must be longer than %s"
-	passwordEqError         = "Passwords do not match"
+	passwordEqError         = "passwords do not match"
 	requiredError           = "%s is required"
-	somethingWentWrongError = "Something went wrong, please try again"
+	somethingWentWrongError = "something went wrong, please try again"
 
 	foreignKeyErrorCode = "23503"
 	duplicateErrorCode  = "23505"
