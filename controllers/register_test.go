@@ -72,7 +72,7 @@ func (s *RegisterDbTestSuite) TestRegisterWithBlankEmailValidation() {
 
 	response := testHttp.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 	p, err := ioutil.ReadAll(response.Body)
-	pageError := err == nil && strings.Index(string(p), "Invalid email format") > 0
+	pageError := err == nil && strings.Index(string(p), "invalid email format") > 0
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, pageError)
@@ -96,7 +96,7 @@ func (s *RegisterDbTestSuite) TestRegisterWithPasswordNotMatchValidation() {
 
 	response := testHttp.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 	p, err := ioutil.ReadAll(response.Body)
-	pageError := err == nil && strings.Index(string(p), "Passwords do not match") > 0
+	pageError := err == nil && strings.Index(string(p), "passwords do not match") > 0
 	isEmailFieldValueExist := err == nil && strings.Index(string(p), s.email) > 0
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)

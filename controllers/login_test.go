@@ -86,7 +86,7 @@ func (s *LoginDbTestSuite) TestLoginWithBlankEmailValidation() {
 
 	response := testHttp.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
 	p, err := ioutil.ReadAll(response.Body)
-	pageError := err == nil && strings.Index(string(p), "Invalid email format") > 0
+	pageError := err == nil && strings.Index(string(p), "invalid email format") > 0
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, pageError)
@@ -123,7 +123,7 @@ func (s *LoginDbTestSuite) TestLoginWithInvalidEmail() {
 
 	response := testHttp.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
 	p, err := ioutil.ReadAll(response.Body)
-	pageError := err == nil && strings.Index(string(p), "Username or password is invalid") > 0
+	pageError := err == nil && strings.Index(string(p), "username or password is invalid") > 0
 	isEmailFieldValueExist := err == nil && strings.Index(string(p), "test@email.com") > 0
 
 	assert.Equal(s.T(), http.StatusUnauthorized, response.Code)
@@ -136,7 +136,7 @@ func (s *LoginDbTestSuite) TestLoginWithInvalidPassword() {
 
 	response := testHttp.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
 	p, err := ioutil.ReadAll(response.Body)
-	pageError := err == nil && strings.Index(string(p), "Username or password is invalid") > 0
+	pageError := err == nil && strings.Index(string(p), "username or password is invalid") > 0
 	isEmailFieldValueExist := err == nil && strings.Index(string(p), s.email) > 0
 
 	assert.Equal(s.T(), http.StatusUnauthorized, response.Code)
