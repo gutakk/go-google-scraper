@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/securecookie"
 )
 
-func GetCookie(key interface{}, value interface{}) *http.Cookie {
+func GenerateCookie(key interface{}, value interface{}) *http.Cookie {
 	codecs := securecookie.CodecsFromPairs([]byte("secret"))
 	data := make(map[interface{}]interface{})
 	data[key] = value

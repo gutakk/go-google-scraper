@@ -88,7 +88,7 @@ func TestDisplayKeywordWithGuestUser(t *testing.T) {
 
 func (s *KeywordDbTestSuite) TestUploadKeywordWithAuthenticatedUserAndValidParams() {
 	headers, payload := testFile.CreateMultipartPayload("tests/fixture/adword_keywords.csv")
-	cookie := fixture.GetCookie("user_id", s.userID)
+	cookie := fixture.GenerateCookie("user_id", s.userID)
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
 	response := testHttp.PerformFileUploadRequest(s.engine, "POST", "/keyword", headers, payload)
@@ -99,7 +99,7 @@ func (s *KeywordDbTestSuite) TestUploadKeywordWithAuthenticatedUserAndValidParam
 
 func (s *KeywordDbTestSuite) TestUploadKeywordWithAuthenticatedUserAndBlankPayload() {
 	headers := http.Header{}
-	cookie := fixture.GetCookie("user_id", s.userID)
+	cookie := fixture.GenerateCookie("user_id", s.userID)
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
 	response := testHttp.PerformFileUploadRequest(s.engine, "POST", "/keyword", headers, &bytes.Buffer{})
