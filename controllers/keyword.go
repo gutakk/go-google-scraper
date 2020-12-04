@@ -33,56 +33,62 @@ func (k *KeywordController) applyRoutes(engine *gin.RouterGroup) {
 }
 
 func (k *KeywordController) displayKeyword(c *gin.Context) {
-	currentUser := helpers.GetCurrentUser(c)
-	keywordService := keyword_service.Keyword{CurrentUserID: currentUser.ID}
-
-	keywords, err := keywordService.GetAll()
-	if err != nil {
-		html.RenderWithError(c, http.StatusUnprocessableEntity, keywordView, keywordTitle, err, nil)
-	}
-
-	data := map[string]interface{}{
-		"keywords": keywords,
-	}
+	keywordService := initKeywordService(c)
+	data := getKeywordsData(keywordService)
 
 	html.RenderWithFlash(c, http.StatusOK, keywordView, keywordTitle, data)
 }
 
 func (k *KeywordController) uploadKeyword(c *gin.Context) {
+	keywordService := initKeywordService(c)
+	data := getKeywordsData(keywordService)
+
 	form := &UploadFileForm{}
 	if err := c.ShouldBind(form); err != nil {
 		for _, fieldErr := range err.(validator.ValidationErrors) {
-			html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, errorHandler.ValidationErrorMessage(fieldErr), nil)
+			html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, errorHandler.ValidationErrorMessage(fieldErr), data)
 			return
 		}
 	}
 
 	// Validate if file is CSV type
 	if err := models.ValidateFileType(form.File.Header["Content-Type"][0]); err != nil {
-		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, err, nil)
+		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, err, data)
 		return
 	}
 
 	filename := models.UploadFile(c, form.File)
 	record, readFileErr := models.ReadFile(filename)
 	if readFileErr != nil {
-		html.RenderWithError(c, http.StatusUnprocessableEntity, keywordView, keywordTitle, readFileErr, nil)
+		html.RenderWithError(c, http.StatusUnprocessableEntity, keywordView, keywordTitle, readFileErr, data)
 	}
 
 	// Validate if CSV has row between 1 and 1,000
 	if err := models.ValidateCSVLength(len(record)); err != nil {
-		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, err, nil)
+		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, err, data)
 		return
 	}
 
-	currentUser := helpers.GetCurrentUser(c)
 	// Save keywords to database
-	_, saveKeywordsErr := models.SaveKeywords(currentUser.ID, record)
+	_, saveKeywordsErr := keywordService.Save(record)
 	if saveKeywordsErr != nil {
-		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, saveKeywordsErr, nil)
+		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, saveKeywordsErr, data)
 		return
 	}
 
 	session.AddFlash(c, uploadSuccessFlash, "notice")
 	c.Redirect(http.StatusFound, "/keyword")
+}
+
+func initKeywordService(c *gin.Context) keyword_service.Keyword {
+	currentUser := helpers.GetCurrentUser(c)
+	return keyword_service.Keyword{CurrentUserID: currentUser.ID}
+}
+
+func getKeywordsData(keywordService keyword_service.Keyword) map[string]interface{} {
+	keywords, _ := keywordService.GetAll()
+
+	return map[string]interface{}{
+		"keywords": keywords,
+	}
 }

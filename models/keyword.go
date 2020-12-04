@@ -58,21 +58,11 @@ func ReadFile(filename string) ([]string, error) {
 	return record, nil
 }
 
-func SaveKeywords(userID uint, record []string) ([]Keyword, error) {
-	// Check if record is empty slices
-	if len(record) == 0 {
-		return nil, errors.New(invalidDataError)
-	}
-
-	var keywords = []Keyword{}
-	// Create bulk data
-	for _, value := range record {
-		keywords = append(keywords, Keyword{Keyword: value, UserID: userID})
-	}
-
+func SaveKeywords(keywords []Keyword) ([]Keyword, error) {
 	// Insert bulk data
-	if result := db.GetDB().Create(&keywords); result.Error != nil {
-		return nil, errorHandler.DatabaseErrorMessage(result.Error)
+	result := db.GetDB().Create(&keywords)
+	if result.Error != nil {
+		return nil, result.Error
 	}
 
 	return keywords, nil

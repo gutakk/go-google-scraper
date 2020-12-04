@@ -6,6 +6,7 @@ import (
 	"github.com/bxcodec/faker/v3"
 	"github.com/gutakk/go-google-scraper/db"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	"github.com/jackc/pgconn"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -55,9 +56,15 @@ func TestReadFileWithFileNotFound(t *testing.T) {
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
-	keywords := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
+	bulkData := []Keyword{
+		{Keyword: "Hazard", UserID: s.userID},
+		{Keyword: "Ronaldo", UserID: s.userID},
+		{Keyword: "Neymar", UserID: s.userID},
+		{Keyword: "Messi", UserID: s.userID},
+		{Keyword: "Mbappe", UserID: s.userID},
+	}
 
-	result, err := SaveKeywords(s.userID, keywords)
+	result, err := SaveKeywords(bulkData)
 
 	assert.Equal(s.T(), nil, err)
 	assert.Equal(s.T(), 5, len(result))
@@ -69,9 +76,11 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptyStringSlice() {
-	keywords := []string{""}
+	bulkData := []Keyword{
+		{Keyword: "", UserID: s.userID},
+	}
 
-	result, err := SaveKeywords(s.userID, keywords)
+	result, err := SaveKeywords(bulkData)
 
 	assert.Equal(s.T(), nil, err)
 	assert.Equal(s.T(), 1, len(result))
@@ -79,20 +88,26 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptyStringSlice() {
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptySlice() {
-	keywords := []string{}
+	bulkData := []Keyword{}
 
-	result, err := SaveKeywords(s.userID, keywords)
+	result, err := SaveKeywords(bulkData)
+	_, isPgError := err.(*pgconn.PgError)
 
-	assert.Equal(s.T(), "invalid data", err.Error())
+	assert.Equal(s.T(), "empty slice found", err.Error())
+	assert.Equal(s.T(), false, isPgError)
 	assert.Equal(s.T(), nil, result)
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidUserID() {
-	keywords := []string{"Hazard"}
+	bulkData := []Keyword{
+		{Keyword: "Hazard", UserID: 99999999},
+	}
 
-	result, err := SaveKeywords(9999999999, keywords)
+	result, err := SaveKeywords(bulkData)
+	_, isPgError := err.(*pgconn.PgError)
 
-	assert.Equal(s.T(), "something went wrong, please try again", err.Error())
+	assert.Equal(s.T(), "ERROR: insert or update on table \"keywords\" violates foreign key constraint \"fk_keywords_user\" (SQLSTATE 23503)", err.Error())
+	assert.Equal(s.T(), true, isPgError)
 	assert.Equal(s.T(), nil, result)
 }
 
