@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"strings"
 	"testing"
 
@@ -15,6 +14,7 @@ import (
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	testFile "github.com/gutakk/go-google-scraper/tests/file"
+	"github.com/gutakk/go-google-scraper/tests/fixture"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
@@ -26,7 +26,7 @@ import (
 type KeywordDbTestSuite struct {
 	suite.Suite
 	engine *gin.Engine
-	cookie string
+	userID uint
 }
 
 func (s *KeywordDbTestSuite) SetupTest() {
@@ -47,16 +47,7 @@ func (s *KeywordDbTestSuite) SetupTest() {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	user := models.User{Email: email, Password: string(hashedPassword)}
 	db.GetDB().Create(&user)
-
-	formData := url.Values{}
-	formData.Set("email", email)
-	formData.Set("password", password)
-
-	headers := http.Header{}
-	headers.Set("Content-Type", "application/x-www-form-urlencoded")
-	response := testHttp.PerformRequest(s.engine, "POST", "/login", headers, formData)
-
-	s.cookie = response.Header().Get("Set-Cookie")
+	s.userID = user.ID
 }
 
 func (s *KeywordDbTestSuite) TearDownTest() {
@@ -97,7 +88,8 @@ func TestDisplayKeywordWithGuestUser(t *testing.T) {
 
 func (s *KeywordDbTestSuite) TestUploadKeywordWithAuthenticatedUserAndValidParams() {
 	headers, payload := testFile.CreateMultipartPayload("tests/fixture/adword_keywords.csv")
-	headers.Set("Cookie", s.cookie)
+	cookie := fixture.GetCookie("user_id", s.userID)
+	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
 	response := testHttp.PerformFileUploadRequest(s.engine, "POST", "/keyword", headers, payload)
 
@@ -107,7 +99,8 @@ func (s *KeywordDbTestSuite) TestUploadKeywordWithAuthenticatedUserAndValidParam
 
 func (s *KeywordDbTestSuite) TestUploadKeywordWithAuthenticatedUserAndBlankPayload() {
 	headers := http.Header{}
-	headers.Set("Cookie", s.cookie)
+	cookie := fixture.GetCookie("user_id", s.userID)
+	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
 	response := testHttp.PerformFileUploadRequest(s.engine, "POST", "/keyword", headers, &bytes.Buffer{})
 

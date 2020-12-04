@@ -12,6 +12,7 @@ require (
 	github.com/gin-contrib/sessions v0.0.3
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.2.0
+	github.com/gorilla/securecookie v1.1.1
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/jackc/pgconn v1.7.0
 	github.com/joho/godotenv v1.3.0
