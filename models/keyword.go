@@ -28,14 +28,6 @@ type Keyword struct {
 	User    User
 }
 
-func UploadFile(c *gin.Context, file *multipart.FileHeader) string {
-	path := "dist/"
-	_ = os.Mkdir(path, 0755)
-	filename := filepath.Join(path, filepath.Base(file.Filename))
-	_ = c.SaveUploadedFile(file, filename)
-	return filename
-}
-
 func ReadFile(filename string) ([]string, error) {
 	csvfile, openErr := os.Open(filename)
 	if openErr != nil {
@@ -57,20 +49,6 @@ func ReadFile(filename string) ([]string, error) {
 	return record, nil
 }
 
-func ValidateFileType(fileType string) error {
-	if fileType != "text/csv" {
-		return errors.New(fileFormatError)
-	}
-	return nil
-}
-
-func ValidateCSVLength(row int) error {
-	if row <= 0 || row > 1000 {
-		return errors.New(fileLengthError)
-	}
-	return nil
-}
-
 func SaveKeywords(userID uint, record []string) ([]Keyword, error) {
 	// Check if record is empty slices
 	if len(record) == 0 {
@@ -89,4 +67,26 @@ func SaveKeywords(userID uint, record []string) ([]Keyword, error) {
 	}
 
 	return keywords, nil
+}
+
+func UploadFile(c *gin.Context, file *multipart.FileHeader) string {
+	path := "dist/"
+	_ = os.Mkdir(path, 0755)
+	filename := filepath.Join(path, filepath.Base(file.Filename))
+	_ = c.SaveUploadedFile(file, filename)
+	return filename
+}
+
+func ValidateCSVLength(row int) error {
+	if row <= 0 || row > 1000 {
+		return errors.New(fileLengthError)
+	}
+	return nil
+}
+
+func ValidateFileType(fileType string) error {
+	if fileType != "text/csv" {
+		return errors.New(fileFormatError)
+	}
+	return nil
 }

@@ -68,51 +68,6 @@ func TestKeywordDbTestSuite(t *testing.T) {
 	suite.Run(t, new(KeywordDbTestSuite))
 }
 
-func (s *KeywordDbTestSuite) TestUploadKeywordWithValidParams() {
-	headers, payload := testFile.CreateMultipartPayload("tests/fixture/adword_keywords.csv")
-	headers.Set("Cookie", s.cookie)
-
-	response := testHttp.PerformFileUploadRequest(s.engine, "POST", "/keyword", headers, payload)
-
-	assert.Equal(s.T(), http.StatusFound, response.Code)
-	assert.Equal(s.T(), "/keyword", response.Header().Get("Location"))
-}
-
-func (s *KeywordDbTestSuite) TestUploadKeywordWithBlankPayload() {
-	headers := http.Header{}
-	headers.Set("Cookie", s.cookie)
-
-	response := testHttp.PerformFileUploadRequest(s.engine, "POST", "/keyword", headers, &bytes.Buffer{})
-
-	p, err := ioutil.ReadAll(response.Body)
-	isKeywordPage := err == nil && strings.Index(string(p), "<title>Keyword</title>") > 0
-	pageError := err == nil && strings.Index(string(p), "File is required") > 0
-
-	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
-	assert.Equal(s.T(), true, isKeywordPage)
-	assert.Equal(s.T(), true, pageError)
-}
-
-func TestDisplayKeywordWithGuestUser(t *testing.T) {
-	engine := testConfig.GetRouter(true)
-	new(KeywordController).applyRoutes(EnsureAuthenticatedUserGroup(engine))
-
-	response := testHttp.PerformRequest(engine, "GET", "/keyword", nil, nil)
-
-	assert.Equal(t, http.StatusFound, response.Code)
-	assert.Equal(t, "/login", response.Header().Get("Location"))
-}
-
-func TestUploadKeywordWithGuestUser(t *testing.T) {
-	engine := testConfig.GetRouter(true)
-	new(KeywordController).applyRoutes(EnsureAuthenticatedUserGroup(engine))
-
-	response := testHttp.PerformRequest(engine, "POST", "/keyword", nil, nil)
-
-	assert.Equal(t, http.StatusFound, response.Code)
-	assert.Equal(t, "/login", response.Header().Get("Location"))
-}
-
 func TestDisplayKeywordWithAuthenticatedUser(t *testing.T) {
 	engine := testConfig.GetRouter(true)
 	new(KeywordController).applyRoutes(EnsureAuthenticatedUserGroup(engine))
@@ -128,4 +83,49 @@ func TestDisplayKeywordWithAuthenticatedUser(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, response.Code)
 	assert.Equal(t, true, isKeywordPage)
+}
+
+func TestDisplayKeywordWithGuestUser(t *testing.T) {
+	engine := testConfig.GetRouter(true)
+	new(KeywordController).applyRoutes(EnsureAuthenticatedUserGroup(engine))
+
+	response := testHttp.PerformRequest(engine, "GET", "/keyword", nil, nil)
+
+	assert.Equal(t, http.StatusFound, response.Code)
+	assert.Equal(t, "/login", response.Header().Get("Location"))
+}
+
+func (s *KeywordDbTestSuite) TestUploadKeywordWithAuthenticatedUserAndValidParams() {
+	headers, payload := testFile.CreateMultipartPayload("tests/fixture/adword_keywords.csv")
+	headers.Set("Cookie", s.cookie)
+
+	response := testHttp.PerformFileUploadRequest(s.engine, "POST", "/keyword", headers, payload)
+
+	assert.Equal(s.T(), http.StatusFound, response.Code)
+	assert.Equal(s.T(), "/keyword", response.Header().Get("Location"))
+}
+
+func (s *KeywordDbTestSuite) TestUploadKeywordWithAuthenticatedUserAndBlankPayload() {
+	headers := http.Header{}
+	headers.Set("Cookie", s.cookie)
+
+	response := testHttp.PerformFileUploadRequest(s.engine, "POST", "/keyword", headers, &bytes.Buffer{})
+
+	p, err := ioutil.ReadAll(response.Body)
+	isKeywordPage := err == nil && strings.Index(string(p), "<title>Keyword</title>") > 0
+	pageError := err == nil && strings.Index(string(p), "File is required") > 0
+
+	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
+	assert.Equal(s.T(), true, isKeywordPage)
+	assert.Equal(s.T(), true, pageError)
+}
+
+func TestUploadKeywordWithGuestUser(t *testing.T) {
+	engine := testConfig.GetRouter(true)
+	new(KeywordController).applyRoutes(EnsureAuthenticatedUserGroup(engine))
+
+	response := testHttp.PerformRequest(engine, "POST", "/keyword", nil, nil)
+
+	assert.Equal(t, http.StatusFound, response.Code)
+	assert.Equal(t, "/login", response.Header().Get("Location"))
 }

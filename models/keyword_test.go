@@ -40,6 +40,20 @@ func TestKeywordDBTestSuite(t *testing.T) {
 	suite.Run(t, new(KeywordDBTestSuite))
 }
 
+func TestReadFileWithValidFile(t *testing.T) {
+	result, err := ReadFile("../tests/fixture/adword_keywords.csv")
+
+	assert.Equal(t, []string{"AWS"}, result)
+	assert.Equal(t, nil, err)
+}
+
+func TestReadFileWithFileNotFound(t *testing.T) {
+	result, err := ReadFile("")
+
+	assert.Equal(t, nil, result)
+	assert.Equal(t, "something went wrong, please try again", err.Error())
+}
+
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 	keywords := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
 
@@ -82,18 +96,6 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidUserID() {
 	assert.Equal(s.T(), nil, result)
 }
 
-func TestValidateFileTypeWithValidFileType(t *testing.T) {
-	result := ValidateFileType("text/csv")
-
-	assert.Equal(t, nil, result)
-}
-
-func TestValidateFileTypeWithInvalidFileType(t *testing.T) {
-	result := ValidateFileType("test")
-
-	assert.Equal(t, "file must be CSV format", result.Error())
-}
-
 func TestValidateCSVLengthWithMinRowAllowed(t *testing.T) {
 	result := ValidateCSVLength(1)
 
@@ -118,16 +120,14 @@ func TestValidateCSVLengthWithGreaterThanMaxRowAllowed(t *testing.T) {
 	assert.Equal(t, "CSV file must contain between 1 to 1000 keywords", result.Error())
 }
 
-func TestReadFileWithValidFile(t *testing.T) {
-	result, err := ReadFile("../tests/fixture/adword_keywords.csv")
-
-	assert.Equal(t, []string{"AWS"}, result)
-	assert.Equal(t, nil, err)
-}
-
-func TestReadFileWithFileNotFound(t *testing.T) {
-	result, err := ReadFile("")
+func TestValidateFileTypeWithValidFileType(t *testing.T) {
+	result := ValidateFileType("text/csv")
 
 	assert.Equal(t, nil, result)
-	assert.Equal(t, "something went wrong, please try again", err.Error())
+}
+
+func TestValidateFileTypeWithInvalidFileType(t *testing.T) {
+	result := ValidateFileType("test")
+
+	assert.Equal(t, "file must be CSV format", result.Error())
 }
