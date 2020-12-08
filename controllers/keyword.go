@@ -82,7 +82,7 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/keyword")
 }
 
-func getKeywordsData(keywordService keyword_service.Keyword) map[string]interface{} {
+func getKeywordsData(keywordService keyword_service.KeywordService) map[string]interface{} {
 	keywords, _ := keywordService.GetAll()
 
 	return map[string]interface{}{
@@ -90,7 +90,7 @@ func getKeywordsData(keywordService keyword_service.Keyword) map[string]interfac
 	}
 }
 
-func initKeywordService(c *gin.Context) keyword_service.Keyword {
+func initKeywordService(c *gin.Context) keyword_service.KeywordService {
 	currentUser := helpers.GetCurrentUser(c)
-	return keyword_service.Keyword{CurrentUserID: currentUser.ID}
+	return keyword_service.KeywordService{CurrentUserID: currentUser.ID}
 }

@@ -20,11 +20,11 @@ const (
 	somethingWentWrongError = "something went wrong, please try again"
 )
 
-type Keyword struct {
+type KeywordService struct {
 	CurrentUserID uint
 }
 
-func (k *Keyword) GetAll() ([]models.Keyword, error) {
+func (k *KeywordService) GetAll() ([]models.Keyword, error) {
 	condition := make(map[string]interface{})
 	condition["user_id"] = k.CurrentUserID
 
@@ -36,7 +36,7 @@ func (k *Keyword) GetAll() ([]models.Keyword, error) {
 	return keywords, nil
 }
 
-func (k *Keyword) Save(record []string) ([]models.Keyword, error) {
+func (k *KeywordService) Save(record []string) ([]models.Keyword, error) {
 	// Check if record is empty slices
 	if len(record) == 0 {
 		return nil, errors.New(invalidDataError)
@@ -56,7 +56,7 @@ func (k *Keyword) Save(record []string) ([]models.Keyword, error) {
 	return keywords, nil
 }
 
-func (k *Keyword) ReadFile(filename string) ([]string, error) {
+func (k *KeywordService) ReadFile(filename string) ([]string, error) {
 	csvfile, openErr := os.Open(filename)
 	if openErr != nil {
 		return nil, errors.New(somethingWentWrongError)
@@ -77,7 +77,7 @@ func (k *Keyword) ReadFile(filename string) ([]string, error) {
 	return record, nil
 }
 
-func (k *Keyword) UploadFile(c *gin.Context, file *multipart.FileHeader) string {
+func (k *KeywordService) UploadFile(c *gin.Context, file *multipart.FileHeader) string {
 	path := "dist/"
 	_ = os.Mkdir(path, 0755)
 	filename := filepath.Join(path, filepath.Base(file.Filename))
@@ -85,14 +85,14 @@ func (k *Keyword) UploadFile(c *gin.Context, file *multipart.FileHeader) string 
 	return filename
 }
 
-func (k *Keyword) ValidateCSVLength(row int) error {
+func (k *KeywordService) ValidateCSVLength(row int) error {
 	if row <= 0 || row > 1000 {
 		return errors.New(fileLengthError)
 	}
 	return nil
 }
 
-func (k *Keyword) ValidateFileType(fileType string) error {
+func (k *KeywordService) ValidateFileType(fileType string) error {
 	if fileType != "text/csv" {
 		return errors.New(fileFormatError)
 	}

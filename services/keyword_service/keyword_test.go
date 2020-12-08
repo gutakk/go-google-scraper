@@ -16,7 +16,7 @@ import (
 
 type KeywordServiceDbTestSuite struct {
 	suite.Suite
-	keywordService Keyword
+	keywordService KeywordService
 	userID         uint
 }
 
@@ -33,7 +33,7 @@ func (s *KeywordServiceDbTestSuite) SetupTest() {
 	db.GetDB().Create(&user)
 
 	s.userID = user.ID
-	s.keywordService = Keyword{CurrentUserID: user.ID}
+	s.keywordService = KeywordService{CurrentUserID: user.ID}
 }
 
 func (s *KeywordServiceDbTestSuite) TearDownTest() {
@@ -60,7 +60,7 @@ func (s *KeywordServiceDbTestSuite) TestGetAllWithInvalidUser() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	keywordService := Keyword{}
+	keywordService := KeywordService{}
 	result, err := keywordService.GetAll()
 
 	assert.Equal(s.T(), 0, len(result))
@@ -77,7 +77,7 @@ func (s *KeywordServiceDbTestSuite) TestSaveWithValidParams() {
 
 func (s *KeywordServiceDbTestSuite) TestSaveWithValidInvalidUser() {
 	record := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
-	keywordService := Keyword{}
+	keywordService := KeywordService{}
 	result, err := keywordService.Save(record)
 
 	assert.Equal(s.T(), "something went wrong, please try again", err.Error())
@@ -94,11 +94,11 @@ func (s *KeywordServiceDbTestSuite) TestSaveWithEmptyRecord() {
 
 type KeywordServiceTestSuite struct {
 	suite.Suite
-	keywordService Keyword
+	keywordService KeywordService
 }
 
 func (s *KeywordServiceTestSuite) SetupTest() {
-	s.keywordService = Keyword{}
+	s.keywordService = KeywordService{}
 }
 
 func TestKeywordServiceTestSuite(t *testing.T) {
