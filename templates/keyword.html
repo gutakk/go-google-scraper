@@ -14,32 +14,28 @@
   </form>
 
   {{ if .data.keywords }}
-    <div class="mt-8 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-      <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-        <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead>
-              <tr>
-                <th scope="col">Keyword</th>
-                <th scope="col">Uploaded date</th>
-                <th scope="col">Status</th>
-                <th scope="col">Action</th>
-              </tr>
-            </thead>
-            
-            <tbody>
-              {{ range $k := .data.keywords }}
-                <tr>
-                  <td><strong>{{ $k.Keyword }}</strong></td>
-                  <td>{{ $k.FormattedCreatedAt }}</td>
-                  <td></td>
-                  <td></td>
-                </tr>
-              {{ end }}
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <div class="list-keyword sm:rounded-lg">
+      <table class="list-keyword__table divide-y divide-gray-200">
+        <thead>
+          <tr>
+            <th scope="col">Keyword</th>
+            <th scope="col">Uploaded date</th>
+            <th scope="col">Status</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        
+        <tbody>
+          {{ range $k := .data.keywords }}
+            <tr>
+              <td><strong>{{ $k.Keyword }}</strong></td>
+              <td>{{ $k.FormattedCreatedAt }}</td>
+              <td></td>
+              <td></td>
+            </tr>
+          {{ end }}
+        </tbody>
+      </table>
     </div>
   {{ end }}
 </div>
