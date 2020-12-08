@@ -4,8 +4,12 @@ import (
 	"net/http"
 )
 
-func GoogleRequest(keyword string) (*http.Response, error) {
-	url := "https://www.google.com/search?q=" + keyword
+type GoogleRequest struct {
+	Keyword string
+}
+
+func (g *GoogleRequest) Request() (*http.Response, error) {
+	url := "https://www.google.com/search?q=" + g.Keyword
 	client := &http.Client{}
 
 	req, _ := http.NewRequest("GET", url, nil)

@@ -1,51 +1,67 @@
 package google_scraping_service
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
-func GoogleResultParser(resp *http.Response) (string, error) {
-	doc, err := goquery.NewDocumentFromReader(resp.Body)
+type GoogleResultParser struct {
+	Resp *http.Response
+}
+
+type GoogleResult struct {
+	Links                  int
+	NonAdwords             int
+	NonAdwordLinks         []string
+	TopPostionAdwords      int
+	TopPositionAdwordLinks []string
+	TotalAdwords           int
+}
+
+func (g *GoogleResultParser) ParseGoogleResponse() (GoogleResult, error) {
+	doc, err := goquery.NewDocumentFromReader(g.Resp.Body)
 	if err != nil {
-		log.Printf("@@@@@@@@@@@@@@@@@@@ %v", err)
+		return GoogleResult{}, err
 	}
-	log.Printf("===================== %v", countTopPosAdwords(doc))
-	log.Printf("@@@@@@@@@@@@@@@@@@@@@ %v", fetchTopPosAdwordLinks(doc))
-	log.Printf("##################### %v", countTotalAdwords(doc, 4))
-	log.Printf("!!!!!!!!!!!!!!!!!!!!! %v", countNonAdwords(doc))
-	log.Printf("$$$$$$$$$$$$$$$$$$$$$ %v", fetchNonAdwordLinks(doc))
-	log.Printf("^^^^^^^^^^^^^^^^^^^^^ %v", countLinks(doc))
-	return "hello", nil
+
+	googleResult := GoogleResult{
+		Links:                  g.countLinks(doc),
+		NonAdwords:             g.countNonAdwords(doc),
+		NonAdwordLinks:         g.fetchNonAdwordLinks(doc),
+		TopPostionAdwords:      g.countTopPosAdwords(doc),
+		TopPositionAdwordLinks: g.fetchTopPosAdwordLinks(doc),
+		TotalAdwords:           g.countTotalAdwords(doc),
+	}
+
+	return googleResult, nil
 }
 
-func countLinks(doc *goquery.Document) int {
-	return len(parseLinks(doc, "a"))
+func (g *GoogleResultParser) countLinks(doc *goquery.Document) int {
+	return len(g.parseLinks(doc, "a"))
 }
 
-func countNonAdwords(doc *goquery.Document) int {
+func (g *GoogleResultParser) countNonAdwords(doc *goquery.Document) int {
 	return doc.Find("#rso > div[class=g]").Length()
 }
 
-func countTopPosAdwords(doc *goquery.Document) int {
+func (g *GoogleResultParser) countTopPosAdwords(doc *goquery.Document) int {
 	return doc.Find("#tads > div").Length()
 }
 
-func countTotalAdwords(doc *goquery.Document, topPosAdwords int) int {
-	return doc.Find("#tadsb > div").Length() + topPosAdwords
+func (g *GoogleResultParser) countTotalAdwords(doc *goquery.Document) int {
+	return doc.Find("#tadsb > div").Length() + g.countTopPosAdwords(doc)
 }
 
-func fetchNonAdwordLinks(doc *goquery.Document) []string {
-	return parseLinks(doc, "#rso > div[class=g] .yuRUbf > a")
+func (g *GoogleResultParser) fetchNonAdwordLinks(doc *goquery.Document) []string {
+	return g.parseLinks(doc, "#rso > div[class=g] .yuRUbf > a")
 }
 
-func fetchTopPosAdwordLinks(doc *goquery.Document) []string {
-	return parseLinks(doc, "#tads > div .Krnil")
+func (g *GoogleResultParser) fetchTopPosAdwordLinks(doc *goquery.Document) []string {
+	return g.parseLinks(doc, "#tads > div .Krnil")
 }
 
-func parseLinks(doc *goquery.Document, selector string) []string {
+func (g *GoogleResultParser) parseLinks(doc *goquery.Document, selector string) []string {
 	var links []string
 
 	doc.Find(selector).Each(func(i int, s *goquery.Selection) {
