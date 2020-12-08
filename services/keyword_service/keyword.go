@@ -28,7 +28,7 @@ func (k *Keyword) GetAll() ([]models.Keyword, error) {
 	condition := make(map[string]interface{})
 	condition["user_id"] = k.CurrentUserID
 
-	keywords, err := models.GetKeywords(condition)
+	keywords, err := models.GetKeywordsBy(condition)
 	if err != nil {
 		return nil, errorHandler.DatabaseErrorMessage(err)
 	}
