@@ -35,6 +35,8 @@ func (s *KeywordDbTestSuite) SetupTest() {
 		return database
 	}
 
+	db.GenerateRedisPool("localhost:6379")
+
 	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
 
 	s.engine = testConfig.GetRouter(true)

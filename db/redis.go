@@ -1,16 +1,18 @@
 package db
 
-import "github.com/gomodule/redigo/redis"
+import (
+	"github.com/gomodule/redigo/redis"
+)
 
 var RedisPool *redis.Pool
 
-func GenerateRedisPool() {
+func GenerateRedisPool(address string) {
 	pool := &redis.Pool{
 		MaxActive: 5,
 		MaxIdle:   5,
 		Wait:      true,
 		Dial: func() (redis.Conn, error) {
-			return redis.Dial("tcp", "localhost:6379")
+			return redis.Dial("tcp", address)
 		},
 	}
 
