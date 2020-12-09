@@ -59,20 +59,20 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 
 	filename := keywordService.UploadFile(c, form.File)
 
-	record, readFileErr := keywordService.ReadFile(filename)
+	parsedKeywordList, readFileErr := keywordService.ReadFile(filename)
 	if readFileErr != nil {
 		html.RenderWithError(c, http.StatusUnprocessableEntity, keywordView, keywordTitle, readFileErr, data)
 	}
 
 	// Validate if CSV has row between 1 and 1,000
-	validateLengthErr := keywordService.ValidateCSVLength(len(record))
+	validateLengthErr := keywordService.ValidateCSVLength(len(parsedKeywordList))
 	if validateLengthErr != nil {
 		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, validateLengthErr, data)
 		return
 	}
 
 	// Save keywords to database
-	_, saveKeywordsErr := keywordService.Save(record)
+	_, saveKeywordsErr := keywordService.Save(parsedKeywordList)
 	if saveKeywordsErr != nil {
 		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, saveKeywordsErr, data)
 		return

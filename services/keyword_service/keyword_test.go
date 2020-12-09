@@ -68,25 +68,25 @@ func (s *KeywordServiceDbTestSuite) TestGetAllWithInvalidUser() {
 }
 
 func (s *KeywordServiceDbTestSuite) TestSaveWithValidParams() {
-	record := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
-	result, err := s.keywordService.Save(record)
+	keywordList := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
+	result, err := s.keywordService.Save(keywordList)
 
 	assert.Equal(s.T(), 5, len(result))
 	assert.Equal(s.T(), nil, err)
 }
 
 func (s *KeywordServiceDbTestSuite) TestSaveWithValidInvalidUser() {
-	record := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
+	keywordList := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
 	keywordService := KeywordService{}
-	result, err := keywordService.Save(record)
+	result, err := keywordService.Save(keywordList)
 
 	assert.Equal(s.T(), "something went wrong, please try again", err.Error())
 	assert.Equal(s.T(), nil, result)
 }
 
-func (s *KeywordServiceDbTestSuite) TestSaveWithEmptyRecord() {
-	record := []string{}
-	result, err := s.keywordService.Save(record)
+func (s *KeywordServiceDbTestSuite) TestSaveWithEmptyKeywordList() {
+	keywordList := []string{}
+	result, err := s.keywordService.Save(keywordList)
 
 	assert.Equal(s.T(), "invalid data", err.Error())
 	assert.Equal(s.T(), nil, result)

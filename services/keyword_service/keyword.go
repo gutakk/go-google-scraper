@@ -36,24 +36,24 @@ func (k *KeywordService) GetAll() ([]models.Keyword, error) {
 	return keywords, nil
 }
 
-func (k *KeywordService) Save(record []string) ([]models.Keyword, error) {
+func (k *KeywordService) Save(parsedKeywordList []string) ([]models.Keyword, error) {
 	// Check if record is empty slices
-	if len(record) == 0 {
+	if len(parsedKeywordList) == 0 {
 		return nil, errors.New(invalidDataError)
 	}
 
 	var bulkData = []models.Keyword{}
 	// Create bulk data
-	for _, value := range record {
+	for _, value := range parsedKeywordList {
 		bulkData = append(bulkData, models.Keyword{Keyword: value, UserID: k.CurrentUserID})
 	}
 
-	keywords, err := models.SaveKeywords(bulkData)
+	savedKeywords, err := models.SaveKeywords(bulkData)
 	if err != nil {
 		return nil, errorHandler.DatabaseErrorMessage(err)
 	}
 
-	return keywords, nil
+	return savedKeywords, nil
 }
 
 func (k *KeywordService) ReadFile(filename string) ([]string, error) {
@@ -63,7 +63,7 @@ func (k *KeywordService) ReadFile(filename string) ([]string, error) {
 	}
 
 	r := csv.NewReader(csvfile)
-	var record []string
+	var keywordList []string
 	for {
 		row, err := r.Read()
 		if err == io.EOF {
@@ -71,10 +71,10 @@ func (k *KeywordService) ReadFile(filename string) ([]string, error) {
 		} else if err != nil {
 			return nil, errors.New(somethingWentWrongError)
 		}
-		record = append(record, row[0])
+		keywordList = append(keywordList, row[0])
 	}
 
-	return record, nil
+	return keywordList, nil
 }
 
 func (k *KeywordService) UploadFile(c *gin.Context, file *multipart.FileHeader) string {
