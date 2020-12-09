@@ -8,9 +8,9 @@ import (
 
 func RenderWithError(c *gin.Context, status int, view string, title string, err error, data map[string]interface{}) {
 	ginview.HTML(c, status, view, gin.H{
-		"title":  title,
-		"errors": err.Error(),
-		"data":   data,
+		"title": title,
+		"error": err.Error(),
+		"data":  data,
 	})
 }
 

@@ -1,13 +1,11 @@
 package models
 
 import (
-	"os"
 	"testing"
 
 	"github.com/bxcodec/faker/v3"
-	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/db"
-	"github.com/gutakk/go-google-scraper/tests"
+	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -15,9 +13,100 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestMain(m *testing.M) {
-	gin.SetMode(gin.TestMode)
-	os.Exit(m.Run())
+type UserDBTestSuite struct {
+	suite.Suite
+	userID   uint
+	email    string
+	password string
+}
+
+func (s *UserDBTestSuite) SetupTest() {
+	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	db.GetDB = func() *gorm.DB {
+		return database
+	}
+
+	_ = db.GetDB().AutoMigrate(&User{})
+
+	s.email = faker.Email()
+	s.password = faker.Password()
+
+	user := &User{Email: s.email, Password: s.password}
+	db.GetDB().Create(user)
+
+	s.userID = user.ID
+}
+
+func (s *UserDBTestSuite) TearDownTest() {
+	db.GetDB().Exec("DELETE FROM users")
+}
+
+func TestUserDBTestSuite(t *testing.T) {
+	suite.Run(t, new(UserDBTestSuite))
+}
+
+func (s *UserDBTestSuite) TestSaveUserWithValidParams() {
+	db.GetDB().Exec("DELETE FROM users")
+	err := SaveUser(s.email, s.password)
+	assert.Equal(s.T(), nil, err)
+
+	user := &User{}
+	db.GetDB().First(user)
+	assert.Equal(s.T(), s.email, user.Email)
+}
+
+func (s *UserDBTestSuite) TestSaveUserWithDuplicateEmail() {
+	err := SaveUser(s.email, s.password)
+	assert.NotEqual(s.T(), nil, err)
+
+	result := db.GetDB().First(&User{})
+	assert.Equal(s.T(), int64(1), result.RowsAffected)
+}
+
+func (s *UserDBTestSuite) TestSaveUserWithEmptyStringEmail() {
+	db.GetDB().Exec("DELETE FROM users")
+	err := SaveUser("", "password")
+	assert.Equal(s.T(), "Email or password cannot be blank", err.Error())
+
+	result := db.GetDB().First(&User{})
+	assert.Equal(s.T(), int64(0), result.RowsAffected)
+}
+
+func (s *UserDBTestSuite) TestSaveUserWithEmptyStringPassword() {
+	db.GetDB().Exec("DELETE FROM users")
+	err := SaveUser("email@email.com", "")
+	assert.Equal(s.T(), "Email or password cannot be blank", err.Error())
+
+	result := db.GetDB().First(&User{})
+	assert.Equal(s.T(), int64(0), result.RowsAffected)
+}
+
+func (s *UserDBTestSuite) TestFindUserByConditionWithValidEmail() {
+	user, err := FindUserBy(&User{Email: s.email})
+
+	assert.Equal(s.T(), nil, err)
+	assert.Equal(s.T(), s.email, user.Email)
+}
+
+func (s *UserDBTestSuite) TestFindUserByConditionWithInvalidEmail() {
+	user, err := FindUserBy(&User{Email: "test"})
+
+	assert.NotEqual(s.T(), nil, err)
+	assert.Equal(s.T(), &User{}, user)
+}
+
+func (s *UserDBTestSuite) TestFindUserByIDWithValidID() {
+	user, err := FindUserByID(s.userID)
+
+	assert.Equal(s.T(), nil, err)
+	assert.Equal(s.T(), s.email, user.Email)
+}
+
+func (s *UserDBTestSuite) TestFindUserByIDWithInvalidID() {
+	user, err := FindUserByID("testID")
+
+	assert.NotEqual(s.T(), nil, err)
+	assert.Equal(s.T(), &User{}, user)
 }
 
 func TestHashPassword(t *testing.T) {
@@ -39,100 +128,4 @@ func TestValidatePasswordWithInvalidPassword(t *testing.T) {
 	result := ValidatePassword(string(hashedPassword), "drowssap")
 
 	assert.NotEqual(t, nil, result)
-}
-
-type DBTestSuite struct {
-	suite.Suite
-	userID   uint
-	email    string
-	password string
-}
-
-func (s *DBTestSuite) SetupTest() {
-	testDB, _ := gorm.Open(postgres.Open(tests.ConstructTestDsn()), &gorm.Config{})
-	db.GetDB = func() *gorm.DB {
-		return testDB
-	}
-
-	_ = db.GetDB().AutoMigrate(&User{})
-
-	s.email = faker.Email()
-	s.password = faker.Password()
-
-	user := &User{Email: s.email, Password: s.password}
-	db.GetDB().Create(user)
-
-	s.userID = user.ID
-}
-
-func (s *DBTestSuite) TearDownTest() {
-	db.GetDB().Exec("DELETE FROM users")
-}
-
-func TestDBTestSuite(t *testing.T) {
-	suite.Run(t, new(DBTestSuite))
-}
-
-func (s *DBTestSuite) TestSaveUserWithValidParams() {
-	db.GetDB().Exec("DELETE FROM users")
-	err := SaveUser(s.email, s.password)
-	assert.Equal(s.T(), nil, err)
-
-	user := &User{}
-	db.GetDB().First(user)
-	assert.Equal(s.T(), s.email, user.Email)
-}
-
-func (s *DBTestSuite) TestSaveUserWithDuplicateEmail() {
-	err := SaveUser(s.email, s.password)
-	assert.NotEqual(s.T(), nil, err)
-
-	result := db.GetDB().First(&User{})
-	assert.Equal(s.T(), int64(1), result.RowsAffected)
-}
-
-func (s *DBTestSuite) TestSaveUserWithEmptyStringEmail() {
-	db.GetDB().Exec("DELETE FROM users")
-	err := SaveUser("", "password")
-	assert.Equal(s.T(), "Email or password cannot be blank", err.Error())
-
-	result := db.GetDB().First(&User{})
-	assert.Equal(s.T(), int64(0), result.RowsAffected)
-}
-
-func (s *DBTestSuite) TestSaveUserWithEmptyStringPassword() {
-	db.GetDB().Exec("DELETE FROM users")
-	err := SaveUser("email@email.com", "")
-	assert.Equal(s.T(), "Email or password cannot be blank", err.Error())
-
-	result := db.GetDB().First(&User{})
-	assert.Equal(s.T(), int64(0), result.RowsAffected)
-}
-
-func (s *DBTestSuite) TestFindOneUserByConditionWithValidParams() {
-	user, err := FindUserBy(&User{Email: s.email})
-
-	assert.Equal(s.T(), nil, err)
-	assert.Equal(s.T(), s.email, user.Email)
-}
-
-func (s *DBTestSuite) TestFindOneUserByConditionWithInvalidEmail() {
-	user, err := FindUserBy(&User{Email: "test"})
-
-	assert.NotEqual(s.T(), nil, err)
-	assert.Equal(s.T(), &User{}, user)
-}
-
-func (s *DBTestSuite) TestFindOneUserByIDWithValidID() {
-	user, err := FindUserByID(s.userID)
-
-	assert.Equal(s.T(), nil, err)
-	assert.Equal(s.T(), s.email, user.Email)
-}
-
-func (s *DBTestSuite) TestFindOneUserByIDWithInvalidID() {
-	user, err := FindUserByID("testID")
-
-	assert.NotEqual(s.T(), nil, err)
-	assert.Equal(s.T(), &User{}, user)
 }

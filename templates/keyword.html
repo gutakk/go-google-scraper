@@ -1,0 +1,15 @@
+{{ define "content" }}
+
+{{ include "partials/flashes" }}
+
+<h2>Upload CSV</h2>
+
+<form class="mt-8 space-y-6" action="/keyword" enctype="multipart/form-data" method="POST">
+  <input name="file" type="file" required accept=".csv">
+
+  <button type="submit">
+    Upload
+  </button>
+</form>
+
+{{ end }}

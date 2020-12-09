@@ -12,6 +12,7 @@ func CombineRoutes(engine *gin.Engine) {
 	new(HomeController).applyRoutes(engine)
 
 	// Ensure authenticated user group
+	new(KeywordController).applyRoutes(EnsureAuthenticatedUserGroup(engine))
 	new(LogoutController).applyRoutes(EnsureAuthenticatedUserGroup(engine))
 
 	// Ensure guest user group

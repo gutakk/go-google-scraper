@@ -1,6 +1,10 @@
 .alert {
   @apply mt-8 py-2 rounded-md text-center font-semibold;
 
+  &::first-letter {
+    text-transform: uppercase;
+  }
+
   &--danger {
     @apply bg-red-200 text-red-800;
   }

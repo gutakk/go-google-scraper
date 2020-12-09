@@ -8,14 +8,16 @@ import (
 )
 
 const (
-	commonFieldError    = "%s is not valid"
-	emailFormatError    = "Invalid email format"
-	emailDuplicateError = "Email already exists"
-	minError            = "%s must be longer than %s"
-	passwordEqError     = "Passwords do not match"
-	requiredError       = "%s is required"
+	commonFieldError        = "%s is not valid"
+	emailFormatError        = "invalid email format"
+	emailDuplicateError     = "email already exists"
+	minError                = "%s must be longer than %s"
+	passwordEqError         = "passwords do not match"
+	requiredError           = "%s is required"
+	somethingWentWrongError = "something went wrong, please try again"
 
-	duplicateErrorCode = "23505"
+	foreignKeyErrorCode = "23503"
+	duplicateErrorCode  = "23505"
 )
 
 // interface from github.com/go-playground/validator/v10
@@ -44,6 +46,8 @@ func DatabaseErrorMessage(err error) error {
 	pgErr := err.(*pgconn.PgError)
 
 	switch pgErr.Code {
+	case foreignKeyErrorCode:
+		return errors.New(somethingWentWrongError)
 	case duplicateErrorCode:
 		return errors.New(emailDuplicateError)
 	}

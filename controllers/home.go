@@ -5,8 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	html "github.com/gutakk/go-google-scraper/helpers/html"
-	session "github.com/gutakk/go-google-scraper/helpers/session"
-	"github.com/gutakk/go-google-scraper/models"
+	helpers "github.com/gutakk/go-google-scraper/helpers/user"
 )
 
 const (
@@ -21,16 +20,11 @@ func (h *HomeController) applyRoutes(engine *gin.Engine) {
 }
 
 func (h *HomeController) displayHome(c *gin.Context) {
-	userID := session.Get(c, "user_id")
-
-	var user models.User
-	if userID != nil {
-		user, _ = models.FindUserByID(userID)
-	}
+	currentUser := helpers.GetCurrentUser(c)
 
 	data := map[string]interface{}{
-		"authenticatedUser": userID,
-		"email":             user.Email,
+		"authenticatedUser": currentUser.ID,
+		"email":             currentUser.Email,
 	}
 
 	html.RenderWithFlash(c, http.StatusOK, homeView, homeTitle, data)

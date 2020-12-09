@@ -16,7 +16,7 @@ const (
 	loginTitle = "Login"
 	loginView  = "login"
 
-	invalidUsernameOrPassword = "Username or password is invalid"
+	invalidUsernameOrPassword = "username or password is invalid"
 )
 
 type LoginController struct{}
