@@ -79,7 +79,11 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 		return
 	}
 
-	google_scraping_service.EnqueueScrapingJob(savedKeywords)
+	enqueueErr := google_scraping_service.EnqueueScrapingJob(savedKeywords)
+	if enqueueErr != nil {
+		html.RenderWithError(c, http.StatusUnprocessableEntity, keywordView, keywordTitle, enqueueErr, data)
+		return
+	}
 
 	session.AddFlash(c, uploadSuccessFlash, "notice")
 	c.Redirect(http.StatusFound, "/keyword")
