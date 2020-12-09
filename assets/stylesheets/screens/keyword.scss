@@ -1,12 +1,14 @@
-.form-keyword-upload {
-  @apply border rounded-md p-6;
-  width: fit-content;
-}
-
-.list-keyword {
-  @apply shadow overflow-hidden border-b border-gray-200 mt-8;
-
-  &__table {
-    @apply min-w-full;
+body.keyword {
+  .form-keyword-upload {
+    @apply border rounded-md p-6;
+    width: fit-content;
+  }
+  
+  .list-keyword {
+    @apply shadow overflow-hidden border-b border-gray-200 mt-8;
+  
+    &__table {
+      @apply min-w-full;
+    }
   }
 }
