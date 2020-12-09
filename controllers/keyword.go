@@ -73,13 +73,13 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 	}
 
 	// Save keywords to database
-	_, saveKeywordsErr := keywordService.Save(parsedKeywordList)
+	savedKeywords, saveKeywordsErr := keywordService.Save(parsedKeywordList)
 	if saveKeywordsErr != nil {
 		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, saveKeywordsErr, data)
 		return
 	}
 
-	google_scraping_service.EnqueueJobDistributingJob()
+	google_scraping_service.EnqueueScrapingJob(savedKeywords)
 
 	session.AddFlash(c, uploadSuccessFlash, "notice")
 	c.Redirect(http.StatusFound, "/keyword")
