@@ -11,12 +11,12 @@ type GoogleResponseParser struct {
 }
 
 type ScrapingResult struct {
-	Links                  int
-	NonAdwords             int
+	LinksCount             int
+	NonAdwordsCount        int
 	NonAdwordLinks         []string
-	TopPostionAdwords      int
+	TopPostionAdwordsCount int
 	TopPositionAdwordLinks []string
-	TotalAdwords           int
+	TotalAdwordsCount      int
 }
 
 func (g *GoogleResponseParser) ParseGoogleResponse() (ScrapingResult, error) {
@@ -26,12 +26,12 @@ func (g *GoogleResponseParser) ParseGoogleResponse() (ScrapingResult, error) {
 	}
 
 	scrapingResult := ScrapingResult{
-		Links:                  g.countLinks(doc),
-		NonAdwords:             g.countNonAdwords(doc),
+		LinksCount:             g.countLinks(doc),
+		NonAdwordsCount:        g.countNonAdwords(doc),
 		NonAdwordLinks:         g.fetchNonAdwordLinks(doc),
-		TopPostionAdwords:      g.countTopPositionAdwords(doc),
+		TopPostionAdwordsCount: g.countTopPositionAdwords(doc),
 		TopPositionAdwordLinks: g.fetchTopPositionAdwordLinks(doc),
-		TotalAdwords:           g.countTotalAdwords(doc),
+		TotalAdwordsCount:      g.countTotalAdwords(doc),
 	}
 
 	return scrapingResult, nil
