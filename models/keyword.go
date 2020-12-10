@@ -1,14 +1,35 @@
 package models
 
 import (
+	"database/sql/driver"
+
 	"github.com/gutakk/go-google-scraper/db"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
+type keywordStatus string
+
+const (
+	Pending      keywordStatus = "pending"
+	Processing   keywordStatus = "processing"
+	Processed    keywordStatus = "processed"
+	ProcessError keywordStatus = "error"
+)
+
+func (k *keywordStatus) Scan(value interface{}) error {
+	*k = keywordStatus(value.([]byte))
+	return nil
+}
+
+func (k keywordStatus) Value() (driver.Value, error) {
+	return string(k), nil
+}
+
 type Keyword struct {
 	gorm.Model
-	Keyword                 string `gorm:"notNull;index"`
+	Keyword                 string        `gorm:"notNull;index"`
+	Status                  keywordStatus `gorm:"default:pending;type:keyword_status"`
 	LinksCount              int
 	NonAdwordsCount         int
 	NonAdwordLinks          datatypes.JSON

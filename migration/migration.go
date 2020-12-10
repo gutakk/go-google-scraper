@@ -15,6 +15,8 @@ func Migrate(db *gorm.DB) {
 		log.Print("Migrate user schema successfully")
 	}
 
+	db.Exec("CREATE TYPE keyword_status AS ENUM('pending', 'processing', 'processed', 'error')")
+
 	if err := db.AutoMigrate(&models.Keyword{}); err != nil {
 		log.Fatal(fmt.Sprintf("Failed to migrate %v", err))
 	} else {
