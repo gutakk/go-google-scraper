@@ -17,11 +17,6 @@ const (
 	ProcessError keywordStatus = "error"
 )
 
-func (k *keywordStatus) Scan(value interface{}) error {
-	*k = keywordStatus(value.([]byte))
-	return nil
-}
-
 func (k keywordStatus) Value() (driver.Value, error) {
 	return string(k), nil
 }
@@ -37,6 +32,7 @@ type Keyword struct {
 	TopPositionAdwordsLinks datatypes.JSON
 	TotalAdwordsCount       int
 	UserID                  uint
+	HtmlCode                string
 	User                    User
 }
 

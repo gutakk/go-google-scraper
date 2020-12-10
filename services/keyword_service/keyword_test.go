@@ -5,6 +5,7 @@ import (
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gutakk/go-google-scraper/db"
+	"github.com/gutakk/go-google-scraper/migration"
 	"github.com/gutakk/go-google-scraper/models"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/stretchr/testify/suite"
@@ -26,7 +27,7 @@ func (s *KeywordServiceDbTestSuite) SetupTest() {
 		return database
 	}
 
-	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
+	migration.Migrate(db.GetDB())
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
 	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}

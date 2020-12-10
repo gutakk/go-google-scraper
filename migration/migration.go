@@ -15,11 +15,21 @@ func Migrate(db *gorm.DB) {
 		log.Print("Migrate user schema successfully")
 	}
 
-	db.Exec("CREATE TYPE keyword_status AS ENUM('pending', 'processing', 'processed', 'error')")
+	InitKeywordStatusEnum(db)
 
 	if err := db.AutoMigrate(&models.Keyword{}); err != nil {
 		log.Fatal(fmt.Sprintf("Failed to migrate %v", err))
 	} else {
 		log.Print("Migrate keyword schema successfully")
 	}
+}
+
+func InitKeywordStatusEnum(db *gorm.DB) {
+	db.Exec(`
+		DO $$ BEGIN
+			CREATE TYPE keyword_status AS ENUM('pending', 'processing', 'processed', 'error');
+		EXCEPTION
+			WHEN duplicate_object THEN null;
+		END $$;
+	`)
 }
