@@ -11,6 +11,7 @@ type GoogleResponseParser struct {
 }
 
 type ParsingResult struct {
+	HtmlCode               string
 	LinksCount             int
 	NonAdwordsCount        int
 	NonAdwordLinks         []string
@@ -30,6 +31,7 @@ func (g *GoogleResponseParser) ParseGoogleResponse() (ParsingResult, error) {
 	topPositionAdwordsCount := g.countTopPositionAdwords(doc)
 
 	parsingResult := ParsingResult{
+		HtmlCode:               doc.Text(),
 		LinksCount:             g.countLinks(doc),
 		NonAdwordsCount:        g.countNonAdwords(doc),
 		NonAdwordLinks:         g.fetchNonAdwordLinks(doc),
