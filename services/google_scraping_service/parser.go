@@ -10,7 +10,7 @@ type GoogleResponseParser struct {
 	GoogleResponse *http.Response
 }
 
-type ScrapingResult struct {
+type ParsingResult struct {
 	LinksCount             int
 	NonAdwordsCount        int
 	NonAdwordLinks         []string
@@ -19,17 +19,17 @@ type ScrapingResult struct {
 	TotalAdwordsCount      int
 }
 
-func (g *GoogleResponseParser) ParseGoogleResponse() (ScrapingResult, error) {
+func (g *GoogleResponseParser) ParseGoogleResponse() (ParsingResult, error) {
 
 	doc, err := goquery.NewDocumentFromReader(g.GoogleResponse.Body)
 	if err != nil {
-		return ScrapingResult{}, err
+		return ParsingResult{}, err
 	}
 
 	bottomPoistionAdwordsCount := g.countBottomPositionAdwords(doc)
 	topPositionAdwordsCount := g.countTopPositionAdwords(doc)
 
-	scrapingResult := ScrapingResult{
+	parsingResult := ParsingResult{
 		LinksCount:             g.countLinks(doc),
 		NonAdwordsCount:        g.countNonAdwords(doc),
 		NonAdwordLinks:         g.fetchNonAdwordLinks(doc),
@@ -38,7 +38,7 @@ func (g *GoogleResponseParser) ParseGoogleResponse() (ScrapingResult, error) {
 		TotalAdwordsCount:      bottomPoistionAdwordsCount + topPositionAdwordsCount,
 	}
 
-	return scrapingResult, nil
+	return parsingResult, nil
 }
 
 func (g *GoogleResponseParser) countBottomPositionAdwords(doc *goquery.Document) int {
