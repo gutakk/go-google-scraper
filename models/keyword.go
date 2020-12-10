@@ -11,10 +11,10 @@ import (
 type keywordStatus string
 
 const (
-	Pending      keywordStatus = "pending"
-	Processing   keywordStatus = "processing"
-	Processed    keywordStatus = "processed"
-	ProcessError keywordStatus = "error"
+	Pending    keywordStatus = "pending"
+	Processing keywordStatus = "processing"
+	Processed  keywordStatus = "processed"
+	Failed     keywordStatus = "failed"
 )
 
 func (k keywordStatus) Value() (driver.Value, error) {

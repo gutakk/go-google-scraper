@@ -27,7 +27,7 @@ func Migrate(db *gorm.DB) {
 func InitKeywordStatusEnum(db *gorm.DB) {
 	db.Exec(`
 		DO $$ BEGIN
-			CREATE TYPE keyword_status AS ENUM('pending', 'processing', 'processed', 'error');
+			CREATE TYPE keyword_status AS ENUM('pending', 'processing', 'processed', 'failed');
 		EXCEPTION
 			WHEN duplicate_object THEN null;
 		END $$;
