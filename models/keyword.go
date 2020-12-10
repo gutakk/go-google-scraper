@@ -2,34 +2,41 @@ package models
 
 import (
 	"database/sql/driver"
+	"errors"
 
 	"github.com/gutakk/go-google-scraper/db"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
-type keywordStatus string
+type KeywordStatus string
 
 const (
-	Pending    keywordStatus = "pending"
-	Processing keywordStatus = "processing"
-	Processed  keywordStatus = "processed"
-	Failed     keywordStatus = "failed"
+	Pending    KeywordStatus = "pending"
+	Processing KeywordStatus = "processing"
+	Processed  KeywordStatus = "processed"
+	Failed     KeywordStatus = "failed"
+
+	InvalidKeywordStatusErr = "invalid keyword status"
 )
 
-func (k keywordStatus) Value() (driver.Value, error) {
-	return string(k), nil
+func (k KeywordStatus) Value() (driver.Value, error) {
+	switch k {
+	case Pending, Processing, Processed, Failed:
+		return string(k), nil
+	}
+	return nil, errors.New(InvalidKeywordStatusErr)
 }
 
 type Keyword struct {
 	gorm.Model
 	Keyword                 string        `gorm:"notNull;index"`
-	Status                  keywordStatus `gorm:"default:pending;type:keyword_status"`
+	Status                  KeywordStatus `gorm:"default:pending;type:keyword_status"`
 	LinksCount              int
 	NonAdwordsCount         int
 	NonAdwordLinks          datatypes.JSON
 	TopPositionAdwordsCount int
-	TopPositionAdwordsLinks datatypes.JSON
+	TopPositionAdwordLinks  datatypes.JSON
 	TotalAdwordsCount       int
 	UserID                  uint
 	HtmlCode                string
@@ -58,4 +65,13 @@ func SaveKeywords(keywords []Keyword) ([]Keyword, error) {
 
 func (k *Keyword) FormattedCreatedAt() string {
 	return k.CreatedAt.Format("January 2, 2006")
+}
+
+func UpdateKeywordByID(keywordID uint, newKeyword Keyword) error {
+	result := db.GetDB().Model(&Keyword{}).Where("id = ?", keywordID).Updates(newKeyword)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
 }
