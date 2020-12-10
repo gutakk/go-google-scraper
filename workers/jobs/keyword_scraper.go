@@ -5,8 +5,16 @@ import (
 	"time"
 
 	"github.com/gocraft/work"
+	"github.com/gutakk/go-google-scraper/config"
+	"github.com/gutakk/go-google-scraper/db"
+	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/services/google_scraping_service"
 )
+
+func init() {
+	config.LoadEnv()
+	_ = db.ConnectDB()
+}
 
 type Context struct{}
 
@@ -17,6 +25,8 @@ func (c *Context) Log(job *work.Job, next work.NextMiddlewareFunc) error {
 
 func (c *Context) PerformScrapingJob(job *work.Job) error {
 	start := time.Now()
+
+	db.GetDB().Model(models.Keyword{}).Where("id = ?", job.ArgInt64("keywordID")).Update("status", "processing")
 
 	requester := google_scraping_service.GoogleRequest{Keyword: job.ArgString("keyword")}
 	resp, reqErr := requester.Request()
