@@ -21,50 +21,66 @@ type ParsingResult struct {
 }
 
 func (g *GoogleResponseParser) ParseGoogleResponse() (ParsingResult, error) {
+	countBottomPositionAdwordsCh := make(chan int)
+	countLinksCh := make(chan int)
+	countNonAdwordsCh := make(chan int)
+	countTopPositionAdwordsCh := make(chan int)
+
+	fetchNonAdwordLinksCh := make(chan []string)
+	fetchTopPositionAdwordLinksCh := make(chan []string)
 
 	doc, err := goquery.NewDocumentFromReader(g.GoogleResponse.Body)
 	if err != nil {
 		return ParsingResult{}, err
 	}
 
-	bottomPoistionAdwordsCount := g.countBottomPositionAdwords(doc)
-	topPositionAdwordsCount := g.countTopPositionAdwords(doc)
+	go g.countBottomPositionAdwords(doc, countBottomPositionAdwordsCh)
+	go g.countLinks(doc, countLinksCh)
+	go g.countNonAdwords(doc, countNonAdwordsCh)
+	go g.countTopPositionAdwords(doc, countTopPositionAdwordsCh)
+
+	go g.fetchNonAdwordLinks(doc, fetchNonAdwordLinksCh)
+	go g.fetchTopPositionAdwordLinks(doc, fetchTopPositionAdwordLinksCh)
+
+	bottomPositionAdwordsCount := <-countBottomPositionAdwordsCh
+	htmlCode, _ := doc.Html()
+	topPositionAdwordsCount := <-countTopPositionAdwordsCh
 
 	parsingResult := ParsingResult{
-		HtmlCode:               doc.Text(),
-		LinksCount:             g.countLinks(doc),
-		NonAdwordsCount:        g.countNonAdwords(doc),
-		NonAdwordLinks:         g.fetchNonAdwordLinks(doc),
+		HtmlCode:               htmlCode,
+		LinksCount:             <-countLinksCh,
+		NonAdwordsCount:        <-countNonAdwordsCh,
+		NonAdwordLinks:         <-fetchNonAdwordLinksCh,
 		TopPostionAdwordsCount: topPositionAdwordsCount,
-		TopPositionAdwordLinks: g.fetchTopPositionAdwordLinks(doc),
-		TotalAdwordsCount:      bottomPoistionAdwordsCount + topPositionAdwordsCount,
+		TopPositionAdwordLinks: <-fetchTopPositionAdwordLinksCh,
+		TotalAdwordsCount:      bottomPositionAdwordsCount + topPositionAdwordsCount,
 	}
 
 	return parsingResult, nil
 }
 
-func (g *GoogleResponseParser) countBottomPositionAdwords(doc *goquery.Document) int {
-	return doc.Find("#tadsb > div").Length()
+func (g *GoogleResponseParser) countBottomPositionAdwords(doc *goquery.Document, ch chan int) {
+	ch <- doc.Find("#tadsb > div").Length()
 }
 
-func (g *GoogleResponseParser) countLinks(doc *goquery.Document) int {
-	return len(g.parseLinks(doc, "a"))
+func (g *GoogleResponseParser) countLinks(doc *goquery.Document, ch chan int) {
+	ch <- len(g.parseLinks(doc, "a"))
 }
 
-func (g *GoogleResponseParser) countNonAdwords(doc *goquery.Document) int {
-	return doc.Find("#rso > div[class=g]").Length()
+func (g *GoogleResponseParser) countNonAdwords(doc *goquery.Document, ch chan int) {
+	ch <- doc.Find("#rso .yuRUbf").Length()
 }
 
-func (g *GoogleResponseParser) countTopPositionAdwords(doc *goquery.Document) int {
-	return doc.Find("#tads > div").Length()
+func (g *GoogleResponseParser) countTopPositionAdwords(doc *goquery.Document, ch chan int) {
+	ch <- doc.Find("#tads > div").Length()
 }
 
-func (g *GoogleResponseParser) fetchNonAdwordLinks(doc *goquery.Document) []string {
-	return g.parseLinks(doc, "#rso > div[class=g] .yuRUbf > a")
+func (g *GoogleResponseParser) fetchNonAdwordLinks(doc *goquery.Document, ch chan []string) {
+	ch <- g.parseLinks(doc, "#rso .yuRUbf > a")
 }
 
-func (g *GoogleResponseParser) fetchTopPositionAdwordLinks(doc *goquery.Document) []string {
-	return g.parseLinks(doc, "#tads > div .Krnil")
+func (g *GoogleResponseParser) fetchTopPositionAdwordLinks(doc *goquery.Document, ch chan []string) {
+	ch <- g.parseLinks(doc, "#tads > div .Krnil")
 }
 
 func (g *GoogleResponseParser) parseLinks(doc *goquery.Document, selector string) []string {
