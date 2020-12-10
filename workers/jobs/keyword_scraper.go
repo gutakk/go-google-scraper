@@ -26,7 +26,8 @@ func (c *Context) Log(job *work.Job, next work.NextMiddlewareFunc) error {
 func (c *Context) PerformScrapingJob(job *work.Job) error {
 	start := time.Now()
 
-	db.GetDB().Model(models.Keyword{}).Where("id = ?", job.ArgInt64("keywordID")).Update("status", "processing")
+	// Update status to processing before start executing job
+	db.GetDB().Model(models.Keyword{}).Where("id = ?", job.ArgInt64("keywordID")).Update("status", models.Processing)
 
 	requester := google_scraping_service.GoogleRequest{Keyword: job.ArgString("keyword")}
 	resp, reqErr := requester.Request()
