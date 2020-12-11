@@ -4,7 +4,7 @@ import "fmt"
 
 func ConstructTestDsn() string {
 	host := "localhost"
-	port := "5432"
+	port := "5433"
 	dbName := "go_google_scraper_test"
 	username := "postgres"
 
