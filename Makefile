@@ -11,6 +11,6 @@ start-dev: env-setup
 	goreman start
 
 test:
-	docker-compose -f docker-compose.dev.yml down
 	docker-compose -f docker-compose.test.yml up -d
 	go test -v -p 1 ./...
+	docker-compose -f docker-compose.test.yml down
