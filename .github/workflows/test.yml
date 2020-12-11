@@ -19,11 +19,5 @@ jobs:
         with:
           version: v1.29
 
-      - name: Setup database
-        run: make test-env-setup
-
       - name: Tests
         run: make test
-
-      - name: Destroy database
-        run: make test-env-destroy
