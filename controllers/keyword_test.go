@@ -36,7 +36,7 @@ func (s *KeywordDbTestSuite) SetupTest() {
 		return database
 	}
 
-	db.GenerateRedisPool("localhost:6379")
+	db.GenerateRedisPool("localhost:6380")
 
 	migration.Migrate(db.GetDB())
 
