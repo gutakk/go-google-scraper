@@ -21,27 +21,17 @@ var redisPool = &redis.Pool{
 }
 
 func main() {
-	// Make a new pool. Arguments:
-	// Context{} is a struct that will be the context for the request.
-	// 10 is the max concurrency
-	// "my_app_namespace" is the Redis namespace
-	// redisPool is a Redis pool
 	pool := work.NewWorkerPool(jobs.Context{}, 5, "go-google-scraper", redisPool)
 
-	// Add middleware that will be executed for each job
 	pool.Middleware((*jobs.Context).Log)
 
-	// Map the name of jobs to handler functions
-	pool.Job("scraping", (*jobs.Context).PerformScrapingJob)
+	pool.JobWithOptions("scraping", work.JobOptions{MaxFails: jobs.MaxFails}, (*jobs.Context).PerformScrapingJob)
 
-	// Start processing jobs
 	pool.Start()
 
-	// Wait for a signal to quit:
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
 	<-signalChan
 
-	// Stop the pool
 	pool.Stop()
 }
