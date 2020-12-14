@@ -249,6 +249,7 @@ func (s *KeywordDBTestSuite) TestUpdateKeywordByIDValidStatus() {
 	newKeyword := Keyword{Status: Processing}
 
 	err := UpdateKeywordByID(keyword.ID, newKeyword)
+
 	var result Keyword
 	db.GetDB().First(&result, keyword.ID)
 

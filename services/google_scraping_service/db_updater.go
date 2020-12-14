@@ -16,8 +16,15 @@ func UpdateKeywordStatus(keywordID uint, status models.KeywordStatus) error {
 }
 
 func UpdateKeywordWithParsingResult(keywordID uint, parsingResult ParsingResult) error {
-	nonAdwordLinks, _ := json.Marshal(parsingResult.NonAdwordLinks)
-	topPositionAdwordLinks, _ := json.Marshal(parsingResult.TopPositionAdwordLinks)
+	nonAdwordLinks, nonAdwordLinksParsingErr := json.Marshal(parsingResult.NonAdwordLinks)
+	if nonAdwordLinksParsingErr != nil {
+		return nonAdwordLinksParsingErr
+	}
+
+	topPositionAdwordLinks, topPositionAdwordLinksParsingErr := json.Marshal(parsingResult.TopPositionAdwordLinks)
+	if topPositionAdwordLinksParsingErr != nil {
+		return topPositionAdwordLinksParsingErr
+	}
 
 	newKeyword := models.Keyword{
 		Status:                  models.Processed,
