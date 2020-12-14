@@ -120,7 +120,7 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByWithMoreThanOneRows() {
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordDBTestSuite) TestGetKeywordsByWithTruthyCondition() {
+func (s *KeywordDBTestSuite) TestGetKeywordsByValidKeyword() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
@@ -134,7 +134,7 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByWithTruthyCondition() {
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordDBTestSuite) TestGetKeywordsByWithFalsyCondition() {
+func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidKeyword() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
@@ -147,7 +147,7 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByWithFalsyCondition() {
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordDBTestSuite) TestGetKeywordsByWithNilCondition() {
+func (s *KeywordDBTestSuite) TestGetKeywordsByWithoutKeyword() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
@@ -158,7 +158,7 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByWithNilCondition() {
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordDBTestSuite) TestGetKeywordsByWithInvalidCondition() {
+func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidColumn() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
