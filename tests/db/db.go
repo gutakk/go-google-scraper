@@ -29,3 +29,19 @@ func InitKeywordStatusEnum(db *gorm.DB) {
 		END $$;
 	`)
 }
+
+func RedisKeyJobs(namespace, jobName string) string {
+	return redisKeyJobsPrefix(namespace) + jobName
+}
+
+func redisKeyJobsPrefix(namespace string) string {
+	return redisNamespacePrefix(namespace) + "jobs:"
+}
+
+func redisNamespacePrefix(namespace string) string {
+	l := len(namespace)
+	if (l > 0) && (namespace[l-1] != ':') {
+		namespace = namespace + ":"
+	}
+	return namespace
+}
