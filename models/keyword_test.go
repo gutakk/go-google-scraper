@@ -68,7 +68,7 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithSingleValidParams() {
 	nonAdwordLinks, _ := json.Marshal([]string{"test-non-ads-link"})
 	topPositionAdwordLinks, _ := json.Marshal([]string{"test-top-ads-link"})
 
-	bulkData := []Keyword{
+	keywordList := []Keyword{
 		{
 			Keyword:                 "Hazard",
 			Status:                  Pending,
@@ -83,7 +83,7 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithSingleValidParams() {
 		},
 	}
 
-	result, err := SaveKeywords(bulkData)
+	result, err := SaveKeywords(keywordList)
 
 	var nonAdwordLinksVal []string
 	_ = json.Unmarshal(result[0].NonAdwordLinks, &nonAdwordLinksVal)
@@ -141,11 +141,11 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidUserID() {
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidKeywordStatus() {
-	bulkData := []Keyword{
+	keywordList := []Keyword{
 		{Status: "test"},
 	}
 
-	result, err := SaveKeywords(bulkData)
+	result, err := SaveKeywords(keywordList)
 
 	assert.Equal(s.T(), "invalid keyword status", err.Error())
 	assert.Equal(s.T(), nil, result)
