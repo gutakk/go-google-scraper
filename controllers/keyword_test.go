@@ -10,7 +10,6 @@ import (
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/db"
-	"github.com/gutakk/go-google-scraper/migration"
 	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
@@ -38,7 +37,8 @@ func (s *KeywordDbTestSuite) SetupTest() {
 
 	db.GenerateRedisPool("localhost:6380")
 
-	migration.Migrate(db.GetDB())
+	testDB.InitKeywordStatusEnum(db.GetDB())
+	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
 
 	s.engine = testConfig.GetRouter(true)
 	new(LoginController).applyRoutes(EnsureGuestUserGroup(s.engine))
