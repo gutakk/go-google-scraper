@@ -42,13 +42,13 @@ func (k *KeywordService) Save(parsedKeywordList []string) ([]models.Keyword, err
 		return nil, errors.New(invalidDataError)
 	}
 
-	var bulkData = []models.Keyword{}
+	var keywordList = []models.Keyword{}
 	// Create bulk data
 	for _, value := range parsedKeywordList {
-		bulkData = append(bulkData, models.Keyword{Keyword: value, UserID: k.CurrentUserID})
+		keywordList = append(keywordList, models.Keyword{Keyword: value, UserID: k.CurrentUserID})
 	}
 
-	savedKeywords, err := models.SaveKeywords(bulkData)
+	savedKeywords, err := models.SaveKeywords(keywordList)
 	if err != nil {
 		return nil, errorHandler.DatabaseErrorMessage(err)
 	}

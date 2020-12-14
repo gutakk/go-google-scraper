@@ -43,7 +43,7 @@ func TestKeywordDBTestSuite(t *testing.T) {
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
-	bulkData := []Keyword{
+	keywordList := []Keyword{
 		{Keyword: "Hazard", UserID: s.userID},
 		{Keyword: "Ronaldo", UserID: s.userID},
 		{Keyword: "Neymar", UserID: s.userID},
@@ -51,7 +51,7 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 		{Keyword: "Mbappe", UserID: s.userID},
 	}
 
-	result, err := SaveKeywords(bulkData)
+	result, err := SaveKeywords(keywordList)
 
 	assert.Equal(s.T(), nil, err)
 	assert.Equal(s.T(), 5, len(result))
@@ -63,11 +63,11 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptyStringSlice() {
-	bulkData := []Keyword{
+	keywordList := []Keyword{
 		{Keyword: "", UserID: s.userID},
 	}
 
-	result, err := SaveKeywords(bulkData)
+	result, err := SaveKeywords(keywordList)
 
 	assert.Equal(s.T(), nil, err)
 	assert.Equal(s.T(), 1, len(result))
@@ -75,9 +75,9 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptyStringSlice() {
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptySlice() {
-	bulkData := []Keyword{}
+	keywordList := []Keyword{}
 
-	result, err := SaveKeywords(bulkData)
+	result, err := SaveKeywords(keywordList)
 	_, isPgError := err.(*pgconn.PgError)
 
 	assert.Equal(s.T(), "empty slice found", err.Error())
@@ -86,11 +86,11 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptySlice() {
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidUserID() {
-	bulkData := []Keyword{
+	keywordList := []Keyword{
 		{Keyword: "Hazard", UserID: 99999999},
 	}
 
-	result, err := SaveKeywords(bulkData)
+	result, err := SaveKeywords(keywordList)
 	errVal, isPgError := err.(*pgconn.PgError)
 
 	assert.Equal(s.T(), "23503", errVal.Code)
@@ -99,7 +99,7 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidUserID() {
 }
 
 func (s *KeywordDBTestSuite) TestGetKeywordsByWithMoreThanOneRows() {
-	bulkData := []Keyword{
+	keywordList := []Keyword{
 		{Keyword: "Hazard", UserID: s.userID},
 		{Keyword: "Ronaldo", UserID: s.userID},
 		{Keyword: "Neymar", UserID: s.userID},
@@ -107,7 +107,7 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByWithMoreThanOneRows() {
 		{Keyword: "Mbappe", UserID: s.userID},
 	}
 
-	db.GetDB().Create(&bulkData)
+	db.GetDB().Create(&keywordList)
 
 	result, err := GetKeywordsBy(nil)
 
