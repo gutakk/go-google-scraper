@@ -33,5 +33,5 @@ func SaveKeywords(keywords []Keyword) ([]Keyword, error) {
 }
 
 func (k *Keyword) FormattedCreatedAt() string {
-	return k.CreatedAt.Format("December 2, 2006")
+	return k.CreatedAt.Format("January 2, 2006")
 }
