@@ -63,10 +63,6 @@ func SaveKeywords(keywords []Keyword) ([]Keyword, error) {
 	return keywords, nil
 }
 
-func (k *Keyword) FormattedCreatedAt() string {
-	return k.CreatedAt.Format("January 2, 2006")
-}
-
 func UpdateKeywordByID(keywordID uint, newKeyword Keyword) error {
 	result := db.GetDB().Model(&Keyword{}).Where("id = ?", keywordID).Updates(newKeyword)
 	if result.Error != nil {
@@ -74,4 +70,8 @@ func UpdateKeywordByID(keywordID uint, newKeyword Keyword) error {
 	}
 
 	return nil
+}
+
+func (k *Keyword) FormattedCreatedAt() string {
+	return k.CreatedAt.Format("January 2, 2006")
 }

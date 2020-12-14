@@ -26,6 +26,7 @@ func (s *KeywordDBTestSuite) SetupTest() {
 		return database
 	}
 
+	testDB.InitKeywordStatusEnum(db.GetDB())
 	_ = db.GetDB().AutoMigrate(&User{}, &Keyword{})
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
@@ -223,4 +224,20 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidColumn() {
 	assert.Equal(s.T(), "ERROR: column \"unknown_column\" does not exist (SQLSTATE 42703)", err.Error())
 	assert.Equal(s.T(), true, isPgError)
 	assert.Equal(s.T(), nil, result)
+}
+
+func (s *KeywordDBTestSuite) TestUpdateKeywordByIDWithValidParams() {
+	keyword := Keyword{UserID: s.userID, Keyword: "Hazard"}
+	db.GetDB().Create(&keyword)
+
+	newKeyword := Keyword{Keyword: "Ronaldo"}
+
+	err := UpdateKeywordByID(keyword.ID, newKeyword)
+
+	var result Keyword
+	db.GetDB().First(&result, keyword.ID)
+
+	assert.Equal(s.T(), nil, err)
+	assert.Equal(s.T(), keyword.ID, result.ID)
+	assert.Equal(s.T(), "Ronaldo", result.Keyword)
 }
