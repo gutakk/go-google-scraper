@@ -11,7 +11,6 @@ import (
 
 func TestRequest(t *testing.T) {
 	r, _ := recorder.New("../../tests/fixture/vcr")
-	defer r.Stop()
 
 	googleRequest := GoogleRequest{Keyword: "AWS", Transport: r}
 	resp, _ := googleRequest.Request()
@@ -21,4 +20,6 @@ func TestRequest(t *testing.T) {
 
 	assert.Equal(t, nil, err)
 	assert.Equal(t, true, isGoogleSearchPage)
+
+	_ = r.Stop()
 }
