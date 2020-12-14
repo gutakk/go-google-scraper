@@ -56,6 +56,7 @@ func (s *KeywordDbTestSuite) SetupTest() {
 func (s *KeywordDbTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM keywords")
 	db.GetDB().Exec("DELETE FROM users")
+	_, _ = db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "scraping"))
 }
 
 func TestKeywordDbTestSuite(t *testing.T) {

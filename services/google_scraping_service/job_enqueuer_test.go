@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/garyburd/redigo/redis"
 	"github.com/gocraft/work"
+	"github.com/gomodule/redigo/redis"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
@@ -19,6 +19,10 @@ type JobEnqueuerTestSuite struct {
 
 func (s *JobEnqueuerTestSuite) SetupTest() {
 	db.GenerateRedisPool("localhost:6380")
+}
+
+func (s *JobEnqueuerTestSuite) TearDownTest() {
+	_, _ = db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "scraping"))
 }
 
 func TestJobEnqueuerTestSuite(t *testing.T) {
