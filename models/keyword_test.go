@@ -139,7 +139,7 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByWithFalsyCondition() {
 	db.GetDB().Create(&keyword)
 
 	condition := make(map[string]interface{})
-	condition["keyword"] = keyword.Keyword + "test"
+	condition["keyword"] = "invalid"
 
 	result, err := GetKeywordsBy(condition)
 
