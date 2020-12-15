@@ -50,8 +50,7 @@ func (c *Context) PerformScrapingJob(job *work.Job) error {
 	}
 
 	// Request for Google html
-	requester := google_scraping_service.GoogleRequest{Keyword: keyword}
-	resp, reqErr := requester.Request()
+	resp, reqErr := google_scraping_service.Request(keyword, nil)
 	if reqErr != nil {
 		updateStatusToFailed(job.Fails, jobName, keywordID, keyword, reqErr)
 		return reqErr

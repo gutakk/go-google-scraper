@@ -1,6 +1,8 @@
 package jobs
 
 import (
+	"errors"
+	"net/http"
 	"testing"
 
 	"github.com/bxcodec/faker/v3"
@@ -8,6 +10,7 @@ import (
 	"github.com/gocraft/work"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
+	"github.com/gutakk/go-google-scraper/services/google_scraping_service"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
@@ -53,6 +56,23 @@ func TestKeywordScraperDBTestSuite(t *testing.T) {
 
 func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithValidJob() {
 	r, _ := recorder.New("../../tests/fixture/vcr/valid_keyword")
+	requestFunc := google_scraping_service.Request
+	google_scraping_service.Request = func(keyword string, transport http.RoundTripper) (*http.Response, error) {
+		url := "https://www.google.com/search?q=AWS"
+		client := &http.Client{Transport: r}
+
+		req, _ := http.NewRequest("GET", url, nil)
+		req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36")
+
+		resp, err := client.Do(req)
+		if err != nil {
+			return nil, err
+		}
+
+		return resp, err
+	}
+	defer func() { google_scraping_service.Request = requestFunc }()
+
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
@@ -101,7 +121,6 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithoutKeywordAndReach
 	)
 
 	job.Fails = MaxFails
-
 	ctx := Context{}
 	err := ctx.PerformScrapingJob(job)
 
@@ -109,5 +128,34 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithoutKeywordAndReach
 	db.GetDB().First(&result, keyword.ID)
 
 	assert.Equal(s.T(), "invalid keyword", err.Error())
+	assert.Equal(s.T(), models.Failed, result.Status)
+}
+
+func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithRequestErrorAndReachMaxFails() {
+	requestFunc := google_scraping_service.Request
+	google_scraping_service.Request = func(keyword string, transport http.RoundTripper) (*http.Response, error) {
+		return nil, errors.New("mock request error")
+	}
+	defer func() { google_scraping_service.Request = requestFunc }()
+
+	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
+	db.GetDB().Create(&keyword)
+
+	job, _ := s.enqueuer.Enqueue(
+		"scraping",
+		work.Q{
+			"keywordID": keyword.ID,
+			"keyword":   keyword.Keyword,
+		},
+	)
+
+	job.Fails = MaxFails
+	ctx := Context{}
+	err := ctx.PerformScrapingJob(job)
+
+	var result models.Keyword
+	db.GetDB().First(&result, keyword.ID)
+
+	assert.Equal(s.T(), "mock request error", err.Error())
 	assert.Equal(s.T(), models.Failed, result.Status)
 }

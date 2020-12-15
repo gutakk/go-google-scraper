@@ -12,8 +12,7 @@ import (
 func TestRequestWithValidKeyword(t *testing.T) {
 	r, _ := recorder.New("../../tests/fixture/vcr/valid_keyword")
 
-	googleRequest := GoogleRequest{Keyword: "AWS", Transport: r}
-	resp, _ := googleRequest.Request()
+	resp, _ := Request("AWS", r)
 
 	p, err := ioutil.ReadAll(resp.Body)
 	isGoogleSearchPage := err == nil && strings.Index(string(p), "<title>AWS") > 0
@@ -27,8 +26,7 @@ func TestRequestWithValidKeyword(t *testing.T) {
 func TestRequestWithBlankSpaceKeyword(t *testing.T) {
 	r, _ := recorder.New("../../tests/fixture/vcr/blank_space_keyword")
 
-	googleRequest := GoogleRequest{Keyword: "A W S", Transport: r}
-	resp, _ := googleRequest.Request()
+	resp, _ := Request("A W S", r)
 
 	p, err := ioutil.ReadAll(resp.Body)
 	isGoogleSearchPage := err == nil && strings.Index(string(p), "<title>A W S") > 0
@@ -42,8 +40,7 @@ func TestRequestWithBlankSpaceKeyword(t *testing.T) {
 func TestRequestWithThaiKeyword(t *testing.T) {
 	r, _ := recorder.New("../../tests/fixture/vcr/thai_keyword")
 
-	googleRequest := GoogleRequest{Keyword: "สวัสดี", Transport: r}
-	resp, _ := googleRequest.Request()
+	resp, _ := Request("สวัสดี", r)
 
 	p, err := ioutil.ReadAll(resp.Body)
 	isGoogleSearchPage := err == nil && strings.Index(string(p), "<title>สวัสดี") > 0
