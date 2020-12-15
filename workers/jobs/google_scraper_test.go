@@ -128,6 +128,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithoutKeywordAndReach
 	db.GetDB().First(&result, keyword.ID)
 
 	assert.Equal(s.T(), "invalid keyword", err.Error())
+	assert.Equal(s.T(), "invalid keyword", result.FailedReason)
 	assert.Equal(s.T(), models.Failed, result.Status)
 }
 
@@ -157,6 +158,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithRequestErrorAndRea
 	db.GetDB().First(&result, keyword.ID)
 
 	assert.Equal(s.T(), "mock request error", err.Error())
+	assert.Equal(s.T(), "mock request error", result.FailedReason)
 	assert.Equal(s.T(), models.Failed, result.Status)
 }
 
@@ -186,5 +188,6 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithParsingErrorAndRea
 	db.GetDB().First(&result, keyword.ID)
 
 	assert.Equal(s.T(), "mock parsing error", err.Error())
+	assert.Equal(s.T(), "mock parsing error", result.FailedReason)
 	assert.Equal(s.T(), models.Failed, result.Status)
 }
