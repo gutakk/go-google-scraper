@@ -29,8 +29,10 @@
           {{ range $k := .data.keywords }}
             <tr>
               <td><strong>{{ $k.Keyword }}</strong></td>
-              <td>{{ $k.FormattedCreatedAt }}</td>
-              <td></td>
+              <td>{{ formattedCreatedAt $k.CreatedAt }}</td>
+              <td>
+                <span class="keyword-status keyword-status--{{ $k.Status }}">{{ $k.Status }}</span>
+              </td>
               <td></td>
             </tr>
           {{ end }}
