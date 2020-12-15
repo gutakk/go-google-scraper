@@ -7,8 +7,15 @@ import (
 
 	"github.com/gocraft/work"
 	"github.com/gomodule/redigo/redis"
+	"github.com/gutakk/go-google-scraper/config"
+	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/workers/jobs"
 )
+
+func init() {
+	config.LoadEnv()
+	_ = db.ConnectDB()
+}
 
 // Make a redis pool
 var redisPool = &redis.Pool{

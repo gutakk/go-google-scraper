@@ -1,25 +1,22 @@
 package jobs
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"time"
 
 	"github.com/gocraft/work"
-	"github.com/gutakk/go-google-scraper/config"
-	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/services/google_scraping_service"
 )
 
 const (
 	MaxFails = 3
-)
 
-func init() {
-	config.LoadEnv()
-	_ = db.ConnectDB()
-}
+	invalidKeywordError   = "invalid keyword"
+	invalidKeywordIDError = "invalid keyword id"
+)
 
 type Context struct{}
 
@@ -34,11 +31,22 @@ func (c *Context) PerformScrapingJob(job *work.Job) error {
 	jobName := job.Name
 	keywordID := uint(job.ArgInt64("keywordID"))
 	keyword := job.ArgString("keyword")
+	if keywordID == 0 {
+		log.Printf("Cannot perform job (reason: %v)", invalidKeywordIDError)
+		return errors.New(invalidKeywordIDError)
+	}
+
+	if len(keyword) == 0 {
+		err := errors.New(invalidKeywordError)
+		updateStatusToFailed(job.Fails, jobName, keywordID, keyword, err)
+		return err
+	}
 
 	// Update status to processing before start executing job
 	updateStatusErr := google_scraping_service.UpdateKeywordStatus(keywordID, models.Processing)
 	if updateStatusErr != nil {
 		updateStatusToFailed(job.Fails, jobName, keywordID, keyword, updateStatusErr)
+		return updateStatusErr
 	}
 
 	// Request for Google html
@@ -46,6 +54,7 @@ func (c *Context) PerformScrapingJob(job *work.Job) error {
 	resp, reqErr := requester.Request()
 	if reqErr != nil {
 		updateStatusToFailed(job.Fails, jobName, keywordID, keyword, reqErr)
+		return reqErr
 	}
 
 	// Parse Google response
@@ -53,12 +62,14 @@ func (c *Context) PerformScrapingJob(job *work.Job) error {
 	parsingResult, parseErr := parser.ParseGoogleResponse()
 	if parseErr != nil {
 		updateStatusToFailed(job.Fails, jobName, keywordID, keyword, parseErr)
+		return parseErr
 	}
 
 	// Update keyword with parsing result
 	updateKeywordErr := google_scraping_service.UpdateKeywordWithParsingResult(keywordID, parsingResult)
 	if updateKeywordErr != nil {
 		updateStatusToFailed(job.Fails, jobName, keywordID, keyword, updateKeywordErr)
+		return updateKeywordErr
 	}
 
 	end := time.Since(start)
@@ -79,6 +90,5 @@ func updateStatusToFailed(jobFails int64, jobName string, keywordID uint, keywor
 		}
 
 		log.Printf("Job %v for keyword %v reached maximum fails (reason: %v)", jobName, keyword, err.Error())
-		return
 	}
 }
