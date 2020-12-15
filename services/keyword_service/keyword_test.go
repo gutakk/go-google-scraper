@@ -26,6 +26,8 @@ func (s *KeywordServiceDbTestSuite) SetupTest() {
 		return database
 	}
 
+	db.GenerateRedisPool("localhost:6380")
+
 	testDB.InitKeywordStatusEnum(db.GetDB())
 	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
 
@@ -70,27 +72,24 @@ func (s *KeywordServiceDbTestSuite) TestGetAllWithInvalidUser() {
 
 func (s *KeywordServiceDbTestSuite) TestSaveWithValidParams() {
 	keywordList := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
-	result, err := s.keywordService.Save(keywordList)
+	err := s.keywordService.SaveAndScrape(keywordList)
 
-	assert.Equal(s.T(), 5, len(result))
 	assert.Equal(s.T(), nil, err)
 }
 
 func (s *KeywordServiceDbTestSuite) TestSaveWithValidInvalidUser() {
 	keywordList := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
 	keywordService := KeywordService{}
-	result, err := keywordService.Save(keywordList)
+	err := keywordService.SaveAndScrape(keywordList)
 
 	assert.Equal(s.T(), "something went wrong, please try again", err.Error())
-	assert.Equal(s.T(), nil, result)
 }
 
 func (s *KeywordServiceDbTestSuite) TestSaveWithEmptyKeywordList() {
 	keywordList := []string{}
-	result, err := s.keywordService.Save(keywordList)
+	err := s.keywordService.SaveAndScrape(keywordList)
 
 	assert.Equal(s.T(), "invalid data", err.Error())
-	assert.Equal(s.T(), nil, result)
 }
 
 type KeywordServiceTestSuite struct {

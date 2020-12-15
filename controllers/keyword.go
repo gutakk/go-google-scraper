@@ -10,7 +10,6 @@ import (
 	html "github.com/gutakk/go-google-scraper/helpers/html"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	helpers "github.com/gutakk/go-google-scraper/helpers/user"
-	"github.com/gutakk/go-google-scraper/services/google_scraping_service"
 	"github.com/gutakk/go-google-scraper/services/keyword_service"
 )
 
@@ -73,15 +72,9 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 	}
 
 	// Save keywords to database
-	savedKeywords, saveKeywordsErr := keywordService.Save(parsedKeywordList)
+	saveKeywordsErr := keywordService.SaveAndScrape(parsedKeywordList)
 	if saveKeywordsErr != nil {
 		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, saveKeywordsErr, data)
-		return
-	}
-
-	enqueueErr := google_scraping_service.EnqueueScrapingJob(savedKeywords)
-	if enqueueErr != nil {
-		html.RenderWithError(c, http.StatusUnprocessableEntity, keywordView, keywordTitle, enqueueErr, data)
 		return
 	}
 

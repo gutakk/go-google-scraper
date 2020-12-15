@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/models"
+	"github.com/gutakk/go-google-scraper/services/google_scraping_service"
 )
 
 const (
@@ -36,10 +37,10 @@ func (k *KeywordService) GetAll() ([]models.Keyword, error) {
 	return keywords, nil
 }
 
-func (k *KeywordService) Save(parsedKeywordList []string) ([]models.Keyword, error) {
+func (k *KeywordService) SaveAndScrape(parsedKeywordList []string) error {
 	// Check if record is empty slices
 	if len(parsedKeywordList) == 0 {
-		return nil, errors.New(invalidDataError)
+		return errors.New(invalidDataError)
 	}
 
 	var keywordList = []models.Keyword{}
@@ -50,10 +51,15 @@ func (k *KeywordService) Save(parsedKeywordList []string) ([]models.Keyword, err
 
 	savedKeywords, err := models.SaveKeywords(keywordList)
 	if err != nil {
-		return nil, errorHandler.DatabaseErrorMessage(err)
+		return errorHandler.DatabaseErrorMessage(err)
 	}
 
-	return savedKeywords, nil
+	enqueueErr := google_scraping_service.EnqueueScrapingJob(savedKeywords)
+	if enqueueErr != nil {
+		return enqueueErr
+	}
+
+	return nil
 }
 
 func (k *KeywordService) ReadFile(filename string) ([]string, error) {
