@@ -6,8 +6,15 @@ import (
 	"github.com/gutakk/go-google-scraper/models"
 )
 
-func UpdateKeywordStatus(keywordID uint, status models.KeywordStatus) error {
-	err := models.UpdateKeywordByID(keywordID, models.Keyword{Status: status})
+func UpdateKeywordStatus(keywordID uint, status models.KeywordStatus, failedReason error) error {
+	var keywordModel models.Keyword
+	keywordModel.Status = status
+
+	if failedReason != nil {
+		keywordModel.FailedReason = failedReason.Error()
+	}
+
+	err := models.UpdateKeywordByID(keywordID, keywordModel)
 	if err != nil {
 		return err
 	}

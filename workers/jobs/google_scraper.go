@@ -43,7 +43,7 @@ func (c *Context) PerformScrapingJob(job *work.Job) error {
 	}
 
 	// Update status to processing before start executing job
-	updateStatusErr := google_scraping_service.UpdateKeywordStatus(keywordID, models.Processing)
+	updateStatusErr := google_scraping_service.UpdateKeywordStatus(keywordID, models.Processing, nil)
 	if updateStatusErr != nil {
 		updateStatusToFailed(job.Fails, jobName, keywordID, keyword, updateStatusErr)
 		return updateStatusErr
@@ -81,7 +81,7 @@ func (c *Context) PerformScrapingJob(job *work.Job) error {
 // So this need to be done at jobFails + 1
 func updateStatusToFailed(jobFails int64, jobName string, keywordID uint, keyword string, err error) {
 	if int(jobFails+1) >= MaxFails {
-		updateStatusErr := google_scraping_service.UpdateKeywordStatus(keywordID, models.Failed)
+		updateStatusErr := google_scraping_service.UpdateKeywordStatus(keywordID, models.Failed, err)
 
 		if updateStatusErr != nil {
 			panic(fmt.Sprintf("Cannot update keyword status (reason: %v)", updateStatusErr))

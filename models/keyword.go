@@ -40,6 +40,7 @@ type Keyword struct {
 	TotalAdwordsCount       int
 	UserID                  uint
 	HtmlCode                string
+	FailedReason            string
 	User                    User
 }
 

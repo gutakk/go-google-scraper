@@ -1,6 +1,7 @@
 package google_scraping_service
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/bxcodec/faker/v3"
@@ -43,17 +44,32 @@ func TestDBUpdaterDBTestSuite(t *testing.T) {
 	suite.Run(t, new(DBUpdaterDBTestSuite))
 }
 
-func (s *DBUpdaterDBTestSuite) TestUpdatKeywordStatusWithValidParams() {
+func (s *DBUpdaterDBTestSuite) TestUpdatKeywordStatusWithProcessedStatus() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: "Hazard"}
 	db.GetDB().Create(&keyword)
 
-	err := UpdateKeywordStatus(keyword.ID, models.Processed)
+	err := UpdateKeywordStatus(keyword.ID, models.Processed, nil)
 
 	var result models.Keyword
 	db.GetDB().First(&result, keyword.ID)
 
 	assert.Equal(s.T(), nil, err)
 	assert.Equal(s.T(), models.Processed, result.Status)
+	assert.Equal(s.T(), 0, len(result.FailedReason))
+}
+
+func (s *DBUpdaterDBTestSuite) TestUpdatKeywordStatusWithFailedStatus() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: "Hazard"}
+	db.GetDB().Create(&keyword)
+
+	err := UpdateKeywordStatus(keyword.ID, models.Failed, errors.New("test-error"))
+
+	var result models.Keyword
+	db.GetDB().First(&result, keyword.ID)
+
+	assert.Equal(s.T(), nil, err)
+	assert.Equal(s.T(), models.Failed, result.Status)
+	assert.Equal(s.T(), "test-error", result.FailedReason)
 }
 
 func (s *DBUpdaterDBTestSuite) TestUpdateKeywordWithParsingResultWithValidParams() {
