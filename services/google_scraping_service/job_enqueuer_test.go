@@ -60,7 +60,7 @@ func (s *JobEnqueuerTestSuite) TestEnqueueScrapingJobWithValidSavedKeywordList()
 	assert.Equal(s.T(), "Ronaldo", jobArgList[1])
 }
 
-func (s *JobEnqueuerTestSuite) TestEnqueueScrapingJobWithValidBlankSavedKeywordList() {
+func (s *JobEnqueuerTestSuite) TestEnqueueScrapingJobWithBlankSavedKeywordList() {
 	savedKeywordList := []models.Keyword{}
 
 	err := EnqueueScrapingJob(savedKeywordList)

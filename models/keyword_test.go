@@ -242,7 +242,7 @@ func (s *KeywordDBTestSuite) TestUpdateKeywordByIDWithValidParams() {
 	assert.Equal(s.T(), "Ronaldo", result.Keyword)
 }
 
-func (s *KeywordDBTestSuite) TestUpdateKeywordByIDValidStatus() {
+func (s *KeywordDBTestSuite) TestUpdateKeywordByIDWithValidStatus() {
 	keyword := Keyword{UserID: s.userID, Keyword: "Hazard"}
 	db.GetDB().Create(&keyword)
 
@@ -259,7 +259,7 @@ func (s *KeywordDBTestSuite) TestUpdateKeywordByIDValidStatus() {
 	assert.Equal(s.T(), Processing, result.Status)
 }
 
-func (s *KeywordDBTestSuite) TestUpdateKeywordByIDInvalidKeywordID() {
+func (s *KeywordDBTestSuite) TestUpdateKeywordByIDWithInvalidKeywordID() {
 	keyword := Keyword{UserID: s.userID, Keyword: "Hazard"}
 	db.GetDB().Create(&keyword)
 
