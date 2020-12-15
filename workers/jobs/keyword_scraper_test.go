@@ -159,3 +159,32 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithRequestErrorAndRea
 	assert.Equal(s.T(), "mock request error", err.Error())
 	assert.Equal(s.T(), models.Failed, result.Status)
 }
+
+func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithParsingErrorAndReachMaxFails() {
+	parsingFunc := google_scraping_service.ParseGoogleResponse
+	google_scraping_service.ParseGoogleResponse = func(googleResp *http.Response) (google_scraping_service.ParsingResult, error) {
+		return google_scraping_service.ParsingResult{}, errors.New("mock parsing error")
+	}
+	defer func() { google_scraping_service.ParseGoogleResponse = parsingFunc }()
+
+	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
+	db.GetDB().Create(&keyword)
+
+	job, _ := s.enqueuer.Enqueue(
+		"scraping",
+		work.Q{
+			"keywordID": keyword.ID,
+			"keyword":   keyword.Keyword,
+		},
+	)
+
+	job.Fails = MaxFails
+	ctx := Context{}
+	err := ctx.PerformScrapingJob(job)
+
+	var result models.Keyword
+	db.GetDB().First(&result, keyword.ID)
+
+	assert.Equal(s.T(), "mock parsing error", err.Error())
+	assert.Equal(s.T(), models.Failed, result.Status)
+}

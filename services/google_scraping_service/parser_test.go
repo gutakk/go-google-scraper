@@ -18,8 +18,7 @@ func TestParserWithValidGoogleResponse(t *testing.T) {
 
 	_ = r.Stop()
 
-	googleResponseParser := GoogleResponseParser{GoogleResponse: resp}
-	parsingResult, err := googleResponseParser.ParseGoogleResponse()
+	parsingResult, err := ParseGoogleResponse(resp)
 
 	assert.Equal(t, nil, err)
 	assert.Equal(t, 90, parsingResult.LinksCount)
@@ -41,8 +40,7 @@ func TestParserWithNotGoogleSearchPage(t *testing.T) {
 
 	_ = r.Stop()
 
-	googleResponseParser := GoogleResponseParser{GoogleResponse: resp}
-	parsingResult, err := googleResponseParser.ParseGoogleResponse()
+	parsingResult, err := ParseGoogleResponse(resp)
 
 	assert.Equal(t, nil, err)
 	assert.Equal(t, 16, parsingResult.LinksCount)

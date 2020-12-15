@@ -57,8 +57,7 @@ func (c *Context) PerformScrapingJob(job *work.Job) error {
 	}
 
 	// Parse Google response
-	parser := google_scraping_service.GoogleResponseParser{GoogleResponse: resp}
-	parsingResult, parseErr := parser.ParseGoogleResponse()
+	parsingResult, parseErr := google_scraping_service.ParseGoogleResponse(resp)
 	if parseErr != nil {
 		updateStatusToFailed(job.Fails, jobName, keywordID, keyword, parseErr)
 		return parseErr
