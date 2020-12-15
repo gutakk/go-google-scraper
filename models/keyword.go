@@ -80,7 +80,3 @@ func UpdateKeyword(keywordID uint, newKeyword Keyword) error {
 
 	return nil
 }
-
-func (k *Keyword) FormattedCreatedAt() string {
-	return k.CreatedAt.Format("January 2, 2006")
-}
