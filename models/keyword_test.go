@@ -6,6 +6,7 @@ import (
 	"github.com/bxcodec/faker/v3"
 	"github.com/gutakk/go-google-scraper/db"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	"github.com/jackc/pgconn"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -34,30 +35,23 @@ func (s *KeywordDBTestSuite) SetupTest() {
 
 func (s *KeywordDBTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM keywords")
+	db.GetDB().Exec("DELETE FROM users")
 }
 
 func TestKeywordDBTestSuite(t *testing.T) {
 	suite.Run(t, new(KeywordDBTestSuite))
 }
 
-func TestReadFileWithValidFile(t *testing.T) {
-	result, err := ReadFile("../tests/fixture/adword_keywords.csv")
-
-	assert.Equal(t, []string{"AWS"}, result)
-	assert.Equal(t, nil, err)
-}
-
-func TestReadFileWithFileNotFound(t *testing.T) {
-	result, err := ReadFile("")
-
-	assert.Equal(t, nil, result)
-	assert.Equal(t, "something went wrong, please try again", err.Error())
-}
-
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
-	keywords := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
+	keywordList := []Keyword{
+		{Keyword: "Hazard", UserID: s.userID},
+		{Keyword: "Ronaldo", UserID: s.userID},
+		{Keyword: "Neymar", UserID: s.userID},
+		{Keyword: "Messi", UserID: s.userID},
+		{Keyword: "Mbappe", UserID: s.userID},
+	}
 
-	result, err := SaveKeywords(s.userID, keywords)
+	result, err := SaveKeywords(keywordList)
 
 	assert.Equal(s.T(), nil, err)
 	assert.Equal(s.T(), 5, len(result))
@@ -69,9 +63,11 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptyStringSlice() {
-	keywords := []string{""}
+	keywordList := []Keyword{
+		{Keyword: "", UserID: s.userID},
+	}
 
-	result, err := SaveKeywords(s.userID, keywords)
+	result, err := SaveKeywords(keywordList)
 
 	assert.Equal(s.T(), nil, err)
 	assert.Equal(s.T(), 1, len(result))
@@ -79,55 +75,100 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptyStringSlice() {
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptySlice() {
-	keywords := []string{}
+	keywordList := []Keyword{}
 
-	result, err := SaveKeywords(s.userID, keywords)
+	result, err := SaveKeywords(keywordList)
+	_, isPgError := err.(*pgconn.PgError)
 
-	assert.Equal(s.T(), "invalid data", err.Error())
+	assert.Equal(s.T(), "empty slice found", err.Error())
+	assert.Equal(s.T(), false, isPgError)
 	assert.Equal(s.T(), nil, result)
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidUserID() {
-	keywords := []string{"Hazard"}
+	keywordList := []Keyword{
+		{Keyword: "Hazard", UserID: 99999999},
+	}
 
-	result, err := SaveKeywords(9999999999, keywords)
+	result, err := SaveKeywords(keywordList)
+	errVal, isPgError := err.(*pgconn.PgError)
 
-	assert.Equal(s.T(), "something went wrong, please try again", err.Error())
+	assert.Equal(s.T(), "23503", errVal.Code)
+	assert.Equal(s.T(), true, isPgError)
 	assert.Equal(s.T(), nil, result)
 }
 
-func TestValidateCSVLengthWithMinRowAllowed(t *testing.T) {
-	result := ValidateCSVLength(1)
+func (s *KeywordDBTestSuite) TestGetKeywordsByWithMoreThanOneRows() {
+	keywordList := []Keyword{
+		{Keyword: "Hazard", UserID: s.userID},
+		{Keyword: "Ronaldo", UserID: s.userID},
+		{Keyword: "Neymar", UserID: s.userID},
+		{Keyword: "Messi", UserID: s.userID},
+		{Keyword: "Mbappe", UserID: s.userID},
+	}
 
-	assert.Equal(t, nil, result)
+	db.GetDB().Create(&keywordList)
+
+	result, err := GetKeywordsBy(nil)
+
+	assert.Equal(s.T(), 5, len(result))
+	assert.Equal(s.T(), "Hazard", result[0].Keyword)
+	assert.Equal(s.T(), "Mbappe", result[1].Keyword)
+	assert.Equal(s.T(), "Messi", result[2].Keyword)
+	assert.Equal(s.T(), "Neymar", result[3].Keyword)
+	assert.Equal(s.T(), "Ronaldo", result[4].Keyword)
+	assert.Equal(s.T(), nil, err)
 }
 
-func TestValidateCSVLengthWithMaxRowAllowed(t *testing.T) {
-	result := ValidateCSVLength(1000)
+func (s *KeywordDBTestSuite) TestGetKeywordsByValidKeyword() {
+	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
 
-	assert.Equal(t, nil, result)
+	condition := make(map[string]interface{})
+	condition["keyword"] = keyword.Keyword
+
+	result, err := GetKeywordsBy(condition)
+
+	assert.Equal(s.T(), 1, len(result))
+	assert.Equal(s.T(), keyword.Keyword, result[0].Keyword)
+	assert.Equal(s.T(), nil, err)
 }
 
-func TestValidateCSVLengthWithZeroRow(t *testing.T) {
-	result := ValidateCSVLength(0)
+func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidKeyword() {
+	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
 
-	assert.Equal(t, "CSV file must contain between 1 to 1000 keywords", result.Error())
+	condition := make(map[string]interface{})
+	condition["keyword"] = "invalid"
+
+	result, err := GetKeywordsBy(condition)
+
+	assert.Equal(s.T(), 0, len(result))
+	assert.Equal(s.T(), nil, err)
 }
 
-func TestValidateCSVLengthWithGreaterThanMaxRowAllowed(t *testing.T) {
-	result := ValidateCSVLength(1001)
+func (s *KeywordDBTestSuite) TestGetKeywordsByWithoutKeyword() {
+	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
 
-	assert.Equal(t, "CSV file must contain between 1 to 1000 keywords", result.Error())
+	result, err := GetKeywordsBy(nil)
+
+	assert.Equal(s.T(), 1, len(result))
+	assert.Equal(s.T(), keyword.Keyword, result[0].Keyword)
+	assert.Equal(s.T(), nil, err)
 }
 
-func TestValidateFileTypeWithValidFileType(t *testing.T) {
-	result := ValidateFileType("text/csv")
+func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidColumn() {
+	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
 
-	assert.Equal(t, nil, result)
-}
+	condition := make(map[string]interface{})
+	condition["unknown_column"] = keyword.Keyword
 
-func TestValidateFileTypeWithInvalidFileType(t *testing.T) {
-	result := ValidateFileType("test")
+	result, err := GetKeywordsBy(condition)
+	_, isPgError := err.(*pgconn.PgError)
 
-	assert.Equal(t, "file must be CSV format", result.Error())
+	assert.Equal(s.T(), "ERROR: column \"unknown_column\" does not exist (SQLSTATE 42703)", err.Error())
+	assert.Equal(s.T(), true, isPgError)
+	assert.Equal(s.T(), nil, result)
 }

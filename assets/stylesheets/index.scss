@@ -4,12 +4,18 @@
 @import 'node_modules/tailwindcss/utilities';
 
 // Base
-@import 'base/form';
 @import 'base/button';
+@import 'base/form';
+@import 'base/nav';
+@import 'base/table';
 @import 'base/typography';
 
 // Components
 @import 'components/alert';
 
 // Layouts
+@import 'layouts/application';
 @import 'layouts/authentication';
+
+// Screens
+@import 'screens/keyword.scss';

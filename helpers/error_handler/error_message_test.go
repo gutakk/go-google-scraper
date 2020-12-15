@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"errors"
 	"os"
 	"testing"
 
@@ -93,4 +94,11 @@ func TestDatabaseErrorMessageForDefaultCode(t *testing.T) {
 	result := DatabaseErrorMessage(pgErr)
 
 	assert.Equal(t, "ERROR: Test (SQLSTATE 23506)", result.Error())
+}
+
+func TestDatabaseErrorMessageForNonPgErrorType(t *testing.T) {
+	err := errors.New("custom error")
+	result := DatabaseErrorMessage(err)
+
+	assert.Equal(t, "something went wrong, please try again", result.Error())
 }
