@@ -99,7 +99,7 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 }
 
 func getKeywordResultData(keywordService keyword_service.KeywordService, keywordID string) (map[string]interface{}, error) {
-	keyword, err := keywordService.GetSingle(keywordID)
+	keyword, err := keywordService.GetKeywordResult(keywordID)
 	if err != nil {
 		return nil, err
 	}
