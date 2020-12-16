@@ -24,6 +24,7 @@ func Migrate(db *gorm.DB) {
 	}
 }
 
+// TODO: Separate file for migration
 func InitKeywordStatusEnum(db *gorm.DB) {
 	db.Exec(`
 		DO $$ BEGIN
