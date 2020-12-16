@@ -1,0 +1,29 @@
+body.keyword_result {
+  .result-keyword {
+    @apply bg-white shadow overflow-hidden rounded-lg;
+
+    &__header {
+      @apply px-6 py-5;
+    }
+
+    &__content-group {
+      @apply border-t border-gray-200;
+    }
+
+    &__content {
+      @apply px-6 py-5 grid grid-cols-3 gap-4;
+    }
+
+    &__content-title {
+      @apply text-sm font-medium text-gray-500;
+    }
+
+    &__content-value {
+      @apply mt-0 text-sm text-gray-900 col-span-2;
+    }
+
+    &__content-value-list {
+      @apply border border-gray-200 rounded-md col-span-2;
+    }
+  }
+}
