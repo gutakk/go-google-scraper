@@ -37,7 +37,7 @@ func (k *KeywordController) applyRoutes(engine *gin.RouterGroup) {
 func (k *KeywordController) displayKeywordResult(c *gin.Context) {
 	keywordService := initKeywordService(c)
 	keywordID := c.Param("keyword_id")
-	data, err := getKeywordData(keywordService, keywordID)
+	data, err := getKeywordResultData(keywordService, keywordID)
 
 	if err != nil {
 		html.RenderWithError(c, http.StatusBadRequest, keywordResultView, keywordTitle, err, data)
@@ -98,7 +98,7 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/keyword")
 }
 
-func getKeywordData(keywordService keyword_service.KeywordService, keywordID string) (map[string]interface{}, error) {
+func getKeywordResultData(keywordService keyword_service.KeywordService, keywordID string) (map[string]interface{}, error) {
 	keyword, err := keywordService.GetSingle(keywordID)
 	if err != nil {
 		return nil, err
