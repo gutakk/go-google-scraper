@@ -9,9 +9,11 @@ import (
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gutakk/go-google-scraper/db"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/services/google_scraping_service"
+	"gorm.io/gorm"
 )
 
 const (
@@ -45,14 +47,23 @@ func (k *KeywordService) Save(parsedKeywordList []string) error {
 
 	for _, value := range parsedKeywordList {
 		keyword := models.Keyword{Keyword: value, UserID: k.CurrentUserID}
-		savedKeyword, err := models.SaveKeyword(keyword)
-		if err != nil {
-			return errorHandler.DatabaseErrorMessage(err)
-		}
 
-		enqueueErr := google_scraping_service.EnqueueScrapingJob(savedKeyword)
-		if enqueueErr != nil {
-			return enqueueErr
+		txErr := db.GetDB().Transaction(func(tx *gorm.DB) error {
+			savedKeyword, err := models.SaveKeyword(keyword, tx)
+			if err != nil {
+				return errorHandler.DatabaseErrorMessage(err)
+			}
+
+			enqueueErr := google_scraping_service.EnqueueScrapingJob(savedKeyword)
+			if enqueueErr != nil {
+				return enqueueErr
+			}
+
+			return nil
+		})
+
+		if txErr != nil {
+			return txErr
 		}
 	}
 

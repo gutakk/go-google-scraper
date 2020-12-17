@@ -1,6 +1,7 @@
 package keyword_service
 
 import (
+	"errors"
 	"os"
 	"testing"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
+	"github.com/gutakk/go-google-scraper/services/google_scraping_service"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 	"github.com/stretchr/testify/suite"
@@ -104,6 +106,23 @@ func (s *KeywordServiceDbTestSuite) TestSaveWithEmptyKeywordList() {
 	err := s.keywordService.Save(keywordList)
 
 	assert.Equal(s.T(), "invalid data", err.Error())
+}
+
+func (s *KeywordServiceDbTestSuite) TestSaveWithEnqueueJobError() {
+	enqueueScrapingJobFunc := google_scraping_service.EnqueueScrapingJob
+	google_scraping_service.EnqueueScrapingJob = func(savedKeyword models.Keyword) error {
+		return errors.New("mock enqueue scraping job error")
+	}
+	defer func() { google_scraping_service.EnqueueScrapingJob = enqueueScrapingJobFunc }()
+
+	keywordList := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
+	err := s.keywordService.Save(keywordList)
+
+	result := db.GetDB().Find(&models.Keyword{})
+
+	assert.Equal(s.T(), "mock enqueue scraping job error", err.Error())
+	assert.Equal(s.T(), 0, int(result.RowsAffected))
+	assert.Equal(s.T(), nil, result.Error)
 }
 
 type KeywordServiceTestSuite struct {

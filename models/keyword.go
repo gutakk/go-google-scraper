@@ -54,8 +54,15 @@ func GetKeywordsBy(condition map[string]interface{}) ([]Keyword, error) {
 	return keywords, nil
 }
 
-func SaveKeyword(keyword Keyword) (Keyword, error) {
-	result := db.GetDB().Create(&keyword)
+func SaveKeyword(keyword Keyword, tx ...*gorm.DB) (Keyword, error) {
+	var cnx *gorm.DB
+	if tx != nil {
+		cnx = tx[0]
+	} else {
+		cnx = db.GetDB()
+	}
+
+	result := cnx.Create(&keyword)
 	if result.Error != nil {
 		return Keyword{}, result.Error
 	}
