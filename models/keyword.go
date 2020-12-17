@@ -45,6 +45,17 @@ type Keyword struct {
 	User                    User
 }
 
+func GetKeywordBy(condition map[string]interface{}) (Keyword, error) {
+	var keyword Keyword
+
+	result := db.GetDB().Where(condition).First(&keyword)
+	if result.Error != nil {
+		return Keyword{}, result.Error
+	}
+
+	return keyword, nil
+}
+
 func GetKeywordsBy(condition map[string]interface{}) ([]Keyword, error) {
 	var keywords []Keyword
 

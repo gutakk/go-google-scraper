@@ -15,8 +15,9 @@ import (
 )
 
 const (
-	keywordTitle = "Keyword"
-	keywordView  = "keyword"
+	keywordTitle      = "Keyword"
+	keywordView       = "keyword"
+	keywordResultView = "keyword_result"
 
 	uploadSuccessFlash = "CSV uploaded successfully"
 )
@@ -28,8 +29,22 @@ type UploadFileForm struct {
 }
 
 func (k *KeywordController) applyRoutes(engine *gin.RouterGroup) {
+	engine.GET("/keyword/:keyword_id", k.displayKeywordResult)
 	engine.GET("/keyword", k.displayKeyword)
 	engine.POST("/keyword", k.uploadKeyword)
+}
+
+func (k *KeywordController) displayKeywordResult(c *gin.Context) {
+	keywordService := initKeywordService(c)
+	keywordID := c.Param("keyword_id")
+	data, err := getKeywordData(keywordService, keywordID)
+
+	if err != nil {
+		html.RenderWithError(c, http.StatusBadRequest, keywordResultView, keywordTitle, err, data)
+		return
+	}
+
+	html.RenderWithFlash(c, http.StatusOK, keywordResultView, keywordTitle, data)
 }
 
 func (k *KeywordController) displayKeyword(c *gin.Context) {
@@ -81,6 +96,17 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 
 	session.AddFlash(c, uploadSuccessFlash, "notice")
 	c.Redirect(http.StatusFound, "/keyword")
+}
+
+func getKeywordData(keywordService keyword_service.KeywordService, keywordID string) (map[string]interface{}, error) {
+	keyword, err := keywordService.GetSingle(keywordID)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{
+		"keyword": keyword,
+	}, nil
 }
 
 func getKeywordsData(keywordService keyword_service.KeywordService) map[string]interface{} {
