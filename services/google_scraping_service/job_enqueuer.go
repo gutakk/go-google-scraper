@@ -1,6 +1,7 @@
 package google_scraping_service
 
 import (
+	"errors"
 	"log"
 
 	"github.com/gocraft/work"
@@ -8,22 +9,30 @@ import (
 	"github.com/gutakk/go-google-scraper/models"
 )
 
-func EnqueueScrapingJob(savedKeywords []models.Keyword) error {
+const (
+	invalidKeyword = "invalid keyword"
+)
+
+func EnqueueScrapingJob(savedKeyword models.Keyword) error {
+	if len(savedKeyword.Keyword) == 0 {
+		return errors.New(invalidKeyword)
+	}
+
 	enqueuer := work.NewEnqueuer("go-google-scraper", db.GetRedisPool())
 
-	for _, k := range savedKeywords {
-		job, err := enqueuer.Enqueue(
-			"scraping",
-			work.Q{
-				"keywordID": k.ID,
-				"keyword":   k.Keyword,
-			},
-		)
+	job, err := enqueuer.Enqueue(
+		"scraping",
+		work.Q{
+			"keywordID": savedKeyword.ID,
+			"keyword":   savedKeyword.Keyword,
+		},
+	)
 
-		if err != nil {
-			return err
-		}
-		log.Printf("Enqueued %v job for keyword %v", job.Name, job.ArgString("keyword"))
+	if err != nil {
+		return err
 	}
+
+	log.Printf("Enqueued %v job for keyword %v", job.Name, job.ArgString("keyword"))
+
 	return nil
 }

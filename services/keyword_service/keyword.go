@@ -43,20 +43,17 @@ func (k *KeywordService) Save(parsedKeywordList []string) error {
 		return errors.New(invalidDataError)
 	}
 
-	var keywordList = []models.Keyword{}
-	// Create bulk data
 	for _, value := range parsedKeywordList {
-		keywordList = append(keywordList, models.Keyword{Keyword: value, UserID: k.CurrentUserID})
-	}
+		keyword := models.Keyword{Keyword: value, UserID: k.CurrentUserID}
+		savedKeyword, err := models.SaveKeyword(keyword)
+		if err != nil {
+			return errorHandler.DatabaseErrorMessage(err)
+		}
 
-	savedKeywords, err := models.SaveKeywords(keywordList)
-	if err != nil {
-		return errorHandler.DatabaseErrorMessage(err)
-	}
-
-	enqueueErr := google_scraping_service.EnqueueScrapingJob(savedKeywords)
-	if enqueueErr != nil {
-		return enqueueErr
+		enqueueErr := google_scraping_service.EnqueueScrapingJob(savedKeyword)
+		if enqueueErr != nil {
+			return enqueueErr
+		}
 	}
 
 	return nil

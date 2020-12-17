@@ -29,41 +29,35 @@ func TestJobEnqueuerTestSuite(t *testing.T) {
 	suite.Run(t, new(JobEnqueuerTestSuite))
 }
 
-func (s *JobEnqueuerTestSuite) TestEnqueueScrapingJobWithValidSavedKeywordList() {
-	savedKeywordList := []models.Keyword{
-		{Keyword: "Hazard"},
-		{Keyword: "Ronaldo"},
+func (s *JobEnqueuerTestSuite) TestEnqueueScrapingJobWithValidSavedKeyword() {
+	savedKeyword := models.Keyword{
+		Keyword: "Hazard",
 	}
 
-	err := EnqueueScrapingJob(savedKeywordList)
+	err := EnqueueScrapingJob(savedKeyword)
 
 	conn := db.GetRedisPool().Get()
 	defer conn.Close()
 
 	redisKey := testDB.RedisKeyJobs("go-google-scraper", "scraping")
-	var jobArgList []string
 
-	for i := 0; i < len(savedKeywordList); i++ {
-		rawJSON, errs := redis.Bytes(conn.Do("RPOP", redisKey))
-		if errs != nil {
-			panic("could not RPOP from job queue: " + errs.Error())
-		}
-
-		var job work.Job
-		_ = json.Unmarshal(rawJSON, &job)
-
-		jobArgList = append(jobArgList, job.ArgString("keyword"))
+	rawJSON, redisErr := redis.Bytes(conn.Do("RPOP", redisKey))
+	if redisErr != nil {
+		panic("could not RPOP from job queue: " + redisErr.Error())
 	}
 
+	var job work.Job
+	_ = json.Unmarshal(rawJSON, &job)
+
 	assert.Equal(s.T(), nil, err)
-	assert.Equal(s.T(), "Hazard", jobArgList[0])
-	assert.Equal(s.T(), "Ronaldo", jobArgList[1])
+	assert.Equal(s.T(), "scraping", job.Name)
+	assert.Equal(s.T(), "Hazard", job.ArgString("keyword"))
 }
 
-func (s *JobEnqueuerTestSuite) TestEnqueueScrapingJobWithBlankSavedKeywordList() {
-	savedKeywordList := []models.Keyword{}
+func (s *JobEnqueuerTestSuite) TestEnqueueScrapingJobWithBlankSavedKeyword() {
+	savedKeyword := models.Keyword{}
 
-	err := EnqueueScrapingJob(savedKeywordList)
+	err := EnqueueScrapingJob(savedKeyword)
 
 	conn := db.GetRedisPool().Get()
 	defer conn.Close()
@@ -72,6 +66,6 @@ func (s *JobEnqueuerTestSuite) TestEnqueueScrapingJobWithBlankSavedKeywordList()
 
 	_, redisErr := redis.Bytes(conn.Do("RPOP", redisKey))
 
-	assert.Equal(s.T(), nil, err)
+	assert.Equal(s.T(), "invalid keyword", err.Error())
 	assert.Equal(s.T(), "redigo: nil returned", redisErr.Error())
 }
