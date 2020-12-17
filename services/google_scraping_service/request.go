@@ -17,5 +17,5 @@ var Request = func(keyword string, transport http.RoundTripper) (*http.Response,
 		return nil, err
 	}
 
-	return resp, err
+	return resp, nil
 }

@@ -80,7 +80,7 @@ func (c *Context) PerformScrapingJob(job *work.Job) error {
 // Update status to failed when (jobFails + 1) reach MaxFails. Note: Job won't retry if jobFails reach MaxFails
 // So this need to be done at jobFails + 1
 func updateStatusToFailed(jobFails int64, jobName string, keywordID uint, keyword string, err error) {
-	if int(jobFails+1) >= MaxFails {
+	if int(jobFails)+1 >= MaxFails {
 		updateStatusErr := google_scraping_service.UpdateKeywordStatus(keywordID, models.Failed, err)
 
 		if updateStatusErr != nil {
