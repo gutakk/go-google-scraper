@@ -46,7 +46,7 @@ func (s *JobEnqueuerTestSuite) TestEnqueueScrapingJobWithValidSavedKeywordList()
 	for i := 0; i < len(savedKeywordList); i++ {
 		rawJSON, errs := redis.Bytes(conn.Do("RPOP", redisKey))
 		if errs != nil {
-			panic("could RPOP from job queue: " + errs.Error())
+			panic("could not RPOP from job queue: " + errs.Error())
 		}
 
 		var job work.Job
