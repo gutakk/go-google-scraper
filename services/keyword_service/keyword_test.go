@@ -72,7 +72,7 @@ func (s *KeywordServiceDbTestSuite) TestGetAllWithInvalidUser() {
 
 func (s *KeywordServiceDbTestSuite) TestSaveWithValidParams() {
 	keywordList := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
-	err := s.keywordService.SaveAndScrape(keywordList)
+	err := s.keywordService.Save(keywordList)
 
 	assert.Equal(s.T(), nil, err)
 }
@@ -80,14 +80,14 @@ func (s *KeywordServiceDbTestSuite) TestSaveWithValidParams() {
 func (s *KeywordServiceDbTestSuite) TestSaveWithValidInvalidUser() {
 	keywordList := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
 	keywordService := KeywordService{}
-	err := keywordService.SaveAndScrape(keywordList)
+	err := keywordService.Save(keywordList)
 
 	assert.Equal(s.T(), "something went wrong, please try again", err.Error())
 }
 
 func (s *KeywordServiceDbTestSuite) TestSaveWithEmptyKeywordList() {
 	keywordList := []string{}
-	err := s.keywordService.SaveAndScrape(keywordList)
+	err := s.keywordService.Save(keywordList)
 
 	assert.Equal(s.T(), "invalid data", err.Error())
 }

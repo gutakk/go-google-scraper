@@ -37,7 +37,7 @@ func (k *KeywordService) GetAll() ([]models.Keyword, error) {
 	return keywords, nil
 }
 
-func (k *KeywordService) SaveAndScrape(parsedKeywordList []string) error {
+func (k *KeywordService) Save(parsedKeywordList []string) error {
 	// Check if record is empty slices
 	if len(parsedKeywordList) == 0 {
 		return errors.New(invalidDataError)

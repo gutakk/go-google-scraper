@@ -72,7 +72,7 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 	}
 
 	// Save keywords to database
-	saveKeywordsErr := keywordService.SaveAndScrape(parsedKeywordList)
+	saveKeywordsErr := keywordService.Save(parsedKeywordList)
 	if saveKeywordsErr != nil {
 		html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, saveKeywordsErr, data)
 		return
