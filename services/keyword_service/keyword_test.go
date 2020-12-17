@@ -91,7 +91,7 @@ func (s *KeywordServiceDbTestSuite) TestSaveWithValidParams() {
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordServiceDbTestSuite) TestSaveWithValidInvalidUser() {
+func (s *KeywordServiceDbTestSuite) TestSaveWithInvalidUser() {
 	keywordList := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
 	keywordService := KeywordService{}
 	err := keywordService.Save(keywordList)
