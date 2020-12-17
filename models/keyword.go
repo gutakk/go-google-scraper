@@ -54,14 +54,13 @@ func GetKeywordsBy(condition map[string]interface{}) ([]Keyword, error) {
 	return keywords, nil
 }
 
-func SaveKeywords(keywords []Keyword) ([]Keyword, error) {
-	// Insert bulk data
-	result := db.GetDB().Create(&keywords)
+func SaveKeyword(keyword Keyword) (Keyword, error) {
+	result := db.GetDB().Create(&keyword)
 	if result.Error != nil {
-		return nil, result.Error
+		return Keyword{}, result.Error
 	}
 
-	return keywords, nil
+	return keyword, nil
 }
 
 func UpdateKeyword(keywordID uint, newKeyword Keyword) error {

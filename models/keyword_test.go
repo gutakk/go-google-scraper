@@ -44,111 +44,76 @@ func TestKeywordDBTestSuite(t *testing.T) {
 	suite.Run(t, new(KeywordDBTestSuite))
 }
 
-func (s *KeywordDBTestSuite) TestSaveKeywordsWithMultipleValidParams() {
-	keywordList := []Keyword{
-		{Keyword: "Hazard", UserID: s.userID},
-		{Keyword: "Ronaldo", UserID: s.userID},
-		{Keyword: "Neymar", UserID: s.userID},
-		{Keyword: "Messi", UserID: s.userID},
-		{Keyword: "Mbappe", UserID: s.userID},
-	}
-
-	result, err := SaveKeywords(keywordList)
-
-	assert.Equal(s.T(), nil, err)
-	assert.Equal(s.T(), 5, len(result))
-	assert.Equal(s.T(), "Hazard", result[0].Keyword)
-	assert.Equal(s.T(), "Ronaldo", result[1].Keyword)
-	assert.Equal(s.T(), "Neymar", result[2].Keyword)
-	assert.Equal(s.T(), "Messi", result[3].Keyword)
-	assert.Equal(s.T(), "Mbappe", result[4].Keyword)
-}
-
-func (s *KeywordDBTestSuite) TestSaveKeywordsWithSingleValidParams() {
+func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 	nonAdwordLinks, _ := json.Marshal([]string{"test-non-ads-link"})
 	topPositionAdwordLinks, _ := json.Marshal([]string{"test-top-ads-link"})
 
-	keywordList := []Keyword{
-		{
-			Keyword:                 "Hazard",
-			Status:                  Pending,
-			LinksCount:              100,
-			NonAdwordsCount:         20,
-			NonAdwordLinks:          nonAdwordLinks,
-			TopPositionAdwordsCount: 5,
-			TopPositionAdwordLinks:  topPositionAdwordLinks,
-			TotalAdwordsCount:       25,
-			HtmlCode:                "test-html",
-			UserID:                  s.userID,
-		},
+	keyword := Keyword{
+		Keyword:                 "Hazard",
+		Status:                  Pending,
+		LinksCount:              100,
+		NonAdwordsCount:         20,
+		NonAdwordLinks:          nonAdwordLinks,
+		TopPositionAdwordsCount: 5,
+		TopPositionAdwordLinks:  topPositionAdwordLinks,
+		TotalAdwordsCount:       25,
+		HtmlCode:                "test-html",
+		UserID:                  s.userID,
 	}
 
-	result, err := SaveKeywords(keywordList)
+	result, err := SaveKeyword(keyword)
 
 	var nonAdwordLinksVal []string
-	_ = json.Unmarshal(result[0].NonAdwordLinks, &nonAdwordLinksVal)
+	_ = json.Unmarshal(result.NonAdwordLinks, &nonAdwordLinksVal)
 
 	var topPositionAdwordLinksVal []string
-	_ = json.Unmarshal(result[0].TopPositionAdwordLinks, &topPositionAdwordLinksVal)
+	_ = json.Unmarshal(result.TopPositionAdwordLinks, &topPositionAdwordLinksVal)
 
 	assert.Equal(s.T(), nil, err)
-	assert.Equal(s.T(), 1, len(result))
-	assert.Equal(s.T(), "Hazard", result[0].Keyword)
-	assert.Equal(s.T(), Pending, result[0].Status)
-	assert.Equal(s.T(), 100, result[0].LinksCount)
-	assert.Equal(s.T(), 20, result[0].NonAdwordsCount)
+	assert.Equal(s.T(), "Hazard", result.Keyword)
+	assert.Equal(s.T(), Pending, result.Status)
+	assert.Equal(s.T(), 100, result.LinksCount)
+	assert.Equal(s.T(), 20, result.NonAdwordsCount)
 	assert.Equal(s.T(), []string{"test-non-ads-link"}, nonAdwordLinksVal)
-	assert.Equal(s.T(), 5, result[0].TopPositionAdwordsCount)
+	assert.Equal(s.T(), 5, result.TopPositionAdwordsCount)
 	assert.Equal(s.T(), []string{"test-top-ads-link"}, topPositionAdwordLinksVal)
-	assert.Equal(s.T(), 25, result[0].TotalAdwordsCount)
-	assert.Equal(s.T(), "test-html", result[0].HtmlCode)
+	assert.Equal(s.T(), 25, result.TotalAdwordsCount)
+	assert.Equal(s.T(), "test-html", result.HtmlCode)
 }
 
-func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptyStringSlice() {
-	keywordList := []Keyword{
-		{Keyword: "", UserID: s.userID},
+func (s *KeywordDBTestSuite) TestSaveKeywordsWithKeywordValue() {
+	keyword := Keyword{
+		Keyword: "", UserID: s.userID,
 	}
 
-	result, err := SaveKeywords(keywordList)
+	result, err := SaveKeyword(keyword)
 
 	assert.Equal(s.T(), nil, err)
-	assert.Equal(s.T(), 1, len(result))
-	assert.Equal(s.T(), "", result[0].Keyword)
-}
-
-func (s *KeywordDBTestSuite) TestSaveKeywordsWithEmptySlice() {
-	keywordList := []Keyword{}
-
-	result, err := SaveKeywords(keywordList)
-	_, isPgError := err.(*pgconn.PgError)
-
-	assert.Equal(s.T(), "empty slice found", err.Error())
-	assert.Equal(s.T(), false, isPgError)
-	assert.Equal(s.T(), nil, result)
+	assert.Equal(s.T(), "", result.Keyword)
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidUserID() {
-	keywordList := []Keyword{
-		{Keyword: "Hazard", UserID: 99999999},
+	keyword := Keyword{
+		Keyword: "Hazard", UserID: 99999999,
 	}
 
-	result, err := SaveKeywords(keywordList)
+	result, err := SaveKeyword(keyword)
 	errVal, isPgError := err.(*pgconn.PgError)
 
 	assert.Equal(s.T(), "23503", errVal.Code)
 	assert.Equal(s.T(), true, isPgError)
-	assert.Equal(s.T(), nil, result)
+	assert.Equal(s.T(), Keyword{}, result)
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidKeywordStatus() {
-	keywordList := []Keyword{
-		{Status: "test"},
+	keyword := Keyword{
+		Status: "test",
 	}
 
-	result, err := SaveKeywords(keywordList)
+	result, err := SaveKeyword(keyword)
 
 	assert.Equal(s.T(), "invalid keyword status", err.Error())
-	assert.Equal(s.T(), nil, result)
+	assert.Equal(s.T(), Keyword{}, result)
 }
 
 func (s *KeywordDBTestSuite) TestGetKeywordsByWithMoreThanOneRows() {
