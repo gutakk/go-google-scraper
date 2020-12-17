@@ -19,7 +19,7 @@
 
 ## Usage
 ### Start development server steps
-[**`.env` and `.env.debug` files are required**](#create-necessary-dot-env-files)
+[**`.env` files are required**](#create-necessary-dot-env-files)
 #### Build development dependencies
 This project using `air` for hot reloading and `goreman` to have nice terminal colors and process separations.
 ```sh
