@@ -14,7 +14,7 @@ func UpdateKeywordStatus(keywordID uint, status models.KeywordStatus, failedReas
 		keywordModel.FailedReason = failedReason.Error()
 	}
 
-	err := models.UpdateKeywordByID(keywordID, keywordModel)
+	err := models.UpdateKeyword(keywordID, keywordModel)
 	if err != nil {
 		return err
 	}
@@ -44,7 +44,7 @@ func UpdateKeywordWithParsingResult(keywordID uint, parsingResult ParsingResult)
 		HtmlCode:                parsingResult.HtmlCode,
 	}
 
-	err := models.UpdateKeywordByID(keywordID, newKeyword)
+	err := models.UpdateKeyword(keywordID, newKeyword)
 	if err != nil {
 		return err
 	}

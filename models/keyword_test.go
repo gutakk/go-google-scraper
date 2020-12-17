@@ -226,13 +226,13 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidColumn() {
 	assert.Equal(s.T(), nil, result)
 }
 
-func (s *KeywordDBTestSuite) TestUpdateKeywordByIDWithValidParams() {
+func (s *KeywordDBTestSuite) TestUpdateKeywordWithValidParams() {
 	keyword := Keyword{UserID: s.userID, Keyword: "Hazard"}
 	db.GetDB().Create(&keyword)
 
 	newKeyword := Keyword{Keyword: "Ronaldo"}
 
-	err := UpdateKeywordByID(keyword.ID, newKeyword)
+	err := UpdateKeyword(keyword.ID, newKeyword)
 
 	var result Keyword
 	db.GetDB().First(&result, keyword.ID)
@@ -242,13 +242,13 @@ func (s *KeywordDBTestSuite) TestUpdateKeywordByIDWithValidParams() {
 	assert.Equal(s.T(), "Ronaldo", result.Keyword)
 }
 
-func (s *KeywordDBTestSuite) TestUpdateKeywordByIDWithValidStatus() {
+func (s *KeywordDBTestSuite) TestUpdateKeywordWithValidStatus() {
 	keyword := Keyword{UserID: s.userID, Keyword: "Hazard"}
 	db.GetDB().Create(&keyword)
 
 	newKeyword := Keyword{Status: Processing}
 
-	err := UpdateKeywordByID(keyword.ID, newKeyword)
+	err := UpdateKeyword(keyword.ID, newKeyword)
 
 	var result Keyword
 	db.GetDB().First(&result, keyword.ID)
@@ -259,14 +259,14 @@ func (s *KeywordDBTestSuite) TestUpdateKeywordByIDWithValidStatus() {
 	assert.Equal(s.T(), Processing, result.Status)
 }
 
-func (s *KeywordDBTestSuite) TestUpdateKeywordByIDWithInvalidKeywordID() {
+func (s *KeywordDBTestSuite) TestUpdateKeywordWithInvalidKeywordID() {
 	keyword := Keyword{UserID: s.userID, Keyword: "Hazard"}
 	db.GetDB().Create(&keyword)
 
 	newKeyword := Keyword{Keyword: "Ronaldo"}
 
 	invalidKeywordID := 999999
-	err := UpdateKeywordByID(uint(invalidKeywordID), newKeyword)
+	err := UpdateKeyword(uint(invalidKeywordID), newKeyword)
 
 	var result Keyword
 	db.GetDB().First(&result, keyword.ID)
@@ -276,13 +276,13 @@ func (s *KeywordDBTestSuite) TestUpdateKeywordByIDWithInvalidKeywordID() {
 	assert.Equal(s.T(), "Hazard", result.Keyword)
 }
 
-func (s *KeywordDBTestSuite) TestUpdateKeywordByIDWithInvalidStatus() {
+func (s *KeywordDBTestSuite) TestUpdateKeywordWithInvalidStatus() {
 	keyword := Keyword{UserID: s.userID, Keyword: "Hazard"}
 	db.GetDB().Create(&keyword)
 
 	newKeyword := Keyword{Status: "invalid"}
 
-	err := UpdateKeywordByID(keyword.ID, newKeyword)
+	err := UpdateKeyword(keyword.ID, newKeyword)
 
 	assert.Equal(s.T(), "invalid keyword status", err.Error())
 }

@@ -64,7 +64,7 @@ func SaveKeywords(keywords []Keyword) ([]Keyword, error) {
 	return keywords, nil
 }
 
-func UpdateKeywordByID(keywordID uint, newKeyword Keyword) error {
+func UpdateKeyword(keywordID uint, newKeyword Keyword) error {
 	result := db.GetDB().Model(&Keyword{}).Where("id = ?", keywordID).Updates(newKeyword)
 	if result.Error != nil {
 		return result.Error
