@@ -109,11 +109,11 @@ func (s *KeywordServiceDbTestSuite) TestSaveWithEmptyKeywordList() {
 }
 
 func (s *KeywordServiceDbTestSuite) TestSaveWithEnqueueJobError() {
-	enqueueScrapingJobFunc := google_search_service.EnqueueScrapingJob
-	google_search_service.EnqueueScrapingJob = func(savedKeyword models.Keyword) error {
+	enqueueSearchJobFunc := google_search_service.EnqueueSearchJob
+	google_search_service.EnqueueSearchJob = func(savedKeyword models.Keyword) error {
 		return errors.New("mock enqueue search job error")
 	}
-	defer func() { google_search_service.EnqueueScrapingJob = enqueueScrapingJobFunc }()
+	defer func() { google_search_service.EnqueueSearchJob = enqueueSearchJobFunc }()
 
 	keywordList := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
 	err := s.keywordService.Save(keywordList)

@@ -32,7 +32,7 @@ func main() {
 
 	pool.Middleware((*jobs.Context).Log)
 
-	pool.JobWithOptions("search", work.JobOptions{MaxFails: jobs.MaxFails}, (*jobs.Context).PerformScrapingJob)
+	pool.JobWithOptions("search", work.JobOptions{MaxFails: jobs.MaxFails}, (*jobs.Context).PerformSearchJob)
 
 	pool.Start()
 

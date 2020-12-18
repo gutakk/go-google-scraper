@@ -13,7 +13,7 @@ const (
 	invalidKeyword = "invalid keyword"
 )
 
-var EnqueueScrapingJob = func(savedKeyword models.Keyword) error {
+var EnqueueSearchJob = func(savedKeyword models.Keyword) error {
 	if len(savedKeyword.Keyword) == 0 {
 		return errors.New(invalidKeyword)
 	}

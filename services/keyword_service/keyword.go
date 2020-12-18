@@ -54,7 +54,7 @@ func (k *KeywordService) Save(parsedKeywordList []string) error {
 				return errorHandler.DatabaseErrorMessage(err)
 			}
 
-			enqueueErr := google_search_service.EnqueueScrapingJob(savedKeyword)
+			enqueueErr := google_search_service.EnqueueSearchJob(savedKeyword)
 			if enqueueErr != nil {
 				return enqueueErr
 			}

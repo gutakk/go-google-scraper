@@ -68,7 +68,7 @@ func TestKeywordScraperDBTestSuite(t *testing.T) {
 	suite.Run(t, new(KeywordScraperDBTestSuite))
 }
 
-func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithValidJob() {
+func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithValidJob() {
 	r, _ := recorder.New("tests/fixture/vcr/valid_keyword")
 	requestFunc := google_search_service.Request
 	google_search_service.Request = func(keyword string, transport http.RoundTripper) (*http.Response, error) {
@@ -99,14 +99,14 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithValidJob() {
 	)
 
 	ctx := Context{}
-	err := ctx.PerformScrapingJob(job)
+	err := ctx.PerformSearchJob(job)
 
 	_ = r.Stop()
 
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithoutKeywordID() {
+func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithoutKeywordID() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
@@ -118,12 +118,12 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithoutKeywordID() {
 	)
 
 	ctx := Context{}
-	err := ctx.PerformScrapingJob(job)
+	err := ctx.PerformSearchJob(job)
 
 	assert.Equal(s.T(), "invalid keyword id", err.Error())
 }
 
-func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithoutKeywordAndReachMaxFails() {
+func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithoutKeywordAndReachMaxFails() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
@@ -136,7 +136,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithoutKeywordAndReach
 
 	job.Fails = MaxFails
 	ctx := Context{}
-	err := ctx.PerformScrapingJob(job)
+	err := ctx.PerformSearchJob(job)
 
 	var result models.Keyword
 	db.GetDB().First(&result, keyword.ID)
@@ -146,7 +146,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithoutKeywordAndReach
 	assert.Equal(s.T(), models.Failed, result.Status)
 }
 
-func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithRequestErrorAndReachMaxFails() {
+func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithRequestErrorAndReachMaxFails() {
 	requestFunc := google_search_service.Request
 	google_search_service.Request = func(keyword string, transport http.RoundTripper) (*http.Response, error) {
 		return nil, errors.New("mock request error")
@@ -166,7 +166,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithRequestErrorAndRea
 
 	job.Fails = MaxFails
 	ctx := Context{}
-	err := ctx.PerformScrapingJob(job)
+	err := ctx.PerformSearchJob(job)
 
 	var result models.Keyword
 	db.GetDB().First(&result, keyword.ID)
@@ -176,7 +176,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithRequestErrorAndRea
 	assert.Equal(s.T(), models.Failed, result.Status)
 }
 
-func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithParsingErrorAndReachMaxFails() {
+func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithParsingErrorAndReachMaxFails() {
 	parsingFunc := google_search_service.ParseGoogleResponse
 	google_search_service.ParseGoogleResponse = func(googleResp *http.Response) (google_search_service.ParsingResult, error) {
 		return google_search_service.ParsingResult{}, errors.New("mock parsing error")
@@ -196,7 +196,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithParsingErrorAndRea
 
 	job.Fails = MaxFails
 	ctx := Context{}
-	err := ctx.PerformScrapingJob(job)
+	err := ctx.PerformSearchJob(job)
 
 	var result models.Keyword
 	db.GetDB().First(&result, keyword.ID)

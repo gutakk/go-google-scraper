@@ -29,12 +29,12 @@ func TestJobEnqueuerTestSuite(t *testing.T) {
 	suite.Run(t, new(JobEnqueuerTestSuite))
 }
 
-func (s *JobEnqueuerTestSuite) TestEnqueueScrapingJobWithValidSavedKeyword() {
+func (s *JobEnqueuerTestSuite) TestEnqueueSearchJobWithValidSavedKeyword() {
 	savedKeyword := models.Keyword{
 		Keyword: "Hazard",
 	}
 
-	err := EnqueueScrapingJob(savedKeyword)
+	err := EnqueueSearchJob(savedKeyword)
 
 	conn := db.GetRedisPool().Get()
 	defer conn.Close()
@@ -54,10 +54,10 @@ func (s *JobEnqueuerTestSuite) TestEnqueueScrapingJobWithValidSavedKeyword() {
 	assert.Equal(s.T(), "Hazard", job.ArgString("keyword"))
 }
 
-func (s *JobEnqueuerTestSuite) TestEnqueueScrapingJobWithBlankSavedKeyword() {
+func (s *JobEnqueuerTestSuite) TestEnqueueSearchJobWithBlankSavedKeyword() {
 	savedKeyword := models.Keyword{}
 
-	err := EnqueueScrapingJob(savedKeyword)
+	err := EnqueueSearchJob(savedKeyword)
 
 	conn := db.GetRedisPool().Get()
 	defer conn.Close()

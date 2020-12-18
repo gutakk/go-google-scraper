@@ -25,7 +25,7 @@ func (c *Context) Log(job *work.Job, next work.NextMiddlewareFunc) error {
 	return next()
 }
 
-func (c *Context) PerformScrapingJob(job *work.Job) error {
+func (c *Context) PerformSearchJob(job *work.Job) error {
 	start := time.Now()
 
 	jobName := job.Name
