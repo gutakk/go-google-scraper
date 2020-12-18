@@ -29,7 +29,11 @@ func RenderWithFlash(c *gin.Context, status int, view string, title string, data
 }
 
 func RenderNotFound(c *gin.Context) {
-	html, _ := ioutil.ReadFile("templates/not_found.html")
+	html, err := ioutil.ReadFile("templates/not_found.html")
+	if err != nil {
+		panic(err)
+	}
+
 	c.Writer.WriteHeader(http.StatusNotFound)
 	_, _ = c.Writer.Write(html)
 }
