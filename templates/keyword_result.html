@@ -8,89 +8,21 @@
   </div>
 
   <div class="result-keyword__content-group">
-    <div class="result-keyword__content">
-      <dt class="result-keyword__content-title">
-        Total Links
-      </dt>
-      <dd class="result-keyword__content-value">
-        {{ .data.keyword.LinksCount }}
-      </dd>
-    </div>
+    {{ template "scrape_result" scrapeResult "Total Links" .data.keyword.LinksCount }}
   </div>
 
   <div class="result-keyword__content-group">
-    <div class="result-keyword__content">
-      <dt class="result-keyword__content-title">
-        Total Adword Links
-      </dt>
-      <dd class="result-keyword__content-value">
-        {{ .data.keyword.TotalAdwordsCount }}
-      </dd>
-    </div>
+    {{ template "scrape_result" scrapeResult "Total Adword Links" .data.keyword.TotalAdwordsCount }}
   </div>
 
   <div class="result-keyword__content-group">
-    <div class="result-keyword__content">
-      <dt class="result-keyword__content-title">
-        Total Top Position Adword Links
-      </dt>
-      <dd class="result-keyword__content-value">
-        {{ .data.keyword.TopPositionAdwordsCount }}
-      </dd>
-    </div>
-    <div class="result-keyword__content">
-      <dt class="result-keyword__content-title">
-        Top Position Adword Links
-      </dt>
-      {{ if .data.keyword.TopPositionAdwordLinks }}
-        <ul class="result-keyword__content-value-list divide-y divide-gray-200">
-          {{ range $tpal := .data.keyword.TopPositionAdwordLinks }}
-            <li class="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
-              <div class="w-0 flex-1 flex items-center">
-                <svg class="flex-shrink-0 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" />
-                </svg>
-                <span class="ml-2 flex-1 w-0">
-                  <a href="{{ $tpal }}" target="_blank">{{ $tpal }}</a>
-                </span>
-              </div>
-            </li>
-          {{ end }}
-        </ul>
-      {{ end }} 
-    </div>
+    {{ template "scrape_result" scrapeResult "Total Top Position Adword Links" .data.keyword.TopPositionAdwordsCount }}
+    {{ template "scrape_result_list"  scrapeResult "Top Position Adword Links" .data.keyword.TopPositionAdwordLinks }}
   </div>
 
   <div class="result-keyword__content-group">
-    <div class="result-keyword__content">
-      <dt class="result-keyword__content-title">
-        Total Non Adword Links
-      </dt>
-      <dd class="result-keyword__content-value">
-        {{ .data.keyword.NonAdwordsCount}}
-      </dd>
-    </div>
-    <div class="result-keyword__content">
-      <dt class="result-keyword__content-title">
-        Non Adword Links
-      </dt>
-      {{ if .data.keyword.NonAdwordLinks }}
-        <ul class="result-keyword__content-value-list divide-y divide-gray-200">
-          {{ range $nal := .data.keyword.NonAdwordLinks }}
-            <li class="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
-              <div class="w-0 flex-1 flex items-center">
-                <svg class="flex-shrink-0 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" />
-                </svg>
-                <span class="ml-2 flex-1 w-0 break-all">
-                  <a href="{{ $nal }}" target="_blank">{{ $nal }}</a>
-                </span>
-              </div>
-            </li>
-          {{ end }}
-        </ul>
-      {{ end }}
-    </div>
+    {{ template "scrape_result" scrapeResult "Total Non Adword Links" .data.keyword.NonAdwordsCount }}
+    {{ template "scrape_result_list"  scrapeResult "Non Adword Links" .data.keyword.NonAdwordLinks }}
   </div>
 </div>
 
