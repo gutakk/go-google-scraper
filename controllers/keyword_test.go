@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -91,6 +92,92 @@ func TestDisplayKeywordWithGuestUser(t *testing.T) {
 
 	assert.Equal(t, http.StatusFound, response.Code)
 	assert.Equal(t, "/login", response.Header().Get("Location"))
+}
+
+func (s *KeywordDbTestSuite) TestDisplayKeywordResultWithAuthenticatedUserAndValidKeyword() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+	keywordID := fmt.Sprint(keyword.ID)
+	url := fmt.Sprintf("/keyword/%s", keywordID)
+
+	headers := http.Header{}
+	cookie := fixture.GenerateCookie("user_id", s.userID)
+	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
+
+	response := testHttp.PerformRequest(s.engine, "GET", url, headers, nil)
+	p, err := ioutil.ReadAll(response.Body)
+	isKeywordResultPage := err == nil && strings.Index(string(p), keyword.Keyword) > 0
+
+	assert.Equal(s.T(), http.StatusOK, response.Code)
+	assert.Equal(s.T(), true, isKeywordResultPage)
+}
+
+func (s *KeywordDbTestSuite) TestDisplayKeywordResultWithAuthenticatedUserButInvalidKeyword() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	headers := http.Header{}
+	cookie := fixture.GenerateCookie("user_id", s.userID)
+	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
+
+	response := testHttp.PerformRequest(s.engine, "GET", "/keyword/invalid-keyword", headers, nil)
+	p, err := ioutil.ReadAll(response.Body)
+	isNotFoundPage := err == nil && strings.Index(string(p), "<title>Not found</title>") > 0
+
+	assert.Equal(s.T(), http.StatusNotFound, response.Code)
+	assert.Equal(s.T(), true, isNotFoundPage)
+}
+
+func (s *KeywordDbTestSuite) TestDisplayKeywordResultWithGuestUser() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+	keywordID := fmt.Sprint(keyword.ID)
+	url := fmt.Sprintf("/keyword/%s", keywordID)
+
+	response := testHttp.PerformRequest(s.engine, "GET", url, nil, nil)
+
+	assert.Equal(s.T(), http.StatusFound, response.Code)
+	assert.Equal(s.T(), "/login", response.Header().Get("Location"))
+}
+
+func (s *KeywordDbTestSuite) TestDisplayKeywordGoogleHTMLWithAuthenticatedUserAndValidKeyword() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name(), HtmlCode: "test-html"}
+	db.GetDB().Create(&keyword)
+	keywordID := fmt.Sprint(keyword.ID)
+	url := fmt.Sprintf("/keyword/%s/google-html", keywordID)
+
+	headers := http.Header{}
+	cookie := fixture.GenerateCookie("user_id", s.userID)
+	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
+
+	response := testHttp.PerformRequest(s.engine, "GET", url, headers, nil)
+
+	assert.Equal(s.T(), http.StatusOK, response.Code)
+}
+
+func (s *KeywordDbTestSuite) TestDisplayKeywordGoogleHTMLWithAuthenticatedUserButInvalidKeyword() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name(), HtmlCode: "test-html"}
+	db.GetDB().Create(&keyword)
+
+	headers := http.Header{}
+	cookie := fixture.GenerateCookie("user_id", s.userID)
+	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
+
+	response := testHttp.PerformRequest(s.engine, "GET", "/keyword/invalid-keyword/google-html", headers, nil)
+
+	assert.Equal(s.T(), http.StatusNotFound, response.Code)
+}
+
+func (s *KeywordDbTestSuite) TestDisplayKeywordGoogleHTMLWithGuestUser() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+	keywordID := fmt.Sprint(keyword.ID)
+	url := fmt.Sprintf("/keyword/%s/google-html", keywordID)
+
+	response := testHttp.PerformRequest(s.engine, "GET", url, nil, nil)
+
+	assert.Equal(s.T(), http.StatusFound, response.Code)
+	assert.Equal(s.T(), "/login", response.Header().Get("Location"))
 }
 
 func (s *KeywordDbTestSuite) TestUploadKeywordWithAuthenticatedUserAndValidParams() {
