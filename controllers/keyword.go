@@ -48,7 +48,7 @@ func (k *KeywordController) displayKeywordResult(c *gin.Context) {
 	data, err := getKeywordResultData(keywordService, keywordID)
 
 	if err != nil {
-		html.Render404(c)
+		html.RenderNotFound(c)
 		return
 	}
 
@@ -64,7 +64,7 @@ func (k *KeywordController) displayKeywordGoogleHTML(c *gin.Context) {
 		c.Writer.WriteHeader(http.StatusOK)
 		_, _ = c.Writer.Write([]byte(keyword.HtmlCode))
 	} else {
-		html.Render404(c)
+		html.RenderNotFound(c)
 	}
 }
 

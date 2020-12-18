@@ -28,8 +28,8 @@ func RenderWithFlash(c *gin.Context, status int, view string, title string, data
 	})
 }
 
-func Render404(c *gin.Context) {
-	html, _ := ioutil.ReadFile("templates/404.html")
+func RenderNotFound(c *gin.Context) {
+	html, _ := ioutil.ReadFile("templates/not_found.html")
 	c.Writer.WriteHeader(http.StatusNotFound)
 	_, _ = c.Writer.Write(html)
 }
