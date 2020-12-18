@@ -1,0 +1,21 @@
+{{ define "search_result_list" }}
+
+<div class="search-result-list">
+  <dt class="search-result-list__title">
+    {{ .title }}
+  </dt>
+  {{ if .value }}
+    <ul class="search-result-list__value divide-y divide-gray-200">
+      {{ range $v := .value }}
+        <li class="search-result-list__item">
+          <img class="search-result-list__icon" src="/dist/svg/link.svg">
+          <a class="search-result-list__link" href="{{ $v }}" target="_blank">
+            {{ $v }}
+          </a>
+        </li>
+      {{ end }}
+    </ul>
+  {{ end }} 
+</div>
+
+{{ end }}

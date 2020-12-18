@@ -14,11 +14,11 @@ func AppGoviewConfig() goview.Config {
 		Master:       "layouts/application",
 		DisableCache: false,
 		Partials: []string{
-			"partials/scrape_result",
-			"partials/scrape_result_list",
+			"partials/search_result",
+			"partials/search_result_list",
 		},
 		Funcs: template.FuncMap{
-			"scrapeResultPartial": view.ScrapeResultPartial,
+			"searchResultPartial": view.SearchResultPartial,
 		},
 	}
 }
