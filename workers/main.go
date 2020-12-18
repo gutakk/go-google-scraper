@@ -5,11 +5,12 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/gocraft/work"
-	"github.com/gomodule/redigo/redis"
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/workers/jobs"
+
+	"github.com/gocraft/work"
+	"github.com/gomodule/redigo/redis"
 )
 
 func init() {

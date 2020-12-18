@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/gutakk/go-google-scraper/db"
+
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )

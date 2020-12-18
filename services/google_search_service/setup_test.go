@@ -4,9 +4,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
+
+	"github.com/gin-gonic/gin"
 )
 
 func TestMain(m *testing.M) {

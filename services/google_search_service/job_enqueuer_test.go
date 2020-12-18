@@ -9,6 +9,7 @@ import (
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/go-playground/assert.v1"
 )
