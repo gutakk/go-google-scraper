@@ -60,8 +60,13 @@ func (k *KeywordController) displayKeywordGoogleHTML(c *gin.Context) {
 	keywordID := c.Param("keyword_id")
 	keyword, _ := keywordService.GetKeywordResult(keywordID)
 
-	c.Writer.WriteHeader(http.StatusOK)
-	_, _ = c.Writer.Write([]byte(keyword.HtmlCode))
+	if len(keyword.HtmlCode) > 0 {
+		c.Writer.WriteHeader(http.StatusOK)
+		_, _ = c.Writer.Write([]byte(keyword.HtmlCode))
+	} else {
+		c.Writer.WriteHeader(http.StatusNotFound)
+		_, _ = c.Writer.Write([]byte("Google page not found"))
+	}
 }
 
 func (k *KeywordController) uploadKeyword(c *gin.Context) {
