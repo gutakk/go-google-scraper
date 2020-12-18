@@ -16,7 +16,7 @@ func main() {
 	database := db.ConnectDB()
 	migration.Migrate(database)
 
-	db.GenerateRedisPool()
+	db.SetupRedisPool()
 
 	r := config.SetupRouter()
 	controllers.CombineRoutes(r)

@@ -10,7 +10,7 @@ import (
 
 var RedisPool *redis.Pool
 
-func GenerateRedisPool() {
+func SetupRedisPool() {
 	pool := &redis.Pool{
 		MaxActive: 5,
 		MaxIdle:   5,

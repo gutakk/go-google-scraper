@@ -38,7 +38,7 @@ func (s *KeywordDbTestSuite) SetupTest() {
 		return database
 	}
 
-	db.GenerateRedisPool()
+	db.SetupRedisPool()
 
 	testDB.InitKeywordStatusEnum(db.GetDB())
 	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
