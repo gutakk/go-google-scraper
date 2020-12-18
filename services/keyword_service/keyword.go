@@ -40,7 +40,7 @@ func (k *KeywordService) GetAll() ([]models.Keyword, error) {
 	return keywords, nil
 }
 
-func (k *KeywordService) GetKeywordResult(keywordID string) (models.Keyword, error) {
+func (k *KeywordService) GetKeywordResult(keywordID interface{}) (models.Keyword, error) {
 	condition := make(map[string]interface{})
 	condition["id"] = keywordID
 	condition["user_id"] = k.CurrentUserID

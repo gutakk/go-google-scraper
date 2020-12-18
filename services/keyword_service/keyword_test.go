@@ -87,6 +87,47 @@ func (s *KeywordServiceDbTestSuite) TestGetAllWithInvalidUser() {
 	assert.Equal(s.T(), nil, err)
 }
 
+func (s *KeywordServiceDbTestSuite) TestGetKeywordResultWithValidKeywordAndUser() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	result, err := s.keywordService.GetKeywordResult(keyword.ID)
+
+	assert.Equal(s.T(), keyword.Keyword, result.Keyword)
+	assert.Equal(s.T(), nil, err)
+}
+
+func (s *KeywordServiceDbTestSuite) TestGetKeywordResultWithValidKeywordButInvalidUser() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	keywordService := KeywordService{CurrentUserID: 999999}
+	result, err := keywordService.GetKeywordResult(keyword.ID)
+
+	assert.Equal(s.T(), models.Keyword{}, result)
+	assert.Equal(s.T(), "something went wrong, please try again", err.Error())
+}
+
+func (s *KeywordServiceDbTestSuite) TestGetKeywordResultWithWrongKeywordTypeButValidUser() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	result, err := s.keywordService.GetKeywordResult("invalidKeyword")
+
+	assert.Equal(s.T(), models.Keyword{}, result)
+	assert.Equal(s.T(), "ERROR: invalid input syntax for type bigint: \"invalidKeyword\" (SQLSTATE 22P02)", err.Error())
+}
+
+func (s *KeywordServiceDbTestSuite) TestGetKeywordResultWithInvalidKeywordButValidUser() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	result, err := s.keywordService.GetKeywordResult("999999")
+
+	assert.Equal(s.T(), models.Keyword{}, result)
+	assert.Equal(s.T(), "something went wrong, please try again", err.Error())
+}
+
 func (s *KeywordServiceDbTestSuite) TestSaveWithValidParams() {
 	keywordList := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
 	err := s.keywordService.Save(keywordList)
