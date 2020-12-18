@@ -13,7 +13,7 @@ import (
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
-	"github.com/gutakk/go-google-scraper/services/google_scraping_service"
+	"github.com/gutakk/go-google-scraper/services/google_search_service"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 	"github.com/stretchr/testify/suite"
@@ -70,8 +70,8 @@ func TestKeywordScraperDBTestSuite(t *testing.T) {
 
 func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithValidJob() {
 	r, _ := recorder.New("tests/fixture/vcr/valid_keyword")
-	requestFunc := google_scraping_service.Request
-	google_scraping_service.Request = func(keyword string, transport http.RoundTripper) (*http.Response, error) {
+	requestFunc := google_search_service.Request
+	google_search_service.Request = func(keyword string, transport http.RoundTripper) (*http.Response, error) {
 		url := "https://www.google.com/search?q=AWS"
 		client := &http.Client{Transport: r}
 
@@ -85,7 +85,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithValidJob() {
 
 		return resp, err
 	}
-	defer func() { google_scraping_service.Request = requestFunc }()
+	defer func() { google_search_service.Request = requestFunc }()
 
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
@@ -147,11 +147,11 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithoutKeywordAndReach
 }
 
 func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithRequestErrorAndReachMaxFails() {
-	requestFunc := google_scraping_service.Request
-	google_scraping_service.Request = func(keyword string, transport http.RoundTripper) (*http.Response, error) {
+	requestFunc := google_search_service.Request
+	google_search_service.Request = func(keyword string, transport http.RoundTripper) (*http.Response, error) {
 		return nil, errors.New("mock request error")
 	}
-	defer func() { google_scraping_service.Request = requestFunc }()
+	defer func() { google_search_service.Request = requestFunc }()
 
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
@@ -177,11 +177,11 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithRequestErrorAndRea
 }
 
 func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithParsingErrorAndReachMaxFails() {
-	parsingFunc := google_scraping_service.ParseGoogleResponse
-	google_scraping_service.ParseGoogleResponse = func(googleResp *http.Response) (google_scraping_service.ParsingResult, error) {
-		return google_scraping_service.ParsingResult{}, errors.New("mock parsing error")
+	parsingFunc := google_search_service.ParseGoogleResponse
+	google_search_service.ParseGoogleResponse = func(googleResp *http.Response) (google_search_service.ParsingResult, error) {
+		return google_search_service.ParsingResult{}, errors.New("mock parsing error")
 	}
-	defer func() { google_scraping_service.ParseGoogleResponse = parsingFunc }()
+	defer func() { google_search_service.ParseGoogleResponse = parsingFunc }()
 
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)

@@ -1,4 +1,4 @@
-package google_scraping_service
+package google_search_service
 
 import (
 	"os"
