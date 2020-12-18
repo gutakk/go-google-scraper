@@ -8,21 +8,21 @@
   </div>
 
   <div class="result-keyword__content-group">
-    {{ template "scrape_result" scrapeResult "Total Links" .data.keyword.LinksCount }}
+    {{ template "scrape_result" scrapeResultPartial "Total Links" .data.keyword.LinksCount }}
   </div>
 
   <div class="result-keyword__content-group">
-    {{ template "scrape_result" scrapeResult "Total Adword Links" .data.keyword.TotalAdwordsCount }}
+    {{ template "scrape_result" scrapeResultPartial "Total Adword Links" .data.keyword.TotalAdwordsCount }}
   </div>
 
   <div class="result-keyword__content-group">
-    {{ template "scrape_result" scrapeResult "Total Top Position Adword Links" .data.keyword.TopPositionAdwordsCount }}
-    {{ template "scrape_result_list"  scrapeResult "Top Position Adword Links" .data.keyword.TopPositionAdwordLinks }}
+    {{ template "scrape_result" scrapeResultPartial "Total Top Position Adword Links" .data.keyword.TopPositionAdwordsCount }}
+    {{ template "scrape_result_list"  scrapeResultPartial "Top Position Adword Links" .data.keyword.TopPositionAdwordLinks }}
   </div>
 
   <div class="result-keyword__content-group">
-    {{ template "scrape_result" scrapeResult "Total Non Adword Links" .data.keyword.NonAdwordsCount }}
-    {{ template "scrape_result_list"  scrapeResult "Non Adword Links" .data.keyword.NonAdwordLinks }}
+    {{ template "scrape_result" scrapeResultPartial "Total Non Adword Links" .data.keyword.NonAdwordsCount }}
+    {{ template "scrape_result_list"  scrapeResultPartial "Non Adword Links" .data.keyword.NonAdwordLinks }}
   </div>
 </div>
 

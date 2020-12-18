@@ -4,6 +4,7 @@ import (
 	"html/template"
 
 	"github.com/foolin/goview"
+	"github.com/gutakk/go-google-scraper/helpers/view"
 )
 
 func AppGoviewConfig() goview.Config {
@@ -17,12 +18,7 @@ func AppGoviewConfig() goview.Config {
 			"partials/scrape_result_list",
 		},
 		Funcs: template.FuncMap{
-			"scrapeResult": func(title string, value interface{}) map[string]interface{} {
-				return map[string]interface{}{
-					"title": title,
-					"value": value,
-				}
-			},
+			"scrapeResultPartial": view.ScrapeResultPartial,
 		},
 	}
 }
