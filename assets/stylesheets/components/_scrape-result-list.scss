@@ -8,4 +8,16 @@
   &__value {
     @apply border border-gray-200 rounded-md col-span-2;
   }
+
+  &__item {
+    @apply pl-3 pr-4 py-3 flex items-center justify-between text-sm;
+  }
+
+  &__icon {
+    @apply flex-shrink-0 h-5 w-5 text-gray-400;
+  }
+
+  &__link {
+    @apply ml-2 flex-1 w-0;
+  }
 }

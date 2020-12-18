@@ -7,9 +7,11 @@
   {{ if .value }}
     <ul class="scrape-result-list__value divide-y divide-gray-200">
       {{ range $v := .value }}
-        <li class="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
-          <img class="flex-shrink-0 h-5 w-5 text-gray-400" src="/dist/svg/link.svg">
-          <a class="ml-2 flex-1 w-0" href="{{ $v }}" target="_blank">{{ $v }}</a>
+        <li class="scrape-result-list__item">
+          <img class="scrape-result-list__icon" src="/dist/svg/link.svg">
+          <a class="scrape-result-list__link" href="{{ $v }}" target="_blank">
+            {{ $v }}
+          </a>
         </li>
       {{ end }}
     </ul>
