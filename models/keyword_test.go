@@ -81,7 +81,7 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 	assert.Equal(s.T(), "test-html", result.HtmlCode)
 }
 
-func (s *KeywordDBTestSuite) TestSaveKeywordsWithKeywordValue() {
+func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidKeywordValue() {
 	keyword := Keyword{
 		Keyword: "", UserID: s.userID,
 	}
