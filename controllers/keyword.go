@@ -58,13 +58,14 @@ func (k *KeywordController) displayKeywordResult(c *gin.Context) {
 func (k *KeywordController) displayKeywordGoogleHTML(c *gin.Context) {
 	keywordService := initKeywordService(c)
 	keywordID := c.Param("keyword_id")
-	keyword, _ := keywordService.GetKeywordResult(keywordID)
+	keyword, err := keywordService.GetKeywordResult(keywordID)
 
-	if len(keyword.HtmlCode) > 0 {
+	if err != nil || len(keyword.HtmlCode) == 0 {
+		html.RenderNotFound(c)
+
+	} else {
 		c.Writer.WriteHeader(http.StatusOK)
 		_, _ = c.Writer.Write([]byte(keyword.HtmlCode))
-	} else {
-		html.RenderNotFound(c)
 	}
 }
 

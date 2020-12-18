@@ -168,6 +168,21 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordGoogleHTMLWithAuthenticatedUserBu
 	assert.Equal(s.T(), http.StatusNotFound, response.Code)
 }
 
+func (s *KeywordDbTestSuite) TestDisplayKeywordGoogleHTMLWithAuthenticatedUserButNoHTMLCode() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+	keywordID := fmt.Sprint(keyword.ID)
+	url := fmt.Sprintf("/keyword/%s/google-html", keywordID)
+
+	headers := http.Header{}
+	cookie := fixture.GenerateCookie("user_id", s.userID)
+	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
+
+	response := testHttp.PerformRequest(s.engine, "GET", url, headers, nil)
+
+	assert.Equal(s.T(), http.StatusNotFound, response.Code)
+}
+
 func (s *KeywordDbTestSuite) TestDisplayKeywordGoogleHTMLWithGuestUser() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
