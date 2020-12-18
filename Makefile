@@ -14,4 +14,3 @@ test:
 	docker-compose -f docker-compose.test.yml up -d
 	go test -v -p 1 -count=1 ./...
 	docker-compose -f docker-compose.test.yml down
-
