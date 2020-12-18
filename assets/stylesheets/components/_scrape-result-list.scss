@@ -1,0 +1,11 @@
+.scrape-result-list {
+  @apply px-6 py-5 grid grid-cols-3 gap-4;
+
+  &__title {
+    @apply text-sm font-medium text-gray-500;
+  }
+
+  &__value {
+    @apply border border-gray-200 rounded-md col-span-2;
+  }
+}
