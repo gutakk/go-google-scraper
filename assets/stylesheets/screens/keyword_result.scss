@@ -3,7 +3,11 @@ body.keyword_result {
     @apply bg-white shadow overflow-hidden rounded-lg;
 
     &__header {
-      @apply px-6 py-5;
+      @apply px-6 py-5 flex items-center;
+    }
+
+    &__google-link {
+      @apply w-16 h-16 p-2 mr-4 bg-white shadow overflow-hidden rounded-lg;
     }
 
     &__content-group {

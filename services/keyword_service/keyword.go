@@ -30,6 +30,7 @@ type KeywordService struct {
 }
 
 type KeywordResult struct {
+	ID                      string
 	Keyword                 string
 	Status                  models.KeywordStatus
 	LinksCount              int
@@ -70,6 +71,7 @@ func (k *KeywordService) GetKeywordResult(keywordID string) (KeywordResult, erro
 	_ = json.Unmarshal(keyword.TopPositionAdwordLinks, &topPositionAdwordLinks)
 
 	return KeywordResult{
+		ID:                      keywordID,
 		Keyword:                 keyword.Keyword,
 		Status:                  keyword.Status,
 		LinksCount:              keyword.LinksCount,

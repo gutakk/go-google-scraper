@@ -2,9 +2,10 @@
 
 <div class="result-keyword">
   <div class="result-keyword__header">
-    <h2>
-      {{ .data.keyword.Keyword }}
-    </h2>
+    <a class="result-keyword__google-link" href="/keyword/{{ .data.keyword.ID }}/google-html">
+      <img src="/dist/svg/google.svg">
+    </a>
+    <h2>{{ .data.keyword.Keyword }}</h2>
   </div>
 
   <div class="result-keyword__content-group">
