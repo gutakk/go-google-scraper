@@ -1,6 +1,9 @@
 package helpers
 
 import (
+	"io/ioutil"
+	"net/http"
+
 	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-gonic/gin"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
@@ -23,4 +26,10 @@ func RenderWithFlash(c *gin.Context, status int, view string, title string, data
 		"errorFlashes":  session.Flashes(c, "error"),
 		"data":          data,
 	})
+}
+
+func Render404(c *gin.Context) {
+	html, _ := ioutil.ReadFile("templates/404.html")
+	c.Writer.WriteHeader(http.StatusNotFound)
+	_, _ = c.Writer.Write(html)
 }
