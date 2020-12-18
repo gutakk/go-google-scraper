@@ -21,7 +21,7 @@ var EnqueueScrapingJob = func(savedKeyword models.Keyword) error {
 	enqueuer := work.NewEnqueuer("go-google-scraper", db.GetRedisPool())
 
 	job, err := enqueuer.Enqueue(
-		"scraping",
+		"search",
 		work.Q{
 			"keywordID": savedKeyword.ID,
 			"keyword":   savedKeyword.Keyword,

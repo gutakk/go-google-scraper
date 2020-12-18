@@ -111,7 +111,7 @@ func (s *KeywordServiceDbTestSuite) TestSaveWithEmptyKeywordList() {
 func (s *KeywordServiceDbTestSuite) TestSaveWithEnqueueJobError() {
 	enqueueScrapingJobFunc := google_search_service.EnqueueScrapingJob
 	google_search_service.EnqueueScrapingJob = func(savedKeyword models.Keyword) error {
-		return errors.New("mock enqueue scraping job error")
+		return errors.New("mock enqueue search job error")
 	}
 	defer func() { google_search_service.EnqueueScrapingJob = enqueueScrapingJobFunc }()
 
@@ -120,7 +120,7 @@ func (s *KeywordServiceDbTestSuite) TestSaveWithEnqueueJobError() {
 
 	result := db.GetDB().Find(&models.Keyword{})
 
-	assert.Equal(s.T(), "mock enqueue scraping job error", err.Error())
+	assert.Equal(s.T(), "mock enqueue search job error", err.Error())
 	assert.Equal(s.T(), 0, int(result.RowsAffected))
 	assert.Equal(s.T(), nil, result.Error)
 }

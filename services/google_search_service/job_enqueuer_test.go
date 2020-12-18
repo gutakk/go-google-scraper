@@ -22,7 +22,7 @@ func (s *JobEnqueuerTestSuite) SetupTest() {
 }
 
 func (s *JobEnqueuerTestSuite) TearDownTest() {
-	_, _ = db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "scraping"))
+	_, _ = db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
 }
 
 func TestJobEnqueuerTestSuite(t *testing.T) {
@@ -39,7 +39,7 @@ func (s *JobEnqueuerTestSuite) TestEnqueueScrapingJobWithValidSavedKeyword() {
 	conn := db.GetRedisPool().Get()
 	defer conn.Close()
 
-	redisKey := testDB.RedisKeyJobs("go-google-scraper", "scraping")
+	redisKey := testDB.RedisKeyJobs("go-google-scraper", "search")
 
 	rawJSON, redisErr := redis.Bytes(conn.Do("RPOP", redisKey))
 	if redisErr != nil {
@@ -50,7 +50,7 @@ func (s *JobEnqueuerTestSuite) TestEnqueueScrapingJobWithValidSavedKeyword() {
 	_ = json.Unmarshal(rawJSON, &job)
 
 	assert.Equal(s.T(), nil, err)
-	assert.Equal(s.T(), "scraping", job.Name)
+	assert.Equal(s.T(), "search", job.Name)
 	assert.Equal(s.T(), "Hazard", job.ArgString("keyword"))
 }
 
@@ -62,7 +62,7 @@ func (s *JobEnqueuerTestSuite) TestEnqueueScrapingJobWithBlankSavedKeyword() {
 	conn := db.GetRedisPool().Get()
 	defer conn.Close()
 
-	redisKey := testDB.RedisKeyJobs("go-google-scraper", "scraping")
+	redisKey := testDB.RedisKeyJobs("go-google-scraper", "search")
 
 	_, redisErr := redis.Bytes(conn.Do("RPOP", redisKey))
 

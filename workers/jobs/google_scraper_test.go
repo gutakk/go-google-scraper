@@ -61,7 +61,7 @@ func (s *KeywordScraperDBTestSuite) SetupTest() {
 func (s *KeywordScraperDBTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM keywords")
 	db.GetDB().Exec("DELETE FROM users")
-	_, _ = db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("test-job", "scraping"))
+	_, _ = db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("test-job", "search"))
 }
 
 func TestKeywordScraperDBTestSuite(t *testing.T) {
@@ -91,7 +91,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithValidJob() {
 	db.GetDB().Create(&keyword)
 
 	job, _ := s.enqueuer.Enqueue(
-		"scraping",
+		"search",
 		work.Q{
 			"keywordID": keyword.ID,
 			"keyword":   keyword.Keyword,
@@ -111,7 +111,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithoutKeywordID() {
 	db.GetDB().Create(&keyword)
 
 	job, _ := s.enqueuer.Enqueue(
-		"scraping",
+		"search",
 		work.Q{
 			"keyword": keyword.Keyword,
 		},
@@ -128,7 +128,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithoutKeywordAndReach
 	db.GetDB().Create(&keyword)
 
 	job, _ := s.enqueuer.Enqueue(
-		"scraping",
+		"search",
 		work.Q{
 			"keywordID": keyword.ID,
 		},
@@ -157,7 +157,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithRequestErrorAndRea
 	db.GetDB().Create(&keyword)
 
 	job, _ := s.enqueuer.Enqueue(
-		"scraping",
+		"search",
 		work.Q{
 			"keywordID": keyword.ID,
 			"keyword":   keyword.Keyword,
@@ -187,7 +187,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithParsingErrorAndRea
 	db.GetDB().Create(&keyword)
 
 	job, _ := s.enqueuer.Enqueue(
-		"scraping",
+		"search",
 		work.Q{
 			"keywordID": keyword.ID,
 			"keyword":   keyword.Keyword,
