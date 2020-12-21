@@ -10,6 +10,8 @@ github.com/bxcodec/faker/v3 v3.5.0/go.mod h1:gF31YgnMSMKgkvl+fyEo1xuSMbEuieyqfes
 github.com/cockroachdb/apd v1.1.0/go.mod h1:8Sl8LxpKi29FqWXR16WEFZRNSz3SoPzUzeMeY4+DwBQ=
 github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
 github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
+github.com/cosmtrek/air v1.15.1 h1:MDdKBKRyhYYM8grv2nb1AC8GfXF+jFJlImlr1Lv3Q8Y=
+github.com/cosmtrek/air v1.15.1/go.mod h1:bso29GmSWCd/o8xNC49od/RMb2GK+KAa5gS9gD6xus4=
 github.com/cosmtrek/air v1.21.2 h1:PwChdKs3qlSkKucKwwC04daw5eoy4SVgiEBQiHX5L9A=
 github.com/cosmtrek/air v1.21.2/go.mod h1:5EsgUqrBIHlW2ghNoevwPBEG1FQvF5XNulikjPte538=
 github.com/creack/pty v1.1.7/go.mod h1:lj5s0c3V2DBrqTV7llrYr5NG6My20zk30Fl46Y7DoTY=
@@ -21,6 +23,7 @@ github.com/daaku/go.zipexe v1.0.0/go.mod h1:z8IiR6TsVLEYKwXAoE/I+8ys/sDkgTzSL0CL
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/ddollar/forego v0.16.1 h1:HbAl3XyEdU1lw17PvZzqMzcx7b8BKZshEsdb4+1TI3Y=
 github.com/ddollar/forego v0.16.1/go.mod h1:moJFK5OqWdZeLVEYHynQRJqoKImixOuxgQBFCtoe0bU=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/fatih/color v1.7.0 h1:DkWD4oS2D8LGGgTQ6IvwJJXSL5Vp2ffcQg58nFV38Ys=
