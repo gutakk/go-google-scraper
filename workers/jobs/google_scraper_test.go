@@ -14,7 +14,6 @@ import (
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/bxcodec/faker/v3"
-	"github.com/dnaeon/go-vcr/recorder"
 	"github.com/gin-gonic/gin"
 	"github.com/gocraft/work"
 	"github.com/stretchr/testify/suite"
@@ -36,8 +35,10 @@ func init() {
 
 type KeywordScraperDBTestSuite struct {
 	suite.Suite
-	userID   uint
-	enqueuer *work.Enqueuer
+	userID      uint
+	enqueuer    *work.Enqueuer
+	requestFunc func(keyword string, transport http.RoundTripper) (*http.Response, error)
+	parsingFunc func(googleResp *http.Response) (google_search_service.ParsingResult, error)
 }
 
 func (s *KeywordScraperDBTestSuite) SetupTest() {
@@ -50,6 +51,12 @@ func (s *KeywordScraperDBTestSuite) SetupTest() {
 
 	testDB.InitKeywordStatusEnum(db.GetDB())
 	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
+
+	s.requestFunc = google_search_service.Request
+	s.parsingFunc = google_search_service.ParseGoogleResponse
+
+	defer func() { google_search_service.Request = s.requestFunc }()
+	defer func() { google_search_service.ParseGoogleResponse = s.parsingFunc }()
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
 	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
@@ -70,23 +77,13 @@ func TestKeywordScraperDBTestSuite(t *testing.T) {
 }
 
 func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithValidJob() {
-	r, _ := recorder.New("tests/fixture/vcr/valid_keyword")
-	requestFunc := google_search_service.Request
 	google_search_service.Request = func(keyword string, transport http.RoundTripper) (*http.Response, error) {
-		url := "https://www.google.com/search?q=AWS"
-		client := &http.Client{Transport: r}
-
-		req, _ := http.NewRequest("GET", url, nil)
-		req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36")
-
-		resp, err := client.Do(req)
-		if err != nil {
-			return nil, err
-		}
-
-		return resp, err
+		return &http.Response{}, nil
 	}
-	defer func() { google_search_service.Request = requestFunc }()
+
+	google_search_service.ParseGoogleResponse = func(googleResp *http.Response) (google_search_service.ParsingResult, error) {
+		return google_search_service.ParsingResult{}, nil
+	}
 
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
@@ -102,9 +99,11 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithValidJob() {
 	ctx := Context{}
 	err := ctx.PerformSearchJob(job)
 
-	_ = r.Stop()
+	var result models.Keyword
+	db.GetDB().First(&result, keyword.ID)
 
 	assert.Equal(s.T(), nil, err)
+	assert.Equal(s.T(), models.Processed, result.Status)
 }
 
 func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithoutKeywordID() {
@@ -148,11 +147,9 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithoutKeywordAndReachMa
 }
 
 func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithRequestErrorAndReachMaxFails() {
-	requestFunc := google_search_service.Request
 	google_search_service.Request = func(keyword string, transport http.RoundTripper) (*http.Response, error) {
 		return nil, errors.New("mock request error")
 	}
-	defer func() { google_search_service.Request = requestFunc }()
 
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
@@ -178,11 +175,9 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithRequestErrorAndReach
 }
 
 func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithParsingErrorAndReachMaxFails() {
-	parsingFunc := google_search_service.ParseGoogleResponse
 	google_search_service.ParseGoogleResponse = func(googleResp *http.Response) (google_search_service.ParsingResult, error) {
 		return google_search_service.ParsingResult{}, errors.New("mock parsing error")
 	}
-	defer func() { google_search_service.ParseGoogleResponse = parsingFunc }()
 
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
