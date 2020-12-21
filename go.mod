@@ -6,7 +6,6 @@ require (
 	github.com/bxcodec/faker/v3 v3.5.0
 	github.com/cosmtrek/air v1.15.1 // indirect
 	github.com/creack/pty v1.1.11 // indirect
-	github.com/ddollar/forego v0.16.1 // indirect
 	github.com/fatih/color v1.10.0 // indirect
 	github.com/foolin/goview v0.3.0
 	github.com/gin-contrib/sessions v0.0.3
@@ -16,6 +15,7 @@ require (
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/jackc/pgconn v1.7.0
 	github.com/joho/godotenv v1.3.0
+	github.com/mattn/goreman v0.3.7 // indirect
 	github.com/pelletier/go-toml v1.8.1 // indirect
 	github.com/stretchr/testify v1.5.1
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
