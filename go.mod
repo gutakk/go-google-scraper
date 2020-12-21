@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/bxcodec/faker/v3 v3.5.0
-	github.com/cosmtrek/air v1.21.2 // indirect
+	github.com/cosmtrek/air v1.15.1 // indirect
 	github.com/creack/pty v1.1.11 // indirect
 	github.com/ddollar/forego v0.16.1 // indirect
 	github.com/fatih/color v1.10.0 // indirect
