@@ -1,4 +1,4 @@
-.PHONY: test env-setup
+.PHONY: test env-setup build-dependencies start-dev
 
 build-dependencies:
 	go get github.com/mattn/goreman@v0.3.7
