@@ -2,6 +2,7 @@ package google_search_service
 
 import (
 	"net/http"
+	"reflect"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -20,43 +21,77 @@ type ParsingResult struct {
 	TotalAdwordsCount      int
 }
 
-var ParseGoogleResponse = func(googleResp *http.Response) (ParsingResult, error) {
-	countBottomPositionAdwordsCh := make(chan int)
-	countLinksCh := make(chan int)
-	countNonAdwordsCh := make(chan int)
-	countTopPositionAdwordsCh := make(chan int)
+type parsingChannel struct {
+	countBottomPositionAdwordsCh  chan int
+	countLinksCh                  chan int
+	countNonAdwordsCh             chan int
+	countTopPositionAdwordsCh     chan int
+	fetchNonAdwordLinksCh         chan []string
+	fetchTopPositionAdwordLinksCh chan []string
+}
 
-	fetchNonAdwordLinksCh := make(chan []string)
-	fetchTopPositionAdwordLinksCh := make(chan []string)
+var ParseGoogleResponse = func(googleResp *http.Response) (ParsingResult, error) {
+	parsingCh := parsingChannel{
+		countBottomPositionAdwordsCh:  make(chan int),
+		countLinksCh:                  make(chan int),
+		countNonAdwordsCh:             make(chan int),
+		countTopPositionAdwordsCh:     make(chan int),
+		fetchNonAdwordLinksCh:         make(chan []string),
+		fetchTopPositionAdwordLinksCh: make(chan []string),
+	}
 
 	doc, err := goquery.NewDocumentFromReader(googleResp.Body)
 	if err != nil {
 		return ParsingResult{}, err
 	}
 
-	go countBottomPositionAdwords(doc, countBottomPositionAdwordsCh)
-	go countLinks(doc, countLinksCh)
-	go countNonAdwords(doc, countNonAdwordsCh)
-	go countTopPositionAdwords(doc, countTopPositionAdwordsCh)
+	go countBottomPositionAdwords(doc, parsingCh.countBottomPositionAdwordsCh)
+	go countLinks(doc, parsingCh.countLinksCh)
+	go countNonAdwords(doc, parsingCh.countNonAdwordsCh)
+	go countTopPositionAdwords(doc, parsingCh.countTopPositionAdwordsCh)
 
-	go fetchNonAdwordLinks(doc, fetchNonAdwordLinksCh)
-	go fetchTopPositionAdwordLinks(doc, fetchTopPositionAdwordLinksCh)
+	go fetchNonAdwordLinks(doc, parsingCh.fetchNonAdwordLinksCh)
+	go fetchTopPositionAdwordLinks(doc, parsingCh.fetchTopPositionAdwordLinksCh)
 
-	bottomPositionAdwordsCount := <-countBottomPositionAdwordsCh
 	htmlCode, _ := doc.Html()
-	topPositionAdwordsCount := <-countTopPositionAdwordsCh
 
-	parsingResult := ParsingResult{
-		HtmlCode:               htmlCode,
-		LinksCount:             <-countLinksCh,
-		NonAdwordsCount:        <-countNonAdwordsCh,
-		NonAdwordLinks:         <-fetchNonAdwordLinksCh,
+	parsingResult := parsingCh.getParsingResultFromChannel()
+	parsingResult.HtmlCode = htmlCode
+
+	return parsingResult, nil
+}
+
+func (pc *parsingChannel) getParsingResultFromChannel() ParsingResult {
+	parsingChannelLength := reflect.TypeOf(*pc).NumField()
+	var bottomPositionAdwordsCount, topPositionAdwordsCount, linksCount, nonAdwordsCount int
+	var nonAdwordLinks, topPositionAdwordLinks []string
+
+	for i := 0; i < parsingChannelLength; i++ {
+		select {
+		case val := <-pc.countBottomPositionAdwordsCh:
+			bottomPositionAdwordsCount = val
+		case val := <-pc.countTopPositionAdwordsCh:
+			topPositionAdwordsCount = val
+		case val := <-pc.countLinksCh:
+			linksCount = val
+		case val := <-pc.countNonAdwordsCh:
+			nonAdwordsCount = val
+		case val := <-pc.fetchNonAdwordLinksCh:
+			nonAdwordLinks = val
+		case val := <-pc.fetchTopPositionAdwordLinksCh:
+			topPositionAdwordLinks = val
+		}
+	}
+
+	return ParsingResult{
+		LinksCount:             linksCount,
+		NonAdwordsCount:        nonAdwordsCount,
+		NonAdwordLinks:         nonAdwordLinks,
 		TopPostionAdwordsCount: topPositionAdwordsCount,
-		TopPositionAdwordLinks: <-fetchTopPositionAdwordLinksCh,
+		TopPositionAdwordLinks: topPositionAdwordLinks,
 		TotalAdwordsCount:      bottomPositionAdwordsCount + topPositionAdwordsCount,
 	}
 
-	return parsingResult, nil
 }
 
 func countBottomPositionAdwords(doc *goquery.Document, ch chan int) {
