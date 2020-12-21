@@ -35,10 +35,18 @@ func init() {
 
 type KeywordScraperDBTestSuite struct {
 	suite.Suite
-	userID      uint
-	enqueuer    *work.Enqueuer
-	requestFunc func(keyword string, transport http.RoundTripper) (*http.Response, error)
-	parsingFunc func(googleResp *http.Response) (google_search_service.ParsingResult, error)
+	userID   uint
+	enqueuer *work.Enqueuer
+}
+
+func setupMocks() {
+	google_search_service.Request = func(keyword string, transport http.RoundTripper) (*http.Response, error) {
+		return &http.Response{}, nil
+	}
+
+	google_search_service.ParseGoogleResponse = func(googleResp *http.Response) (google_search_service.ParsingResult, error) {
+		return google_search_service.ParsingResult{}, nil
+	}
 }
 
 func (s *KeywordScraperDBTestSuite) SetupTest() {
@@ -52,11 +60,7 @@ func (s *KeywordScraperDBTestSuite) SetupTest() {
 	testDB.InitKeywordStatusEnum(db.GetDB())
 	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
 
-	s.requestFunc = google_search_service.Request
-	s.parsingFunc = google_search_service.ParseGoogleResponse
-
-	defer func() { google_search_service.Request = s.requestFunc }()
-	defer func() { google_search_service.ParseGoogleResponse = s.parsingFunc }()
+	setupMocks()
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
 	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
@@ -77,14 +81,6 @@ func TestKeywordScraperDBTestSuite(t *testing.T) {
 }
 
 func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithValidJob() {
-	google_search_service.Request = func(keyword string, transport http.RoundTripper) (*http.Response, error) {
-		return &http.Response{}, nil
-	}
-
-	google_search_service.ParseGoogleResponse = func(googleResp *http.Response) (google_search_service.ParsingResult, error) {
-		return google_search_service.ParsingResult{}, nil
-	}
-
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
