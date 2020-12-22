@@ -1,6 +1,10 @@
 package db
 
 import (
+	"fmt"
+	"os"
+
+	"github.com/gin-gonic/gin"
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -17,6 +21,20 @@ func GenerateRedisPool(address string) {
 	}
 
 	RedisPool = pool
+}
+
+func GetRedisUrl() string {
+	if gin.Mode() == gin.ReleaseMode {
+		return os.Getenv("REDIS_URL")
+	}
+
+	host := os.Getenv("REDIS_HOST")
+	port := os.Getenv("REDIS_PORT")
+
+	return fmt.Sprintf("%s:%s",
+		host,
+		port,
+	)
 }
 
 func GetRedisPool() *redis.Pool {

@@ -16,7 +16,7 @@ func main() {
 	database := db.ConnectDB()
 	migration.Migrate(database)
 
-	db.GenerateRedisPool("localhost:6379")
+	db.GenerateRedisPool(db.GetRedisUrl())
 
 	r := config.SetupRouter()
 	controllers.CombineRoutes(r)
