@@ -1,15 +1,15 @@
 {{ define "search_result_list" }}
 
-<div class="search-result-list">
-  <dt class="search-result-list__title">
+<div class="list-search-result">
+  <dt class="list-search-result__title">
     {{ .title }}
   </dt>
   {{ if .value }}
-    <ul class="search-result-list__value divide-y divide-gray-200">
+    <ul class="list-search-result__value divide-y divide-gray-200">
       {{ range $v := .value }}
-        <li class="search-result-list__item">
-          <img class="search-result-list__icon" src="/dist/svg/link.svg">
-          <a class="search-result-list__link" href="{{ $v }}" target="_blank">
+        <li class="list-search-result__item">
+          <img class="list-search-result__icon" src="/dist/svg/link.svg">
+          <a class="list-search-result__link" href="{{ $v }}" target="_blank">
             {{ $v }}
           </a>
         </li>
