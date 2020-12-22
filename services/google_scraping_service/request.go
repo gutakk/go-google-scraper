@@ -6,12 +6,13 @@ import (
 )
 
 type GoogleRequest struct {
-	Keyword string
+	Keyword   string
+	Transport http.RoundTripper
 }
 
 func (g *GoogleRequest) Request() (*http.Response, error) {
 	url := "https://www.google.com/search?q=" + url.QueryEscape(g.Keyword)
-	client := &http.Client{}
+	client := &http.Client{Transport: g.Transport}
 
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36")
