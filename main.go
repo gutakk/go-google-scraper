@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/controllers"
@@ -18,7 +19,7 @@ func main() {
 	r := config.SetupRouter()
 	controllers.CombineRoutes(r)
 
-	if error := r.Run(); error != nil {
+	if error := r.Run(fmt.Sprint(":", os.Getenv("APP_PORT"))); error != nil {
 		log.Fatal(fmt.Sprintf("Failed to start the server %v", error))
 	}
 }
