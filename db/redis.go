@@ -10,20 +10,20 @@ import (
 
 var RedisPool *redis.Pool
 
-func GenerateRedisPool(address string) {
+func GenerateRedisPool() {
 	pool := &redis.Pool{
 		MaxActive: 5,
 		MaxIdle:   5,
 		Wait:      true,
 		Dial: func() (redis.Conn, error) {
-			return redis.Dial("tcp", address)
+			return redis.Dial("tcp", getRedisUrl())
 		},
 	}
 
 	RedisPool = pool
 }
 
-func GetRedisUrl() string {
+func getRedisUrl() string {
 	if gin.Mode() == gin.ReleaseMode {
 		return os.Getenv("REDIS_URL")
 	}

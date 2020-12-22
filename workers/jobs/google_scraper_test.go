@@ -3,21 +3,35 @@ package jobs
 import (
 	"errors"
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/dnaeon/go-vcr/recorder"
+	"github.com/gin-gonic/gin"
 	"github.com/gocraft/work"
+	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/services/google_scraping_service"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	"github.com/gutakk/go-google-scraper/tests/path_test"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
+
+func init() {
+	gin.SetMode(gin.TestMode)
+
+	if err := os.Chdir(path_test.GetRoot()); err != nil {
+		panic(err)
+	}
+
+	config.LoadEnv()
+}
 
 type KeywordScraperDBTestSuite struct {
 	suite.Suite
@@ -31,7 +45,7 @@ func (s *KeywordScraperDBTestSuite) SetupTest() {
 		return database
 	}
 
-	db.GenerateRedisPool("localhost:6380")
+	db.GenerateRedisPool()
 
 	testDB.InitKeywordStatusEnum(db.GetDB())
 	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
@@ -55,7 +69,7 @@ func TestKeywordScraperDBTestSuite(t *testing.T) {
 }
 
 func (s *KeywordScraperDBTestSuite) TestPerformScrapingJobWithValidJob() {
-	r, _ := recorder.New("../../tests/fixture/vcr/valid_keyword")
+	r, _ := recorder.New("tests/fixture/vcr/valid_keyword")
 	requestFunc := google_scraping_service.Request
 	google_scraping_service.Request = func(keyword string, transport http.RoundTripper) (*http.Response, error) {
 		url := "https://www.google.com/search?q=AWS"

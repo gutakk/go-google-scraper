@@ -1,18 +1,32 @@
 package keyword_service
 
 import (
+	"os"
 	"testing"
 
 	"github.com/bxcodec/faker/v3"
+	"github.com/gin-gonic/gin"
+	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	"github.com/gutakk/go-google-scraper/tests/path_test"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
+
+func init() {
+	gin.SetMode(gin.TestMode)
+
+	if err := os.Chdir(path_test.GetRoot()); err != nil {
+		panic(err)
+	}
+
+	config.LoadEnv()
+}
 
 type KeywordServiceDbTestSuite struct {
 	suite.Suite
@@ -26,7 +40,7 @@ func (s *KeywordServiceDbTestSuite) SetupTest() {
 		return database
 	}
 
-	db.GenerateRedisPool("localhost:6380")
+	db.GenerateRedisPool()
 
 	testDB.InitKeywordStatusEnum(db.GetDB())
 	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
@@ -106,7 +120,7 @@ func TestKeywordServiceTestSuite(t *testing.T) {
 }
 
 func (s *KeywordServiceTestSuite) TestReadFileWithValidFile() {
-	result, err := s.keywordService.ReadFile("../../tests/fixture/adword_keywords.csv")
+	result, err := s.keywordService.ReadFile("tests/fixture/adword_keywords.csv")
 
 	assert.Equal(s.T(), []string{"AWS"}, result)
 	assert.Equal(s.T(), nil, err)

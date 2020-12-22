@@ -9,7 +9,7 @@ import (
 )
 
 func TestParserWithValidGoogleResponse(t *testing.T) {
-	r, _ := recorder.New("../../tests/fixture/vcr/valid_keyword")
+	r, _ := recorder.New("tests/fixture/vcr/valid_keyword")
 
 	url := "https://www.google.com/search?q=AWS"
 	client := &http.Client{Transport: r}
@@ -31,7 +31,7 @@ func TestParserWithValidGoogleResponse(t *testing.T) {
 }
 
 func TestParserWithNotGoogleSearchPage(t *testing.T) {
-	r, _ := recorder.New("../../tests/fixture/vcr/invalid_site")
+	r, _ := recorder.New("tests/fixture/vcr/invalid_site")
 
 	url := "https://www.golang.org"
 	client := &http.Client{Transport: r}

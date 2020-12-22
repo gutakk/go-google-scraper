@@ -18,7 +18,7 @@ type JobEnqueuerTestSuite struct {
 }
 
 func (s *JobEnqueuerTestSuite) SetupTest() {
-	db.GenerateRedisPool("localhost:6380")
+	db.GenerateRedisPool()
 }
 
 func (s *JobEnqueuerTestSuite) TearDownTest() {

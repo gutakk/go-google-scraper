@@ -9,6 +9,7 @@ import (
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
+	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
@@ -30,12 +31,14 @@ type KeywordDbTestSuite struct {
 }
 
 func (s *KeywordDbTestSuite) SetupTest() {
+	config.LoadEnv()
+
 	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	db.GetDB = func() *gorm.DB {
 		return database
 	}
 
-	db.GenerateRedisPool("localhost:6380")
+	db.GenerateRedisPool()
 
 	testDB.InitKeywordStatusEnum(db.GetDB())
 	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})

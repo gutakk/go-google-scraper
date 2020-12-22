@@ -10,7 +10,7 @@ import (
 )
 
 func TestRequestWithValidKeyword(t *testing.T) {
-	r, _ := recorder.New("../../tests/fixture/vcr/valid_keyword")
+	r, _ := recorder.New("tests/fixture/vcr/valid_keyword")
 
 	resp, _ := Request("AWS", r)
 
@@ -24,7 +24,7 @@ func TestRequestWithValidKeyword(t *testing.T) {
 }
 
 func TestRequestWithBlankSpaceKeyword(t *testing.T) {
-	r, _ := recorder.New("../../tests/fixture/vcr/blank_space_keyword")
+	r, _ := recorder.New("tests/fixture/vcr/blank_space_keyword")
 
 	resp, _ := Request("A W S", r)
 
@@ -38,7 +38,7 @@ func TestRequestWithBlankSpaceKeyword(t *testing.T) {
 }
 
 func TestRequestWithThaiKeyword(t *testing.T) {
-	r, _ := recorder.New("../../tests/fixture/vcr/thai_keyword")
+	r, _ := recorder.New("tests/fixture/vcr/thai_keyword")
 
 	resp, _ := Request("สวัสดี", r)
 
