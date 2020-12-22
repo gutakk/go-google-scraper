@@ -115,7 +115,7 @@ func (s *KeywordServiceDbTestSuite) TestGetKeywordResultWithWrongKeywordTypeButV
 	result, err := s.keywordService.GetKeywordResult("invalidKeyword")
 
 	assert.Equal(s.T(), models.Keyword{}, result)
-	assert.Equal(s.T(), "ERROR: invalid input syntax for type bigint: \"invalidKeyword\" (SQLSTATE 22P02)", err.Error())
+	assert.Equal(s.T(), "invalid input", err.Error())
 }
 
 func (s *KeywordServiceDbTestSuite) TestGetKeywordResultWithInvalidKeywordButValidUser() {
