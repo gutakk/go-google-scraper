@@ -2,14 +2,21 @@ package models
 
 import (
 	"github.com/gutakk/go-google-scraper/db"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
 type Keyword struct {
 	gorm.Model
-	Keyword string `gorm:"notNull;index"`
-	UserID  uint
-	User    User
+	Keyword                 string `gorm:"notNull;index"`
+	LinksCount              int
+	NonAdwordsCount         int
+	NonAdwordLinks          datatypes.JSON
+	TopPositionAdwordsCount int
+	TopPositionAdwordsLinks datatypes.JSON
+	TotalAdwordsCount       int
+	UserID                  uint
+	User                    User
 }
 
 func GetKeywordsBy(condition map[string]interface{}) ([]Keyword, error) {

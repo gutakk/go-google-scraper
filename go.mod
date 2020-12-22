@@ -22,6 +22,7 @@ require (
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1
+	gorm.io/datatypes v1.0.0
 	gorm.io/driver/postgres v1.0.5
 	gorm.io/gorm v1.20.6
 )
