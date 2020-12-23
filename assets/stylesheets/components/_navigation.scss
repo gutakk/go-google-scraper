@@ -2,12 +2,4 @@
   &__logo {
     @apply w-40;
   }
-
-  .dropdown-content {
-    @apply hidden absolute z-10 shadow-lg bg-white w-10;
-    
-    &--show {
-      display: block;
-    }
-  }
 }
