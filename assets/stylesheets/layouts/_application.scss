@@ -1,9 +1,10 @@
 .layout-application {
   body {
-    @apply min-h-screen flex;;
+    @apply min-h-screen flex;
   }
   
   .app-main {
     @apply py-10 px-16;
+    flex: 1 1 100%;
   }
 }
