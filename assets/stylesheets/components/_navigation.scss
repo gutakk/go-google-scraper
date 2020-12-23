@@ -5,13 +5,21 @@
 
   &__input {
     @apply text-indigo-600 font-semibold bg-transparent;
+    transition: 0.2s;
+    cursor: pointer;
+
+    &:hover {
+      @apply bg-indigo-700 text-white;
+    }
   }
 
   &__link {
-    @apply inline-block mt-0;
+    @apply inline-block mt-0 px-2 py-1 rounded text-sm;
+    transition: 0.2s;
+    cursor: pointer;
 
     &:hover {
-      @apply bg-indigo-700;
+      @apply bg-indigo-700 text-white;
     }
 
     &:not(:last-child) {
