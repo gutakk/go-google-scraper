@@ -2,4 +2,20 @@
   &__logo {
     @apply w-40;
   }
+
+  &__input {
+    @apply text-indigo-600 font-semibold bg-transparent;
+  }
+
+  &__link {
+    @apply inline-block mt-0;
+
+    &:hover {
+      @apply bg-indigo-700;
+    }
+
+    &:not(:last-child) {
+      @apply border-r border-gray-200;
+    }
+  }
 }

@@ -3,8 +3,17 @@
     <a href="/"><img class="navigation__logo" src="/dist/images/google-go.jpg"></img></a>
   </div>
 
-  <div>
-    <a class="navigation__link" href="/login">Login</a>
-    <a class="navigation__link" href="/register">Register</a>
-  </div>
+  {{ if .data.authenticatedUser }}
+    <div>
+      <a class="navigation__link" href="/keyword">Keywords</a>
+      <form class="navigation__link" action="/logout" method="POST">
+        <input class="navigation__input" type="submit" value="Logout"></input>
+      </form>
+    </div>
+  {{ else }}
+    <div>
+      <a class="navigation__link" href="/login">Login</a>
+      <a class="navigation__link" href="/register">Register</a>
+    </div>
+  {{ end }}
 </nav>
