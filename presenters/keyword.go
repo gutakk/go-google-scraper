@@ -1,7 +1,13 @@
 package presenters
 
-import "time"
+import (
+	"github.com/gutakk/go-google-scraper/models"
+)
 
-func FormattedCreatedAt(createdAt time.Time) string {
-	return createdAt.Format("January 2, 2006")
+type KeywordPresenter struct {
+	Keyword models.Keyword
+}
+
+func (kp *KeywordPresenter) FormattedCreatedAt() string {
+	return kp.Keyword.CreatedAt.Format("January 2, 2006")
 }

@@ -1,10 +1,7 @@
 package config
 
 import (
-	"html/template"
-
 	"github.com/foolin/goview"
-	"github.com/gutakk/go-google-scraper/presenters"
 )
 
 func AppGoviewConfig() goview.Config {
@@ -13,9 +10,6 @@ func AppGoviewConfig() goview.Config {
 		Extension:    ".html",
 		Master:       "layouts/application",
 		DisableCache: false,
-		Funcs: template.FuncMap{
-			"formattedCreatedAt": presenters.FormattedCreatedAt,
-		},
 	}
 }
 
