@@ -55,10 +55,11 @@ func GetKeywordsBy(condition map[string]interface{}) ([]Keyword, error) {
 	return keywords, nil
 }
 
-func SaveKeyword(keyword Keyword, tx ...*gorm.DB) (Keyword, error) {
+// TODO: Improve how to use transaction instead of send as an param
+func SaveKeyword(keyword Keyword, tx *gorm.DB) (Keyword, error) {
 	var cnx *gorm.DB
 	if tx != nil {
-		cnx = tx[0]
+		cnx = tx
 	} else {
 		cnx = db.GetDB()
 	}

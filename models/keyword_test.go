@@ -61,7 +61,7 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 		UserID:                  s.userID,
 	}
 
-	result, err := SaveKeyword(keyword)
+	result, err := SaveKeyword(keyword, nil)
 
 	var nonAdwordLinksVal []string
 	_ = json.Unmarshal(result.NonAdwordLinks, &nonAdwordLinksVal)
@@ -86,7 +86,7 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidKeywordValue() {
 		Keyword: "", UserID: s.userID,
 	}
 
-	result, err := SaveKeyword(keyword)
+	result, err := SaveKeyword(keyword, nil)
 
 	assert.Equal(s.T(), nil, err)
 	assert.Equal(s.T(), "", result.Keyword)
@@ -97,7 +97,7 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidUserID() {
 		Keyword: "Hazard", UserID: 99999999,
 	}
 
-	result, err := SaveKeyword(keyword)
+	result, err := SaveKeyword(keyword, nil)
 	errVal, isPgError := err.(*pgconn.PgError)
 
 	assert.Equal(s.T(), "23503", errVal.Code)
@@ -110,7 +110,7 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidKeywordStatus() {
 		Status: "test",
 	}
 
-	result, err := SaveKeyword(keyword)
+	result, err := SaveKeyword(keyword, nil)
 
 	assert.Equal(s.T(), "invalid keyword status", err.Error())
 	assert.Equal(s.T(), Keyword{}, result)
