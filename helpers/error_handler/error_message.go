@@ -3,7 +3,6 @@ package helpers
 import (
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/jackc/pgconn"
 	"gorm.io/gorm"
@@ -57,8 +56,6 @@ func DatabaseErrorMessage(err error) error {
 		case duplicateErrorCode:
 			return errors.New(emailDuplicateError)
 		case invalidInputErrorCode:
-			log.Printf("================ %v", pgErr.Message)
-			log.Printf("@@@@@@@@@@@@@@@@ %v", pgErr.Detail)
 			return errors.New(invalidInputError)
 		}
 		return errors.New(pgErr.Error())
