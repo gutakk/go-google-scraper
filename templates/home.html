@@ -1,15 +1,13 @@
 {{ define "content" }}
-  <div class="home-container">
-    {{ include "partials/flashes" }}
-    
-    <p class="home__title sm:text-5xl md:text-6xl">
-      <span class="text-indigo-600">Go</span>ogle Scraper
-    </p>
+  {{ include "partials/flashes" }}
   
-    <p class="home__subtitle sm:mt-5 sm:text-lg md:mt-5 md:text-xl">
-      Gathering Google search information with your own keywords
-    </p>
+  <p class="home__title sm:text-5xl md:text-6xl">
+    <span class="text-indigo-600">Go</span>ogle Scraper
+  </p>
 
-    <a href="/keyword"><button  class="home__button sm:mt-8 sm:text-lg sm:px-8 sm:py-4">Get Started</button></a>
-  </div>
+  <p class="home__subtitle sm:mt-5 sm:text-lg md:mt-5 md:text-xl">
+    Gathering Google search information with your own keywords
+  </p>
+
+  <a href="/keyword"><button class="home__button sm:mt-8 sm:text-lg sm:px-8 sm:py-4">Get Started</button></a>
 {{ end }}
