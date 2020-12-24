@@ -31,7 +31,7 @@ type UploadFileForm struct {
 func (k *KeywordController) applyRoutes(engine *gin.RouterGroup) {
 	engine.GET("/keyword", k.displayKeyword)
 	engine.GET("/keyword/:keyword_id", k.displayKeywordResult)
-	engine.GET("/keyword/:keyword_id/google-html", k.displayKeywordGoogleHTML)
+	engine.GET("/keyword/:keyword_id/html", k.displayKeywordHTML)
 	engine.POST("/keyword", k.uploadKeyword)
 }
 
@@ -55,7 +55,7 @@ func (k *KeywordController) displayKeywordResult(c *gin.Context) {
 	html.RenderWithFlash(c, http.StatusOK, keywordResultView, keywordTitle, data)
 }
 
-func (k *KeywordController) displayKeywordGoogleHTML(c *gin.Context) {
+func (k *KeywordController) displayKeywordHTML(c *gin.Context) {
 	keywordService := initKeywordService(c)
 	keywordID := c.Param("keyword_id")
 	keyword, err := keywordService.GetKeywordResult(keywordID)

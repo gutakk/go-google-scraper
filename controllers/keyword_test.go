@@ -140,11 +140,11 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordResultWithGuestUser() {
 	assert.Equal(s.T(), "/login", response.Header().Get("Location"))
 }
 
-func (s *KeywordDbTestSuite) TestDisplayKeywordGoogleHTMLWithAuthenticatedUserAndValidKeyword() {
+func (s *KeywordDbTestSuite) TestDisplayKeywordHTMLWithAuthenticatedUserAndValidKeyword() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name(), HtmlCode: "test-html"}
 	db.GetDB().Create(&keyword)
 	keywordID := fmt.Sprint(keyword.ID)
-	url := fmt.Sprintf("/keyword/%s/google-html", keywordID)
+	url := fmt.Sprintf("/keyword/%s/html", keywordID)
 
 	headers := http.Header{}
 	cookie := fixture.GenerateCookie("user_id", s.userID)
@@ -155,7 +155,7 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordGoogleHTMLWithAuthenticatedUserAn
 	assert.Equal(s.T(), http.StatusOK, response.Code)
 }
 
-func (s *KeywordDbTestSuite) TestDisplayKeywordGoogleHTMLWithAuthenticatedUserButInvalidKeyword() {
+func (s *KeywordDbTestSuite) TestDisplayKeywordHTMLWithAuthenticatedUserButInvalidKeyword() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name(), HtmlCode: "test-html"}
 	db.GetDB().Create(&keyword)
 
@@ -163,16 +163,16 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordGoogleHTMLWithAuthenticatedUserBu
 	cookie := fixture.GenerateCookie("user_id", s.userID)
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
-	response := testHttp.PerformRequest(s.engine, "GET", "/keyword/invalid-keyword/google-html", headers, nil)
+	response := testHttp.PerformRequest(s.engine, "GET", "/keyword/invalid-keyword/html", headers, nil)
 
 	assert.Equal(s.T(), http.StatusNotFound, response.Code)
 }
 
-func (s *KeywordDbTestSuite) TestDisplayKeywordGoogleHTMLWithAuthenticatedUserButNoHTMLCode() {
+func (s *KeywordDbTestSuite) TestDisplayKeywordHTMLWithAuthenticatedUserButNoHTMLCode() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 	keywordID := fmt.Sprint(keyword.ID)
-	url := fmt.Sprintf("/keyword/%s/google-html", keywordID)
+	url := fmt.Sprintf("/keyword/%s/html", keywordID)
 
 	headers := http.Header{}
 	cookie := fixture.GenerateCookie("user_id", s.userID)
@@ -183,11 +183,11 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordGoogleHTMLWithAuthenticatedUserBu
 	assert.Equal(s.T(), http.StatusNotFound, response.Code)
 }
 
-func (s *KeywordDbTestSuite) TestDisplayKeywordGoogleHTMLWithGuestUser() {
+func (s *KeywordDbTestSuite) TestDisplayKeywordHTMLWithGuestUser() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 	keywordID := fmt.Sprint(keyword.ID)
-	url := fmt.Sprintf("/keyword/%s/google-html", keywordID)
+	url := fmt.Sprintf("/keyword/%s/html", keywordID)
 
 	response := testHttp.PerformRequest(s.engine, "GET", url, nil, nil)
 
