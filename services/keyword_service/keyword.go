@@ -2,7 +2,6 @@ package keyword_service
 
 import (
 	"encoding/csv"
-	"encoding/json"
 	"errors"
 	"io"
 	"mime/multipart"
@@ -29,20 +28,6 @@ type KeywordService struct {
 	CurrentUserID uint
 }
 
-type KeywordResult struct {
-	ID                      string
-	Keyword                 string
-	Status                  models.KeywordStatus
-	LinksCount              int
-	NonAdwordsCount         int
-	NonAdwordLinks          []string
-	TopPositionAdwordsCount int
-	TopPositionAdwordLinks  []string
-	TotalAdwordsCount       int
-	HtmlCode                string
-	FailedReason            string
-}
-
 func (k *KeywordService) GetAll() ([]models.Keyword, error) {
 	condition := make(map[string]interface{})
 	condition["user_id"] = k.CurrentUserID
@@ -55,34 +40,16 @@ func (k *KeywordService) GetAll() ([]models.Keyword, error) {
 	return keywords, nil
 }
 
-func (k *KeywordService) GetKeywordResult(keywordID string) (KeywordResult, error) {
+func (k *KeywordService) GetKeywordResult(keywordID string) (models.Keyword, error) {
 	condition := make(map[string]interface{})
 	condition["id"] = keywordID
 
 	keyword, err := models.GetKeywordBy(condition)
 	if err != nil {
-		return KeywordResult{}, errorHandler.DatabaseErrorMessage(err)
+		return models.Keyword{}, errorHandler.DatabaseErrorMessage(err)
 	}
 
-	var nonAdwordLinks []string
-	_ = json.Unmarshal(keyword.NonAdwordLinks, &nonAdwordLinks)
-
-	var topPositionAdwordLinks []string
-	_ = json.Unmarshal(keyword.TopPositionAdwordLinks, &topPositionAdwordLinks)
-
-	return KeywordResult{
-		ID:                      keywordID,
-		Keyword:                 keyword.Keyword,
-		Status:                  keyword.Status,
-		LinksCount:              keyword.LinksCount,
-		NonAdwordsCount:         keyword.NonAdwordsCount,
-		NonAdwordLinks:          nonAdwordLinks,
-		TopPositionAdwordsCount: keyword.TopPositionAdwordsCount,
-		TopPositionAdwordLinks:  topPositionAdwordLinks,
-		TotalAdwordsCount:       keyword.TotalAdwordsCount,
-		HtmlCode:                keyword.HtmlCode,
-		FailedReason:            keyword.FailedReason,
-	}, nil
+	return keyword, nil
 }
 
 func (k *KeywordService) Save(parsedKeywordList []string) error {
