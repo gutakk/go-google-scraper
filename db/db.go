@@ -46,6 +46,16 @@ func constructDsn() string {
 	)
 }
 
+func GetDatabaseURL() string {
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+	username := os.Getenv("DB_USERNAME")
+	password := os.Getenv("DB_PASSWORD")
+
+	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s", username, password, host, port, dbName)
+}
+
 var GetDB = func() *gorm.DB {
 	return DB
 }
