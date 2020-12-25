@@ -135,14 +135,14 @@ func getKeywordsData(keywordService keyword_service.KeywordService) map[string]i
 	}
 
 	data := getCurrentUser(keywordService)
-	data["keywords"] = keywords
+	data["keywordPresenters"] = keywordPresenters
 
 	return data
 }
 
 func getCurrentUser(keywordService keyword_service.KeywordService) map[string]interface{} {
 	return map[string]interface{}{
-		"keywordPresenters": keywordPresenters,
+		"authenticatedUser": keywordService.CurrentUserID,
 	}
 }
 
