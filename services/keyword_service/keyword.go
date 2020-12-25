@@ -25,12 +25,12 @@ const (
 )
 
 type KeywordService struct {
-	CurrentUser models.User
+	CurrentUserID uint
 }
 
 func (k *KeywordService) GetAll() ([]models.Keyword, error) {
 	condition := make(map[string]interface{})
-	condition["user_id"] = k.CurrentUser.ID
+	condition["user_id"] = k.CurrentUserID
 
 	keywords, err := models.GetKeywordsBy(condition)
 	if err != nil {
@@ -43,7 +43,7 @@ func (k *KeywordService) GetAll() ([]models.Keyword, error) {
 func (k *KeywordService) GetKeywordResult(keywordID interface{}) (models.Keyword, error) {
 	condition := make(map[string]interface{})
 	condition["id"] = keywordID
-	condition["user_id"] = k.CurrentUser.ID
+	condition["user_id"] = k.CurrentUserID
 
 	keyword, err := models.GetKeywordBy(condition)
 	if err != nil {
@@ -60,7 +60,7 @@ func (k *KeywordService) Save(parsedKeywordList []string) error {
 	}
 
 	for _, value := range parsedKeywordList {
-		keyword := models.Keyword{Keyword: value, UserID: k.CurrentUser.ID}
+		keyword := models.Keyword{Keyword: value, UserID: k.CurrentUserID}
 
 		txErr := db.GetDB().Transaction(func(tx *gorm.DB) error {
 			savedKeyword, err := models.SaveKeyword(keyword, tx)
