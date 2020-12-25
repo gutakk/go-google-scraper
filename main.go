@@ -13,8 +13,10 @@ import (
 
 func main() {
 	config.LoadEnv()
-	db := db.ConnectDB()
-	migration.Migrate(db)
+	database := db.ConnectDB()
+	migration.Migrate(database)
+
+	db.SetupRedisPool()
 
 	r := config.SetupRouter()
 	controllers.CombineRoutes(r)

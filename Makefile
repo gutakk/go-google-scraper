@@ -1,4 +1,4 @@
-.PHONY: test env-setup
+.PHONY: test env-setup build-dependencies start-dev
 
 build-dependencies:
 	go get github.com/mattn/goreman@v0.3.7
@@ -10,5 +10,7 @@ env-setup:
 start-dev: env-setup
 	goreman start
 
-test: env-setup
-	go test -v -p 1 ./...
+test:
+	docker-compose -f docker-compose.test.yml up -d
+	go test -v -p 1 -count=1 ./...
+	docker-compose -f docker-compose.test.yml down

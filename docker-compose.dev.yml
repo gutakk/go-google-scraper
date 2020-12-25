@@ -8,5 +8,9 @@ services:
       - POSTGRES_DB=go_google_scraper_development
     ports:
       - "5432:5432"
-    volumes:
-      - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+
+  redis:
+    image: redis:5.0.7
+    container_name: go_google_scraper_redis
+    ports:
+      - "6379:6379"

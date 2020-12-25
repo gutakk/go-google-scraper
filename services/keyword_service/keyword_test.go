@@ -1,18 +1,35 @@
 package keyword_service
 
 import (
+	"errors"
+	"os"
 	"testing"
 
-	"github.com/bxcodec/faker/v3"
+	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
+	"github.com/gutakk/go-google-scraper/services/google_search_service"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	"github.com/gutakk/go-google-scraper/tests/path_test"
+
+	"github.com/bxcodec/faker/v3"
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
+
+func init() {
+	gin.SetMode(gin.TestMode)
+
+	if err := os.Chdir(path_test.GetRoot()); err != nil {
+		panic(err)
+	}
+
+	config.LoadEnv()
+}
 
 type KeywordServiceDbTestSuite struct {
 	suite.Suite
@@ -26,6 +43,9 @@ func (s *KeywordServiceDbTestSuite) SetupTest() {
 		return database
 	}
 
+	db.SetupRedisPool()
+
+	testDB.InitKeywordStatusEnum(db.GetDB())
 	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
@@ -69,27 +89,41 @@ func (s *KeywordServiceDbTestSuite) TestGetAllWithInvalidUser() {
 
 func (s *KeywordServiceDbTestSuite) TestSaveWithValidParams() {
 	keywordList := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
-	result, err := s.keywordService.Save(keywordList)
+	err := s.keywordService.Save(keywordList)
 
-	assert.Equal(s.T(), 5, len(result))
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordServiceDbTestSuite) TestSaveWithValidInvalidUser() {
+func (s *KeywordServiceDbTestSuite) TestSaveWithInvalidUser() {
 	keywordList := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
 	keywordService := KeywordService{}
-	result, err := keywordService.Save(keywordList)
+	err := keywordService.Save(keywordList)
 
 	assert.Equal(s.T(), "something went wrong, please try again", err.Error())
-	assert.Equal(s.T(), nil, result)
 }
 
 func (s *KeywordServiceDbTestSuite) TestSaveWithEmptyKeywordList() {
 	keywordList := []string{}
-	result, err := s.keywordService.Save(keywordList)
+	err := s.keywordService.Save(keywordList)
 
 	assert.Equal(s.T(), "invalid data", err.Error())
-	assert.Equal(s.T(), nil, result)
+}
+
+func (s *KeywordServiceDbTestSuite) TestSaveWithEnqueueJobError() {
+	enqueueSearchJobFunc := google_search_service.EnqueueSearchJob
+	google_search_service.EnqueueSearchJob = func(savedKeyword models.Keyword) error {
+		return errors.New("mock enqueue search job error")
+	}
+	defer func() { google_search_service.EnqueueSearchJob = enqueueSearchJobFunc }()
+
+	keywordList := []string{"Hazard", "Ronaldo", "Neymar", "Messi", "Mbappe"}
+	err := s.keywordService.Save(keywordList)
+
+	result := db.GetDB().Find(&models.Keyword{})
+
+	assert.Equal(s.T(), "mock enqueue search job error", err.Error())
+	assert.Equal(s.T(), 0, int(result.RowsAffected))
+	assert.Equal(s.T(), nil, result.Error)
 }
 
 type KeywordServiceTestSuite struct {
@@ -106,7 +140,7 @@ func TestKeywordServiceTestSuite(t *testing.T) {
 }
 
 func (s *KeywordServiceTestSuite) TestReadFileWithValidFile() {
-	result, err := s.keywordService.ReadFile("../../tests/fixture/adword_keywords.csv")
+	result, err := s.keywordService.ReadFile("tests/fixture/adword_keywords.csv")
 
 	assert.Equal(s.T(), []string{"AWS"}, result)
 	assert.Equal(s.T(), nil, err)

@@ -1,1 +1,0 @@
-CREATE DATABASE go_google_scraper_test

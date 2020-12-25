@@ -8,9 +8,13 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gutakk/go-google-scraper/db"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/models"
+	"github.com/gutakk/go-google-scraper/services/google_search_service"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 const (
@@ -36,24 +40,35 @@ func (k *KeywordService) GetAll() ([]models.Keyword, error) {
 	return keywords, nil
 }
 
-func (k *KeywordService) Save(parsedKeywordList []string) ([]models.Keyword, error) {
+func (k *KeywordService) Save(parsedKeywordList []string) error {
 	// Check if record is empty slices
 	if len(parsedKeywordList) == 0 {
-		return nil, errors.New(invalidDataError)
+		return errors.New(invalidDataError)
 	}
 
-	var keywordList = []models.Keyword{}
-	// Create bulk data
 	for _, value := range parsedKeywordList {
-		keywordList = append(keywordList, models.Keyword{Keyword: value, UserID: k.CurrentUserID})
+		keyword := models.Keyword{Keyword: value, UserID: k.CurrentUserID}
+
+		txErr := db.GetDB().Transaction(func(tx *gorm.DB) error {
+			savedKeyword, err := models.SaveKeyword(keyword, tx)
+			if err != nil {
+				return errorHandler.DatabaseErrorMessage(err)
+			}
+
+			enqueueErr := google_search_service.EnqueueSearchJob(savedKeyword)
+			if enqueueErr != nil {
+				return enqueueErr
+			}
+
+			return nil
+		})
+
+		if txErr != nil {
+			return txErr
+		}
 	}
 
-	savedKeywords, err := models.SaveKeywords(keywordList)
-	if err != nil {
-		return nil, errorHandler.DatabaseErrorMessage(err)
-	}
-
-	return savedKeywords, nil
+	return nil
 }
 
 func (k *KeywordService) ReadFile(filename string) ([]string, error) {
