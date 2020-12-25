@@ -105,7 +105,7 @@ func (s *KeywordServiceDbTestSuite) TestGetKeywordResultWithValidKeywordButInval
 	result, err := keywordService.GetKeywordResult(keyword.ID)
 
 	assert.Equal(s.T(), models.Keyword{}, result)
-	assert.Equal(s.T(), "something went wrong, please try again", err.Error())
+	assert.Equal(s.T(), "keyword not found", err.Error())
 }
 
 func (s *KeywordServiceDbTestSuite) TestGetKeywordResultWithWrongKeywordTypeButValidUser() {
@@ -125,7 +125,7 @@ func (s *KeywordServiceDbTestSuite) TestGetKeywordResultWithInvalidKeywordButVal
 	result, err := s.keywordService.GetKeywordResult("999999")
 
 	assert.Equal(s.T(), models.Keyword{}, result)
-	assert.Equal(s.T(), "something went wrong, please try again", err.Error())
+	assert.Equal(s.T(), "keyword not found", err.Error())
 }
 
 func (s *KeywordServiceDbTestSuite) TestSaveWithValidParams() {

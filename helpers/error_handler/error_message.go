@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgconn"
+	"gorm.io/gorm"
 )
 
 const (
@@ -12,6 +13,7 @@ const (
 	emailFormatError        = "invalid email format"
 	emailDuplicateError     = "email already exists"
 	invalidInputError       = "invalid input"
+	keywordNotFoundError    = "keyword not found"
 	minError                = "%s must be longer than %s"
 	passwordEqError         = "passwords do not match"
 	requiredError           = "%s is required"
@@ -58,6 +60,10 @@ func DatabaseErrorMessage(err error) error {
 		}
 		return errors.New(pgErr.Error())
 	} else {
+		switch err {
+		case gorm.ErrRecordNotFound:
+			return errors.New(keywordNotFoundError)
+		}
 		return errors.New(somethingWentWrongError)
 	}
 }
