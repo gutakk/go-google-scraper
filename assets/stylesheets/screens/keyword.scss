@@ -30,6 +30,11 @@ body.keyword {
     &--failed {
       @apply bg-red-100 text-red-800;
     }
+  }
 
+  .keyword-action {
+    &__icon {
+      cursor: pointer;
+    }
   }
 }
