@@ -1,17 +1,18 @@
 {{ define "content" }}
 
-<h1 class="text-primary">HELLO GOLANG</h1>
-{{ include "partials/flashes" }}
 
-{{ if .data.authenticatedUser }}
-  <h2 class="greeting">Welcome {{ .data.email }}</h2>
-  <h2><a href="/keyword">Keyword</a></h2>
-  <form class="mt-8 space-y-6" action="/logout" method="POST">
-    <button type="submit">Logout</button>
-  </form>
-{{ else }}
-  <h2><a href="/login">Login</a></h2>
-  <h2><a href="/register">Register</a></h2>
-{{ end }}
+  <div class="home">
+    {{ include "partials/flashes" }}
+    
+    <p class="home__title sm:text-5xl md:text-6xl">
+      <span class="text-indigo-600">Go</span>ogle Scraper
+    </p>
+  
+    <p class="home__subtitle sm:mt-5 sm:text-lg md:mt-5 md:text-xl">
+      Gathering Google search information with your own keywords
+    </p>
+
+    <a href="/keyword"><button  class="home__button sm:mt-8 sm:text-lg sm:px-8 sm:py-4">Get Started</button></a>
+  </div>
 
 {{ end }}
