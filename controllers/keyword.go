@@ -10,6 +10,7 @@ import (
 	html "github.com/gutakk/go-google-scraper/helpers/html"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	helpers "github.com/gutakk/go-google-scraper/helpers/user"
+	"github.com/gutakk/go-google-scraper/presenters"
 	"github.com/gutakk/go-google-scraper/services/keyword_service"
 )
 
@@ -84,9 +85,14 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 
 func getKeywordsData(keywordService keyword_service.KeywordService) map[string]interface{} {
 	keywords, _ := keywordService.GetAll()
+	var keywordPresenters []presenters.KeywordPresenter
+
+	for _, k := range keywords {
+		keywordPresenters = append(keywordPresenters, presenters.KeywordPresenter{Keyword: k})
+	}
 
 	return map[string]interface{}{
-		"keywords": keywords,
+		"keywordPresenters": keywordPresenters,
 	}
 }
 

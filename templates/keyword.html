@@ -13,7 +13,7 @@
     </button>
   </form>
 
-  {{ if .data.keywords }}
+  {{ if .data.keywordPresenters }}
     <div class="list-keyword sm:rounded-lg">
       <table class="list-keyword__table divide-y divide-gray-200">
         <thead>
@@ -26,11 +26,13 @@
         </thead>
         
         <tbody>
-          {{ range $k := .data.keywords }}
+          {{ range $k := .data.keywordPresenters }}
             <tr>
-              <td><strong>{{ $k.Keyword }}</strong></td>
+              <td><strong>{{ $k.Keyword.Keyword }}</strong></td>
               <td>{{ $k.FormattedCreatedAt }}</td>
-              <td></td>
+              <td>
+                <span class="keyword-status keyword-status--{{ $k.Keyword.Status }}">{{ $k.Keyword.Status }}</span>
+              </td>
               <td></td>
             </tr>
           {{ end }}
