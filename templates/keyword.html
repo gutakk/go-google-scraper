@@ -35,7 +35,9 @@
               </td>
               <td class="keyword-action">
                 {{ if eq $k.Keyword.Status "processed" }}
-                  <img class="keyword-action__icon" src="/dist/svg/document.svg">
+                  <a href="/keyword/{{ $k.Keyword.ID }}" target="_blank">
+                    <img class="keyword-action__icon" src="/dist/svg/document.svg">
+                  </a>
                 {{ end }}
               </td>
             </tr>
