@@ -38,6 +38,8 @@ func CombineRoutes(engine *gin.Engine) {
 
 	// Public API group
 	new(api.TokenAPIController).ApplyRoutes(PublicAPIGroup(engine))
+
+	new(api.DummyAPIController).ApplyRoutes(PrivateAPIGroup(engine))
 }
 
 func BasicAuthAPIGroup(engine *gin.Engine) *gin.RouterGroup {
@@ -48,6 +50,13 @@ func BasicAuthAPIGroup(engine *gin.Engine) *gin.RouterGroup {
 
 func PublicAPIGroup(engine *gin.Engine) *gin.RouterGroup {
 	return engine.Group("/api")
+}
+
+func PrivateAPIGroup(engine *gin.Engine) *gin.RouterGroup {
+	privateAPIGroup := engine.Group("/api")
+	privateAPIGroup.Use(validateToken)
+
+	return privateAPIGroup
 }
 
 func EnsureAuthenticatedUserGroup(engine *gin.Engine) *gin.RouterGroup {
@@ -64,4 +73,12 @@ func EnsureGuestUserGroup(engine *gin.Engine) *gin.RouterGroup {
 	ensureGuestUserGroup.Use(middlewares.EnsureGuestUser)
 
 	return ensureGuestUserGroup
+}
+
+func validateToken(c *gin.Context) {
+	_, err := config.GetOAuthServer().ValidationBearerToken(c.Request)
+	if err != nil {
+		http.Error(c.Writer, err.Error(), http.StatusUnauthorized)
+		c.Abort()
+	}
 }
