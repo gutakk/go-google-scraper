@@ -1,13 +1,13 @@
 {{ define "content" }}
   {{ include "partials/flashes" }}
   
-  <p class="home__title sm:text-5xl md:text-6xl">
+  <h1 class="sm:text-5xl md:text-6xl">
     <span class="text-indigo-600">Go</span>ogle Scraper
-  </p>
+  </h1>
 
-  <p class="home__subtitle sm:mt-5 sm:text-lg md:mt-5 md:text-xl">
+  <h4 class="display-subtitle sm:mt-5 md:text-xl">
     Gathering Google search information with your own keywords
-  </p>
+  </h4>
 
-  <a href="/keyword"><button class="home__button sm:mt-8 sm:text-lg sm:px-8 sm:py-4">Get Started</button></a>
+  <a href="/keyword"><button class="button-primary sm:mt-8 sm:text-lg sm:px-8 sm:py-4">Get Started</button></a>
 {{ end }}

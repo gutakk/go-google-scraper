@@ -1,15 +1,11 @@
 body.home {
   @apply text-center;
 
-  &__title {
-    @apply text-4xl font-extrabold text-gray-900;
+  .display-subtitle {
+    @apply mt-3;
   }
 
-  &__subtitle {
-    @apply mt-3 text-gray-500;
-  }
-
-  &__button {
+  .button-primary {
     @apply py-2 px-4 mt-5;
     width: fit-content;
   }
