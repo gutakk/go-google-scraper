@@ -33,9 +33,17 @@ func CombineRoutes(engine *gin.Engine) {
 	new(RegisterController).applyRoutes(EnsureGuestUserGroup(engine))
 	new(LoginController).applyRoutes(EnsureGuestUserGroup(engine))
 
+	// Basic Auth API group
+	new(api.OAuthController).ApplyRoutes(BasicAuthAPIGroup(engine))
+
 	// Public API group
-	new(api.OAuthController).ApplyRoutes(PublicAPIGroup(engine))
 	new(api.TokenController).ApplyRoutes(PublicAPIGroup(engine))
+}
+
+func BasicAuthAPIGroup(engine *gin.Engine) *gin.RouterGroup {
+	return engine.Group("/api", gin.BasicAuth(gin.Accounts{
+		"foo": "bar",
+	}))
 }
 
 func PublicAPIGroup(engine *gin.Engine) *gin.RouterGroup {
