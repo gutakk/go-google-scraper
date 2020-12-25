@@ -24,7 +24,7 @@ func CombineRoutes(engine *gin.Engine) {
 	new(api.OAuthController).ApplyRoutes(BasicAuthAPIGroup(engine))
 
 	// Public API group
-	new(api.TokenController).ApplyRoutes(PublicAPIGroup(engine))
+	new(api.TokenAPIController).ApplyRoutes(PublicAPIGroup(engine))
 }
 
 func BasicAuthAPIGroup(engine *gin.Engine) *gin.RouterGroup {
