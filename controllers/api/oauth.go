@@ -3,10 +3,11 @@ package api
 import (
 	"fmt"
 
+	"github.com/gutakk/go-google-scraper/oauth"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-oauth2/oauth2/v4/models"
 	"github.com/google/uuid"
-	"github.com/gutakk/go-google-scraper/config"
 )
 
 type OAuthController struct{}
@@ -18,7 +19,7 @@ func (oa *OAuthController) ApplyRoutes(engine *gin.RouterGroup) {
 func (oa *OAuthController) generateClient(c *gin.Context) {
 	clientId := uuid.New().String()[:8]
 	clientSecret := uuid.New().String()[:8]
-	err := config.GetClientStore().Create(&models.Client{
+	err := oauth.GetClientStore().Create(&models.Client{
 		ID:     clientId,
 		Secret: clientSecret,
 		Domain: "http://localhost:8080",
