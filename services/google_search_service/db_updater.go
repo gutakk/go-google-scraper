@@ -7,14 +7,14 @@ import (
 )
 
 func UpdateKeywordStatus(keywordID uint, status models.KeywordStatus, failedReason error) error {
-	var keywordModel models.Keyword
-	keywordModel.Status = status
+	var keyword models.Keyword
+	keyword.Status = status
 
 	if failedReason != nil {
-		keywordModel.FailedReason = failedReason.Error()
+		keyword.FailedReason = failedReason.Error()
 	}
 
-	err := models.UpdateKeyword(keywordID, keywordModel)
+	err := models.UpdateKeyword(keywordID, keyword)
 	if err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ func UpdateKeywordWithParsingResult(keywordID uint, parsingResult ParsingResult)
 		return topPositionAdwordLinksParsingErr
 	}
 
-	newKeyword := models.Keyword{
+	keyword := models.Keyword{
 		Status:                  models.Processed,
 		LinksCount:              parsingResult.LinksCount,
 		NonAdwordsCount:         parsingResult.NonAdwordsCount,
@@ -44,7 +44,7 @@ func UpdateKeywordWithParsingResult(keywordID uint, parsingResult ParsingResult)
 		HtmlCode:                parsingResult.HtmlCode,
 	}
 
-	err := models.UpdateKeyword(keywordID, newKeyword)
+	err := models.UpdateKeyword(keywordID, keyword)
 	if err != nil {
 		return err
 	}
