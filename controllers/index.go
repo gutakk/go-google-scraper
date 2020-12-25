@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"os"
+
 	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/config"
@@ -42,7 +44,7 @@ func CombineRoutes(engine *gin.Engine) {
 
 func BasicAuthAPIGroup(engine *gin.Engine) *gin.RouterGroup {
 	return engine.Group("/api", gin.BasicAuth(gin.Accounts{
-		"foo": "bar",
+		os.Getenv("WEB_USERNAME"): os.Getenv("WEB_PASSWORD"),
 	}))
 }
 
