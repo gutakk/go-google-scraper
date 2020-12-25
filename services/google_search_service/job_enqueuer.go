@@ -4,9 +4,10 @@ import (
 	"errors"
 	"log"
 
-	"github.com/gocraft/work"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
+
+	"github.com/gocraft/work"
 )
 
 const (

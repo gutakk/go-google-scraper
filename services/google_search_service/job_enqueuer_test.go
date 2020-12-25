@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/gocraft/work"
-	"github.com/gomodule/redigo/redis"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 
+	"github.com/gocraft/work"
+	"github.com/gomodule/redigo/redis"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/go-playground/assert.v1"
 )
