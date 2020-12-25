@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"net/http"
-
 	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/config"
@@ -43,7 +41,7 @@ func PublicAPIGroup(engine *gin.Engine) *gin.RouterGroup {
 
 func PrivateAPIGroup(engine *gin.Engine) *gin.RouterGroup {
 	privateAPIGroup := engine.Group("/api")
-	privateAPIGroup.Use(validateToken)
+	privateAPIGroup.Use(middlewares.ValidateToken)
 
 	return privateAPIGroup
 }
@@ -62,12 +60,4 @@ func EnsureGuestUserGroup(engine *gin.Engine) *gin.RouterGroup {
 	ensureGuestUserGroup.Use(middlewares.EnsureGuestUser)
 
 	return ensureGuestUserGroup
-}
-
-func validateToken(c *gin.Context) {
-	_, err := config.GetOAuthServer().ValidationBearerToken(c.Request)
-	if err != nil {
-		http.Error(c.Writer, err.Error(), http.StatusUnauthorized)
-		c.Abort()
-	}
 }

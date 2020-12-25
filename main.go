@@ -9,6 +9,7 @@ import (
 	"github.com/gutakk/go-google-scraper/controllers"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/migration"
+	"github.com/gutakk/go-google-scraper/oauth"
 )
 
 func main() {
@@ -17,7 +18,7 @@ func main() {
 	migration.Migrate(database)
 
 	db.SetupRedisPool()
-	config.SetupOAuthServer()
+	oauth.SetupOAuthServer()
 
 	r := config.SetupRouter()
 	controllers.CombineRoutes(r)

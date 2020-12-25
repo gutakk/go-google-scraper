@@ -1,8 +1,9 @@
 package api
 
 import (
+	"github.com/gutakk/go-google-scraper/oauth"
+
 	"github.com/gin-gonic/gin"
-	"github.com/gutakk/go-google-scraper/config"
 )
 
 type TokenAPIController struct{}
@@ -12,7 +13,7 @@ func (t *TokenAPIController) ApplyRoutes(engine *gin.RouterGroup) {
 }
 
 func (t *TokenAPIController) generateToken(c *gin.Context) {
-	err := config.GetOAuthServer().HandleTokenRequest(c.Writer, c.Request)
+	err := oauth.GetOAuthServer().HandleTokenRequest(c.Writer, c.Request)
 	if err != nil {
 		c.JSON(400, nil)
 	}
