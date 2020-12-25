@@ -17,6 +17,7 @@ func main() {
 	migration.Migrate(database)
 
 	db.SetupRedisPool()
+	_ = config.SetupOAuthServer()
 
 	r := config.SetupRouter()
 	controllers.CombineRoutes(r)
