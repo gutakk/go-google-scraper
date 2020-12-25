@@ -2,10 +2,10 @@ package config
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"os"
 	"time"
+
+	"github.com/gutakk/go-google-scraper/db"
 
 	"github.com/go-oauth2/oauth2/v4/errors"
 	"github.com/go-oauth2/oauth2/v4/manage"
@@ -19,13 +19,7 @@ var oauthServer *server.Server
 var clientStore *pg.ClientStore
 
 func SetupOAuthServer() {
-	host := os.Getenv("DB_HOST")
-	port := os.Getenv("DB_PORT")
-	dbName := os.Getenv("DB_NAME")
-	username := os.Getenv("DB_USERNAME")
-	password := os.Getenv("DB_PASSWORD")
-
-	pgxConn, _ := pgx.Connect(context.TODO(), fmt.Sprintf("postgres://%s:%s@%s:%s/%s", username, password, host, port, dbName))
+	pgxConn, _ := pgx.Connect(context.TODO(), db.GetDatabaseURL())
 	manager := manage.NewDefaultManager()
 
 	// use PostgreSQL token store with pgx.Connection adapter
