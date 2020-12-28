@@ -24,7 +24,7 @@ func SetupOAuthServer() {
 
 	// use PostgreSQL token store with pgx.Connection adapter
 	adapter := pgx4adapter.NewConn(pgxConn)
-	log.Printf("=============== %v", adapter)
+	log.Printf("=============== %v", pgxConn)
 	tokenStore, _ := pg.NewTokenStore(adapter, pg.WithTokenStoreGCInterval(time.Minute))
 	defer tokenStore.Close()
 
