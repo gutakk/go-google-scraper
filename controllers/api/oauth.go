@@ -17,8 +17,9 @@ func (oa *OAuthController) ApplyRoutes(engine *gin.RouterGroup) {
 }
 
 func (oa *OAuthController) generateClient(c *gin.Context) {
-	clientId := uuid.New().String()[:8]
-	clientSecret := uuid.New().String()[:8]
+	clientId := uuid.New().String()
+	clientSecret := uuid.New().String()
+
 	err := oauth.GetClientStore().Create(&models.Client{
 		ID:     clientId,
 		Secret: clientSecret,
