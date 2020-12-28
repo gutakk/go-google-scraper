@@ -39,6 +39,11 @@ func init() {
 	}
 
 	config.LoadEnv()
+	oauth.SetupOAuthServer()
+	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	db.GetDB = func() *gorm.DB {
+		return database
+	}
 }
 
 type OAuthControllerDbTestSuite struct {
@@ -47,12 +52,6 @@ type OAuthControllerDbTestSuite struct {
 }
 
 func (s *OAuthControllerDbTestSuite) SetupTest() {
-	oauth.SetupOAuthServer()
-	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
-	db.GetDB = func() *gorm.DB {
-		return database
-	}
-
 	s.engine = testConfig.GetRouter(true)
 	new(api.OAuthController).ApplyRoutes(controllers.BasicAuthAPIGroup(s.engine))
 }
