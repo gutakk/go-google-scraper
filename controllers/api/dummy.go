@@ -1,6 +1,10 @@
 package api
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
 
 type DummyAPIController struct{}
 
@@ -9,7 +13,7 @@ func (d *DummyAPIController) ApplyRoutes(engine *gin.RouterGroup) {
 }
 
 func (d *DummyAPIController) dummyAPI(c *gin.Context) {
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"hello": "world",
 	})
 }

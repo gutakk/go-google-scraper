@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 
 	"github.com/gutakk/go-google-scraper/oauth"
@@ -30,7 +31,7 @@ func (oa *OAuthController) generateClient(c *gin.Context) {
 		fmt.Println(err.Error())
 	}
 
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusCreated, gin.H{
 		"CLIENT_ID":     clientId,
 		"CLIENT_SECRET": clientSecret,
 	})
