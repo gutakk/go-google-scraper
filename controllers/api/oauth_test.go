@@ -86,6 +86,16 @@ func (s *OAuthControllerDbTestSuite) TestGenerateClientWithValidBasicAuth() {
 	assert.Equal(s.T(), fmt.Sprintf("http://localhost:%s", os.Getenv("APP_PORT")), result.Domain)
 }
 
+func (s *OAuthControllerDbTestSuite) TestGenerateClientWithInvalidBasicAuth() {
+	headers := http.Header{}
+	// Basic auth with username = admin and password = password
+	headers.Set("Authorization", "Basic invalid")
+
+	resp := testHttp.PerformRequest(s.engine, "POST", "/api/client", headers, nil)
+
+	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
+}
+
 func (s *OAuthControllerDbTestSuite) TestGenerateClientWithoutBasicAuth() {
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/client", nil, nil)
 
