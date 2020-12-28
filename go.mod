@@ -22,6 +22,7 @@ require (
 	github.com/mattn/goreman v0.3.7 // indirect
 	github.com/pelletier/go-toml v1.8.1 // indirect
 	github.com/robfig/cron v1.2.0 // indirect
+	github.com/soveran/redisurl v0.0.0-20180322091936-eb325bc7a4b8
 	github.com/stretchr/testify v1.5.1
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect

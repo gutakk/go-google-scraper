@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gomodule/redigo/redis"
+	"github.com/soveran/redisurl"
 )
 
 var RedisPool *redis.Pool
@@ -16,7 +17,7 @@ func SetupRedisPool() {
 		MaxIdle:   5,
 		Wait:      true,
 		Dial: func() (redis.Conn, error) {
-			return redis.Dial("tcp", GetRedisUrl())
+			return redisurl.ConnectToURL(GetRedisUrl())
 		},
 	}
 
