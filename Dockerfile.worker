@@ -4,4 +4,8 @@ ARG DOCKER_REGISTRY
 
 FROM ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BRANCH_TAG}
 
-ENTRYPOINT ["/app/go-google-scraper/workers"]
+WORKDIR /app/workers
+
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
+
+ENTRYPOINT ["/app/workers/workers"]
