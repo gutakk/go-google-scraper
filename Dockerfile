@@ -1,8 +1,6 @@
 FROM golang:alpine
 
-ENV GIN_MODE=release \
-    APP_PORT=8080 \
-    PORT=8080
+ENV GIN_MODE=release
 
 WORKDIR /app
 
