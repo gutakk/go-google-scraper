@@ -72,8 +72,8 @@ func TestDisplayKeywordWithAuthenticatedUser(t *testing.T) {
 
 	// Cookie from login API Set-Cookie header
 	headers := http.Header{}
-	cookie := "go-google-scraper=MTYwNjQ2Mjk3MXxEdi1CQkFFQ180SUFBUkFCRUFBQUlmLUNBQUVHYzNSeWFXNW5EQWtBQjNWelpYSmZhV1FFZFdsdWRBWUVBUDRFdFE9PXzl6APqAQw3gAQqlHoXMYrPpnqPFkEP8SRHJZEpl-_LDQ=="
-	headers.Set("Cookie", cookie)
+	cookie := fixture.GenerateCookie("user_id", "test-user")
+	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
 	response := testHttp.PerformRequest(engine, "GET", "/keyword", headers, nil)
 	p, err := ioutil.ReadAll(response.Body)

@@ -10,6 +10,7 @@ import (
 	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	"github.com/gutakk/go-google-scraper/tests/fixture"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 	"gopkg.in/go-playground/assert.v1"
 	"gorm.io/driver/postgres"
@@ -41,8 +42,8 @@ func TestDisplayHomeWithAuthenticatedUser(t *testing.T) {
 
 	// Cookie from login API Set-Cookie header
 	headers := http.Header{}
-	cookie := "go-google-scraper=MTYwNjQ2Mjk3MXxEdi1CQkFFQ180SUFBUkFCRUFBQUlmLUNBQUVHYzNSeWFXNW5EQWtBQjNWelpYSmZhV1FFZFdsdWRBWUVBUDRFdFE9PXzl6APqAQw3gAQqlHoXMYrPpnqPFkEP8SRHJZEpl-_LDQ=="
-	headers.Set("Cookie", cookie)
+	cookie := fixture.GenerateCookie("user_id", "test-user")
+	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
 	response := testHttp.PerformRequest(engine, "GET", "/", headers, nil)
 	p, err := ioutil.ReadAll(response.Body)
