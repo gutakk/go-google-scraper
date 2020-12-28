@@ -13,6 +13,7 @@ import (
 	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	"github.com/gutakk/go-google-scraper/tests/fixture"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/go-playground/assert.v1"
@@ -119,9 +120,8 @@ func (s *RegisterDbTestSuite) TestRegisterWithTooShortPasswordValidation() {
 }
 
 func (s *RegisterDbTestSuite) TestDisplayRegisterWithAuthenticatedUser() {
-	// Cookie from login API Set-Cookie header
-	cookie := "go-google-scraper=MTYwNjQ2Mjk3MXxEdi1CQkFFQ180SUFBUkFCRUFBQUlmLUNBQUVHYzNSeWFXNW5EQWtBQjNWelpYSmZhV1FFZFdsdWRBWUVBUDRFdFE9PXzl6APqAQw3gAQqlHoXMYrPpnqPFkEP8SRHJZEpl-_LDQ=="
-	s.headers.Set("Cookie", cookie)
+	cookie := fixture.GenerateCookie("user_id", "test-user")
+	s.headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
 	response := testHttp.PerformRequest(s.engine, "GET", "/register", s.headers, nil)
 

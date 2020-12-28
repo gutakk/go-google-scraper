@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
+	"github.com/gutakk/go-google-scraper/tests/fixture"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/go-playground/assert.v1"
@@ -26,9 +27,9 @@ func TestLogoutTestSuit(t *testing.T) {
 }
 
 func (s *LogoutTestSuite) TestLogoutWithAuthenticatedUser() {
-	cookie := "go-google-scraper=MTYwNjQ2Mjk3MXxEdi1CQkFFQ180SUFBUkFCRUFBQUlmLUNBQUVHYzNSeWFXNW5EQWtBQjNWelpYSmZhV1FFZFdsdWRBWUVBUDRFdFE9PXzl6APqAQw3gAQqlHoXMYrPpnqPFkEP8SRHJZEpl-_LDQ=="
+	cookie := fixture.GenerateCookie("user_id", "test-user")
 	headers := http.Header{}
-	headers.Set("Cookie", cookie)
+	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
 	response := testHttp.PerformRequest(s.engine, "POST", "/logout", headers, nil)
 
