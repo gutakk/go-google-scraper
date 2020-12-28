@@ -2,7 +2,6 @@ package db
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -17,16 +16,14 @@ func SetupRedisPool() {
 		MaxIdle:   5,
 		Wait:      true,
 		Dial: func() (redis.Conn, error) {
-			return redis.Dial("tcp", getRedisUrl())
+			return redis.Dial("tcp", GetRedisUrl())
 		},
 	}
 
 	RedisPool = pool
 }
 
-func getRedisUrl() string {
-	log.Printf("============== %v", gin.Mode())
-	log.Printf("@@@@@@@@@@@@@@ %v", os.Getenv("REDIS_URL"))
+func GetRedisUrl() string {
 	if gin.Mode() == gin.ReleaseMode {
 		return os.Getenv("REDIS_URL")
 	}
