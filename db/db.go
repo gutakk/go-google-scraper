@@ -53,6 +53,8 @@ func GetDatabaseURL() string {
 	username := os.Getenv("DB_USERNAME")
 	password := os.Getenv("DB_PASSWORD")
 
+	log.Printf("================= %v", os.Environ())
+
 	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s", username, password, host, port, dbName)
 }
 
