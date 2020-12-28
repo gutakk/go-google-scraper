@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -24,6 +25,8 @@ func SetupRedisPool() {
 }
 
 func getRedisUrl() string {
+	log.Printf("============== %v", gin.Mode())
+	log.Printf("@@@@@@@@@@@@@@ %v", os.Getenv("REDIS_URL"))
 	if gin.Mode() == gin.ReleaseMode {
 		return os.Getenv("REDIS_URL")
 	}
