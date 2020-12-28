@@ -8,7 +8,6 @@ import (
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/workers/jobs"
-	"github.com/soveran/redisurl"
 
 	"github.com/gocraft/work"
 	"github.com/gomodule/redigo/redis"
@@ -25,7 +24,7 @@ var redisPool = &redis.Pool{
 	MaxIdle:   5,
 	Wait:      true,
 	Dial: func() (redis.Conn, error) {
-		return redisurl.ConnectToURL(db.GetRedisUrl())
+		return db.GetRedisConnection()
 	},
 }
 

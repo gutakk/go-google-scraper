@@ -17,25 +17,23 @@ func SetupRedisPool() {
 		MaxIdle:   5,
 		Wait:      true,
 		Dial: func() (redis.Conn, error) {
-			return redisurl.ConnectToURL(GetRedisUrl())
+			return GetRedisConnection()
 		},
 	}
 
 	RedisPool = pool
 }
 
-func GetRedisUrl() string {
+func GetRedisConnection() (redis.Conn, error) {
 	if gin.Mode() == gin.ReleaseMode {
-		return os.Getenv("REDIS_URL")
+		return redisurl.ConnectToURL(os.Getenv("REDIS_URL"))
 	}
 
 	host := os.Getenv("REDIS_HOST")
 	port := os.Getenv("REDIS_PORT")
+	redisURL := fmt.Sprintf("%s:%s", host, port)
 
-	return fmt.Sprintf("%s:%s",
-		host,
-		port,
-	)
+	return redis.Dial("tcp", redisURL)
 }
 
 func GetRedisPool() *redis.Pool {
