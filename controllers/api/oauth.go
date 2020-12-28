@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/gutakk/go-google-scraper/oauth"
 
@@ -23,7 +24,7 @@ func (oa *OAuthController) generateClient(c *gin.Context) {
 	err := oauth.GetClientStore().Create(&models.Client{
 		ID:     clientId,
 		Secret: clientSecret,
-		Domain: "http://localhost:8080",
+		Domain: fmt.Sprintf("http://localhost:%s", os.Getenv("APP_PORT")),
 	})
 	if err != nil {
 		fmt.Println(err.Error())
