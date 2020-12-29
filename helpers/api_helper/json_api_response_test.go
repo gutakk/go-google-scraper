@@ -10,7 +10,7 @@ import (
 )
 
 func TestConstructErrorResponseWithValidErrorResponseObject(t *testing.T) {
-	errorResponseObject := api_helper.ErrorResponseObject{
+	errorResponseObject := &api_helper.ErrorResponseObject{
 		Title:  "test-error",
 		Detail: "test-detail",
 		Status: 999,
@@ -28,7 +28,7 @@ func TestConstructErrorResponseWithValidErrorResponseObject(t *testing.T) {
 }
 
 func TestConstructErrorResponseWithMissingSomeFieldOnErrorResponseObject(t *testing.T) {
-	errorResponseObject := api_helper.ErrorResponseObject{
+	errorResponseObject := &api_helper.ErrorResponseObject{
 		Detail: "test-detail",
 		Status: 999,
 	}
@@ -41,4 +41,35 @@ func TestConstructErrorResponseWithMissingSomeFieldOnErrorResponseObject(t *test
 	}
 
 	assert.Equal(t, expectedResult, errorResponse)
+}
+
+func TestConstructDataResponseWithValidDataResponseObject(t *testing.T) {
+	dataResponseObject := &api_helper.DataResponseObject{
+		ID:   "1",
+		Type: "test",
+		Attributes: map[string]interface{}{
+			"hello": "world",
+		},
+	}
+	dataResponse := dataResponseObject.ConstructDataResponse()
+	expectedResult := gin.H{
+		"data": dataResponseObject,
+	}
+
+	assert.Equal(t, expectedResult, dataResponse)
+}
+
+func TestConstructDataResponseWithMissingSomeFieldOnDataResponseObject(t *testing.T) {
+	dataResponseObject := &api_helper.DataResponseObject{
+		Type: "test",
+		Attributes: map[string]interface{}{
+			"hello": "world",
+		},
+	}
+	dataResponse := dataResponseObject.ConstructDataResponse()
+	expectedResult := gin.H{
+		"data": dataResponseObject,
+	}
+
+	assert.Equal(t, expectedResult, dataResponse)
 }

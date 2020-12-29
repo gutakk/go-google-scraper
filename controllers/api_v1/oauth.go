@@ -18,15 +18,20 @@ func (oa *OAuthController) ApplyRoutes(engine *gin.RouterGroup) {
 func (oa *OAuthController) generateClient(c *gin.Context) {
 	clientID, clientSecret, err := oauth_service.GenerateClient()
 	if err != nil {
-		errorResponse := api_helper.ErrorResponseObject{
+		errorResponse := &api_helper.ErrorResponseObject{
 			Detail: err.Error(),
 			Status: http.StatusUnprocessableEntity,
 		}
 		c.JSON(errorResponse.Status, errorResponse.ConstructErrorResponse())
 	} else {
-		c.JSON(http.StatusCreated, gin.H{
-			"CLIENT_ID":     clientID,
-			"CLIENT_SECRET": clientSecret,
-		})
+		dataResponse := &api_helper.DataResponseObject{
+			ID:   clientID,
+			Type: "client",
+			Attributes: map[string]interface{}{
+				"client_id":     clientID,
+				"client_secret": clientSecret,
+			},
+		}
+		c.JSON(http.StatusCreated, dataResponse.ConstructDataResponse())
 	}
 }
