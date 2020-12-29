@@ -18,3 +18,15 @@ func (e *ErrorResponseObject) ConstructErrorResponse() gin.H {
 		"errors": errorResponse,
 	}
 }
+
+type DataResponseObject struct {
+	ID         string                 `json:"id"`
+	Type       string                 `json:"type"`
+	Attributes map[string]interface{} `json:"attributes"`
+}
+
+func (d *DataResponseObject) ConstructDataResponse() gin.H {
+	return gin.H{
+		"data": d,
+	}
+}
