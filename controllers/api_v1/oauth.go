@@ -1,15 +1,11 @@
 package api_v1
 
 import (
-	"fmt"
 	"net/http"
-	"os"
 
-	"github.com/gutakk/go-google-scraper/oauth"
+	"github.com/gutakk/go-google-scraper/services/oauth_service"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-oauth2/oauth2/v4/models"
-	"github.com/google/uuid"
 )
 
 type OAuthController struct{}
@@ -19,20 +15,13 @@ func (oa *OAuthController) ApplyRoutes(engine *gin.RouterGroup) {
 }
 
 func (oa *OAuthController) generateClient(c *gin.Context) {
-	clientId := uuid.New().String()
-	clientSecret := uuid.New().String()
-
-	err := oauth.GetClientStore().Create(&models.Client{
-		ID:     clientId,
-		Secret: clientSecret,
-		Domain: fmt.Sprintf("http://localhost:%s", os.Getenv("APP_PORT")),
-	})
+	clientID, clientSecret, err := oauth_service.GenerateClient()
 	if err != nil {
-		fmt.Println(err.Error())
+		c.JSON(http.StatusUnprocessableEntity, gin.H{})
+	} else {
+		c.JSON(http.StatusCreated, gin.H{
+			"CLIENT_ID":     clientID,
+			"CLIENT_SECRET": clientSecret,
+		})
 	}
-
-	c.JSON(http.StatusCreated, gin.H{
-		"CLIENT_ID":     clientId,
-		"CLIENT_SECRET": clientSecret,
-	})
 }
