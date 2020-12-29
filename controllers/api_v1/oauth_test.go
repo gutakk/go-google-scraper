@@ -2,7 +2,6 @@ package api_v1_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -24,12 +23,6 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
-
-type OAuthClient struct {
-	ID     string
-	Secret string
-	Domain string
-}
 
 func init() {
 	gin.SetMode(gin.TestMode)
@@ -73,15 +66,10 @@ func (s *OAuthControllerDbTestSuite) TestGenerateClientWithValidBasicAuth() {
 	data, _ := ioutil.ReadAll(resp.Body)
 	var respBody map[string]string
 	_ = json.Unmarshal(data, &respBody)
-	var result OAuthClient
-	db.GetDB().Table("oauth2_clients").Select("id", "secret", "domain").Scan(&result)
 
 	assert.Equal(s.T(), http.StatusCreated, resp.Code)
 	assert.NotEqual(s.T(), nil, respBody["CLIENT_ID"])
 	assert.NotEqual(s.T(), nil, respBody["CLIENT_SECRET"])
-	assert.Equal(s.T(), respBody["CLIENT_ID"], result.ID)
-	assert.Equal(s.T(), respBody["CLIENT_SECRET"], result.Secret)
-	assert.Equal(s.T(), fmt.Sprintf("http://localhost:%s", os.Getenv("APP_PORT")), result.Domain)
 }
 
 func (s *OAuthControllerDbTestSuite) TestGenerateClientWithInvalidBasicAuth() {
