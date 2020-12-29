@@ -122,7 +122,8 @@ func getKeywordResultData(keywordService keyword_service.KeywordService, keyword
 	keywordPresenter := presenters.KeywordPresenter{Keyword: keyword}
 
 	return map[string]interface{}{
-		"keyword": keywordPresenter.KeywordResult(),
+		"keyword":       keyword,
+		"keywordResult": keywordPresenter.KeywordResult(),
 	}, nil
 }
 

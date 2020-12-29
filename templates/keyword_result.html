@@ -18,12 +18,12 @@
 
   <div class="result-keyword__content-group">
     {{ template "search_result" searchResultPartial "Total Top Position Adword Links" .data.keyword.TopPositionAdwordsCount }}
-    {{ template "search_result_list"  searchResultPartial "Top Position Adword Links" .data.keyword.TopPositionAdwordLinks }}
+    {{ template "search_result_list"  searchResultPartial "Top Position Adword Links" .data.keywordResult.TopPositionAdwordLinks }}
   </div>
 
   <div class="result-keyword__content-group">
     {{ template "search_result" searchResultPartial "Total Non Adword Links" .data.keyword.NonAdwordsCount }}
-    {{ template "search_result_list"  searchResultPartial "Non Adword Links" .data.keyword.NonAdwordLinks }}
+    {{ template "search_result_list"  searchResultPartial "Non Adword Links" .data.keywordResult.NonAdwordLinks }}
   </div>
 </div>
 

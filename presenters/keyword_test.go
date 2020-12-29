@@ -43,14 +43,6 @@ func TestKeywordResultWithValidKeywordModels(t *testing.T) {
 	keywordPresenter := KeywordPresenter{Keyword: keyword}
 	result := keywordPresenter.KeywordResult()
 
-	assert.Equal(t, "0", result.ID)
-	assert.Equal(t, keyword.Keyword, result.Keyword)
-	assert.Equal(t, models.Pending, result.Status)
-	assert.Equal(t, 10, result.LinksCount)
-	assert.Equal(t, 10, result.TopPositionAdwordsCount)
 	assert.Equal(t, []string{"non-ad-link1", "non-ad-link2"}, result.NonAdwordLinks)
-	assert.Equal(t, 10, result.TotalAdwordsCount)
 	assert.Equal(t, []string{"top-ad-link1", "top-ad-link2"}, result.TopPositionAdwordLinks)
-	assert.Equal(t, "test-html", result.HtmlCode)
-	assert.Equal(t, "", result.FailedReason)
 }
