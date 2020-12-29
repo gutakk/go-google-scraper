@@ -17,15 +17,15 @@ import (
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
-	"github.com/stretchr/testify/suite"
 
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/suite"
 	"gopkg.in/go-playground/assert.v1"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-type OAuthClientResult struct {
+type OAuthClient struct {
 	ID     string
 	Secret string
 	Domain string
@@ -73,7 +73,7 @@ func (s *OAuthControllerDbTestSuite) TestGenerateClientWithValidBasicAuth() {
 	data, _ := ioutil.ReadAll(resp.Body)
 	var respBody map[string]string
 	_ = json.Unmarshal(data, &respBody)
-	var result OAuthClientResult
+	var result OAuthClient
 	db.GetDB().Table("oauth2_clients").Select("id", "secret", "domain").Scan(&result)
 
 	assert.Equal(s.T(), http.StatusCreated, resp.Code)
