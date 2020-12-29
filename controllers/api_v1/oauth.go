@@ -3,6 +3,7 @@ package api_v1
 import (
 	"net/http"
 
+	"github.com/gutakk/go-google-scraper/helpers/api_helper"
 	"github.com/gutakk/go-google-scraper/services/oauth_service"
 
 	"github.com/gin-gonic/gin"
@@ -17,7 +18,11 @@ func (oa *OAuthController) ApplyRoutes(engine *gin.RouterGroup) {
 func (oa *OAuthController) generateClient(c *gin.Context) {
 	clientID, clientSecret, err := oauth_service.GenerateClient()
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{})
+		errorResponse := api_helper.ErrorResponseObject{
+			Detail: err.Error(),
+			Status: http.StatusUnprocessableEntity,
+		}
+		c.JSON(errorResponse.Status, errorResponse.ConstructErrorResponse())
 	} else {
 		c.JSON(http.StatusCreated, gin.H{
 			"CLIENT_ID":     clientID,
