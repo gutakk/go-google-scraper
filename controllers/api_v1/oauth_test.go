@@ -11,6 +11,7 @@ import (
 	"github.com/gutakk/go-google-scraper/controllers"
 	"github.com/gutakk/go-google-scraper/controllers/api_v1"
 	"github.com/gutakk/go-google-scraper/db"
+	"github.com/gutakk/go-google-scraper/helpers/api_helper"
 	"github.com/gutakk/go-google-scraper/oauth"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
@@ -63,13 +64,20 @@ func (s *OAuthControllerDbTestSuite) TestGenerateClientWithValidBasicAuth() {
 	headers.Set("Authorization", "Basic YWRtaW46cGFzc3dvcmQ=")
 
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/client", headers, nil)
-	data, _ := ioutil.ReadAll(resp.Body)
-	var respBody map[string]string
-	_ = json.Unmarshal(data, &respBody)
+	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	var parsedRespBody map[string]api_helper.DataResponseObject
+	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+
+	var data []byte
+	row := db.GetDB().Table("oauth2_clients").Select("data").Row()
+	_ = row.Scan(&data)
+
+	var dataVal map[string]interface{}
+	_ = json.Unmarshal(data, &dataVal)
 
 	assert.Equal(s.T(), http.StatusCreated, resp.Code)
-	assert.NotEqual(s.T(), nil, respBody["CLIENT_ID"])
-	assert.NotEqual(s.T(), nil, respBody["CLIENT_SECRET"])
+	assert.Equal(s.T(), parsedRespBody["data"].Attributes["client_id"], dataVal["ID"])
+	assert.Equal(s.T(), parsedRespBody["data"].Attributes["client_secret"], dataVal["Secret"])
 }
 
 func (s *OAuthControllerDbTestSuite) TestGenerateClientWithInvalidBasicAuth() {
