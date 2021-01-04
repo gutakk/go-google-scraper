@@ -11,7 +11,6 @@ import (
 
 type LoginAPIController struct{}
 
-// TODO: Unit test in login API PR as grant type need to change to password
 func (t *LoginAPIController) ApplyRoutes(engine *gin.RouterGroup) {
 	engine.POST("/login", t.generateToken)
 }
