@@ -24,7 +24,7 @@ var redisPool = &redis.Pool{
 	MaxIdle:   5,
 	Wait:      true,
 	Dial: func() (redis.Conn, error) {
-		return redis.Dial("tcp", "localhost:6379")
+		return db.GetRedisConnection()
 	},
 }
 

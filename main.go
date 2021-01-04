@@ -21,7 +21,7 @@ func main() {
 	r := config.SetupRouter()
 	controllers.CombineRoutes(r)
 
-	if error := r.Run(fmt.Sprint(":", os.Getenv("APP_PORT"))); error != nil {
+	if error := r.Run(fmt.Sprint(":", os.Getenv("PORT"))); error != nil {
 		log.Fatal(fmt.Sprintf("Failed to start the server %v", error))
 	}
 }
