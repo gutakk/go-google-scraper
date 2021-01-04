@@ -10,6 +10,7 @@ import (
 	"github.com/gutakk/go-google-scraper/oauth"
 	"github.com/gutakk/go-google-scraper/services/oauth_service"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	"github.com/gutakk/go-google-scraper/tests/oauth_test"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/gin-gonic/gin"
@@ -18,12 +19,6 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
-
-type OAuthClient struct {
-	ID     string
-	Secret string
-	Domain string
-}
 
 func init() {
 	gin.SetMode(gin.TestMode)
@@ -54,7 +49,7 @@ func TestOAuthControllerDbTestSuite(t *testing.T) {
 
 func (s *OAuthControllerDbTestSuite) TestGenerateClient() {
 	oauthClient, err := oauth_service.GenerateClient()
-	var result OAuthClient
+	var result oauth_test.OAuthClient
 	db.GetDB().Table("oauth2_clients").Select("id", "secret", "domain").Scan(&result)
 
 	assert.Equal(s.T(), oauthClient.ClientID, result.ID)
