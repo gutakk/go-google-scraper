@@ -11,7 +11,6 @@ import (
 	"github.com/gutakk/go-google-scraper/oauth"
 	"github.com/gutakk/go-google-scraper/services/login_api_service"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
-	"github.com/gutakk/go-google-scraper/tests/oauth_test"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/bxcodec/faker/v3"
@@ -43,32 +42,18 @@ func init() {
 
 type LoginAPIServiceDbTestSuite struct {
 	suite.Suite
-	user        models.User
-	oauthClient oauth_test.OAuthClient
+	user models.User
 }
 
 func (s *LoginAPIServiceDbTestSuite) SetupTest() {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
 	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
 	db.GetDB().Create(&user)
-
-	s.oauthClient = oauth_test.OAuthClient{
-		ID:     "client-id",
-		Secret: "client-secret",
-		Domain: "http://localhost:8080",
-	}
-	db.GetDB().Raw("INSERT INTO oauth2_clients(id, secret, domain) VALUES(?, ?, ?)",
-		s.oauthClient.ID,
-		s.oauthClient.Secret,
-		s.oauthClient.Domain,
-	)
-
 	s.user = user
 }
 
 func (s *LoginAPIServiceDbTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM users")
-	db.GetDB().Exec("DELETE FROM oauth2_clients")
 }
 
 func TestLoginAPIServiceDbTestSuite(t *testing.T) {
