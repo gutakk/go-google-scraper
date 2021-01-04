@@ -39,7 +39,7 @@ func init() {
 	}
 
 	config.LoadEnv()
-	oauth.SetupOAuthServer()
+	_ = oauth.SetupOAuthServer()
 	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	db.GetDB = func() *gorm.DB {
 		return database

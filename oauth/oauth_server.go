@@ -18,16 +18,25 @@ import (
 var oauthServer *server.Server
 var clientStore *pg.ClientStore
 
-func SetupOAuthServer() {
-	pgxConn, _ := pgx.Connect(context.TODO(), db.GetDatabaseURL())
+func SetupOAuthServer() error {
+	pgxConn, connectErr := pgx.Connect(context.TODO(), db.GetDatabaseURL())
+	if connectErr != nil {
+		return connectErr
+	}
 	manager := manage.NewDefaultManager()
 
 	// use PostgreSQL token store with pgx.Connection adapter
 	adapter := pgx4adapter.NewConn(pgxConn)
-	tokenStore, _ := pg.NewTokenStore(adapter, pg.WithTokenStoreGCInterval(time.Minute))
+	tokenStore, tokenStoreErr := pg.NewTokenStore(adapter, pg.WithTokenStoreGCInterval(time.Minute))
+	if tokenStoreErr != nil {
+		return tokenStoreErr
+	}
 	defer tokenStore.Close()
 
-	store, _ := pg.NewClientStore(adapter)
+	store, clientStoreErr := pg.NewClientStore(adapter)
+	if clientStoreErr != nil {
+		return clientStoreErr
+	}
 
 	manager.MapTokenStorage(tokenStore)
 	manager.MapClientStorage(store)
@@ -48,6 +57,8 @@ func SetupOAuthServer() {
 
 	oauthServer = srv
 	clientStore = store
+
+	return nil
 }
 
 func GetOAuthServer() *server.Server {
