@@ -9,14 +9,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type TokenAPIController struct{}
+type LoginAPIController struct{}
 
 // TODO: Unit test in login API PR as grant type need to change to password
-func (t *TokenAPIController) ApplyRoutes(engine *gin.RouterGroup) {
-	engine.POST("/token", t.generateToken)
+func (t *LoginAPIController) ApplyRoutes(engine *gin.RouterGroup) {
+	engine.POST("/login", t.generateToken)
 }
 
-func (t *TokenAPIController) generateToken(c *gin.Context) {
+func (t *LoginAPIController) generateToken(c *gin.Context) {
 	server := oauth.GetOAuthServer()
 	server.SetPasswordAuthorizationHandler(login_api_service.PasswordAuthorizationHandler)
 
