@@ -17,7 +17,7 @@ func GenerateClient() (string, string, error) {
 	err := oauth.GetClientStore().Create(&models.Client{
 		ID:     clientID,
 		Secret: clientSecret,
-		Domain: fmt.Sprintf("http://localhost:%s", os.Getenv("APP_PORT")),
+		Domain: fmt.Sprintf("http://localhost:%s", os.Getenv("PORT")),
 	})
 	if err != nil {
 		return "", "", err

@@ -59,6 +59,6 @@ func (s *OAuthControllerDbTestSuite) TestGenerateClient() {
 
 	assert.Equal(s.T(), clientID, result.ID)
 	assert.Equal(s.T(), clientSecret, result.Secret)
-	assert.Equal(s.T(), fmt.Sprintf("http://localhost:%s", os.Getenv("APP_PORT")), result.Domain)
+	assert.Equal(s.T(), fmt.Sprintf("http://localhost:%s", os.Getenv("PORT")), result.Domain)
 	assert.Equal(s.T(), nil, err)
 }
