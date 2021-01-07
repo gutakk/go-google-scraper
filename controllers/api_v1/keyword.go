@@ -1,6 +1,7 @@
 package api_v1
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gutakk/go-google-scraper/helpers/api_helper"
@@ -19,9 +20,11 @@ func (kapi *KeywordAPIController) ApplyRoutes(engine *gin.RouterGroup) {
 func (kapi *KeywordAPIController) uploadKeyword(c *gin.Context) {
 	file, fileErr := c.FormFile("file")
 	if fileErr != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid file",
-		})
+		errorResponse := &api_helper.ErrorResponseObject{
+			Detail: errors.New("invalid file").Error(),
+			Status: http.StatusBadRequest,
+		}
+		c.JSON(http.StatusBadRequest, errorResponse.ConstructErrorResponse())
 		return
 	}
 
