@@ -26,6 +26,7 @@ func ValidateToken(c *gin.Context) {
 
 		c.JSON(http.StatusUnauthorized, errorResponse.ConstructErrorResponse())
 		c.Abort()
+		return
 	}
 
 	c.Set("currentUserID", token.GetUserID())
