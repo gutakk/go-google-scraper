@@ -8,16 +8,17 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-oauth2/oauth2/v4/errors"
+	pgAdapter "github.com/vgarvardt/go-pg-adapter"
 )
 
 func ValidateToken(c *gin.Context) {
-	_, err := oauth.GetOAuthServer().ValidationBearerToken(c.Request)
+	token, err := oauth.GetOAuthServer().ValidationBearerToken(c.Request)
 	if err != nil {
 		errorResponse := &api_helper.ErrorResponseObject{
 			Status: http.StatusUnauthorized,
 		}
 
-		if err.Error() == "sql: no rows in result set" {
+		if err == pgAdapter.ErrNoRows {
 			errorResponse.Detail = errors.ErrInvalidAccessToken.Error()
 		} else {
 			errorResponse.Detail = err.Error()
@@ -26,4 +27,6 @@ func ValidateToken(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, errorResponse.ConstructErrorResponse())
 		c.Abort()
 	}
+
+	c.Set("currentUserID", token.GetUserID())
 }
