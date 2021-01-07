@@ -11,14 +11,12 @@ import (
 
 func TestConstructErrorResponseWithValidErrorResponseObject(t *testing.T) {
 	errorResponseObject := &api_helper.ErrorResponseObject{
-		Title:  "test-error",
 		Detail: "test-detail",
 		Status: 999,
 	}
 	errorResponse := errorResponseObject.ConstructErrorResponse()
 	expectedResult := gin.H{
 		"errors": []api_helper.ErrorResponseObject{{
-			Title:  "test-error",
 			Detail: "test-detail",
 			Status: 999,
 		}},
