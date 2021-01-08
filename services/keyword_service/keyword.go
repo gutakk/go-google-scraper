@@ -18,10 +18,11 @@ import (
 )
 
 const (
-	fileFormatError         = "file must be CSV format"
-	fileLengthError         = "CSV file must contain between 1 to 1000 keywords"
-	invalidDataError        = "invalid data"
-	somethingWentWrongError = "something went wrong, please try again"
+	cannotOpenFileError = "file cannot be opened"
+	cannotReadFileError = "file cannot be read"
+	fileFormatError     = "file must be CSV format"
+	fileLengthError     = "CSV file must contain between 1 to 1000 keywords"
+	invalidDataError    = "invalid data"
 )
 
 type KeywordService struct {
@@ -87,7 +88,7 @@ func (k *KeywordService) Save(parsedKeywordList []string) error {
 func (k *KeywordService) ReadFile(filename string) ([]string, error) {
 	csvfile, openErr := os.Open(filename)
 	if openErr != nil {
-		return nil, errors.New(somethingWentWrongError)
+		return nil, errors.New(cannotOpenFileError)
 	}
 
 	r := csv.NewReader(csvfile)
@@ -97,7 +98,7 @@ func (k *KeywordService) ReadFile(filename string) ([]string, error) {
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			return nil, errors.New(somethingWentWrongError)
+			return nil, errors.New(cannotReadFileError)
 		}
 		keywordList = append(keywordList, row[0])
 	}
