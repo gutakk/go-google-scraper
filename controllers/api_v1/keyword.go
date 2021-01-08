@@ -11,6 +11,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	invalidFileErr = "invalid file"
+)
+
 type KeywordAPIController struct{}
 
 func (kapi *KeywordAPIController) ApplyRoutes(engine *gin.RouterGroup) {
@@ -21,7 +25,7 @@ func (kapi *KeywordAPIController) uploadKeyword(c *gin.Context) {
 	file, fileErr := c.FormFile("file")
 	if fileErr != nil {
 		errorResponse := &api_helper.ErrorResponseObject{
-			Detail: errors.New("invalid file").Error(),
+			Detail: errors.New(invalidFileErr).Error(),
 			Status: http.StatusBadRequest,
 		}
 		c.JSON(http.StatusBadRequest, errorResponse.ConstructErrorResponse())
