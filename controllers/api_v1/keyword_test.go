@@ -43,7 +43,6 @@ func init() {
 
 	config.LoadEnv()
 	_ = oauth.SetupOAuthServer()
-	db.SetupRedisPool()
 
 	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	db.GetDB = func() *gorm.DB {
@@ -61,6 +60,8 @@ type KeywordAPIControllerDbTestSuite struct {
 }
 
 func (s *KeywordAPIControllerDbTestSuite) SetupTest() {
+	db.SetupRedisPool()
+
 	s.engine = testConfig.GetRouter(false)
 	new(api_v1.KeywordAPIController).ApplyRoutes(controllers.PrivateAPIGroup(s.engine.Group("/api/v1")))
 
@@ -97,6 +98,7 @@ func (s *KeywordAPIControllerDbTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM keywords")
 	db.GetDB().Exec("DELETE FROM users")
 	db.GetDB().Exec("DELETE FROM oauth2_tokens")
+	_, _ = db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
 }
 
 func TestKeywordAPIControllerDbTestSuite(t *testing.T) {
