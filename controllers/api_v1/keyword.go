@@ -18,7 +18,7 @@ const (
 type KeywordAPIController struct{}
 
 func (kapi *KeywordAPIController) ApplyRoutes(engine *gin.RouterGroup) {
-	engine.POST("/keyword", kapi.uploadKeyword)
+	engine.POST("/keywords", kapi.uploadKeyword)
 }
 
 func (kapi *KeywordAPIController) uploadKeyword(c *gin.Context) {

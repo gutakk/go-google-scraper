@@ -109,13 +109,13 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithValidParams() 
 	headers, payload := testFile.CreateMultipartPayload("tests/fixture/adword_keywords.csv")
 	headers.Set("Authorization", "Bearer test-access")
 
-	resp := testHttp.PerformFileUploadRequest(s.engine, "POST", "/api/v1/keyword", headers, payload)
+	resp := testHttp.PerformFileUploadRequest(s.engine, "POST", "/api/v1/keywords", headers, payload)
 
 	assert.Equal(s.T(), http.StatusNoContent, resp.Code)
 }
 
 func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithoutAuthorizationHeader() {
-	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keyword", nil, nil)
+	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", nil, nil)
 	respBodyData, _ := ioutil.ReadAll(resp.Body)
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
 	_ = json.Unmarshal(respBodyData, &parsedRespBody)
@@ -128,7 +128,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithInvalidAccessT
 	headers := http.Header{}
 	headers.Set("Authorization", "invalid_token")
 
-	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keyword", headers, nil)
+	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", headers, nil)
 	respBodyData, _ := ioutil.ReadAll(resp.Body)
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
 	_ = json.Unmarshal(respBodyData, &parsedRespBody)
@@ -166,7 +166,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithExpiredAccessT
 	headers := http.Header{}
 	headers.Set("Authorization", "Bearer test-access")
 
-	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keyword", headers, nil)
+	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", headers, nil)
 	respBodyData, _ := ioutil.ReadAll(resp.Body)
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
 	_ = json.Unmarshal(respBodyData, &parsedRespBody)
@@ -179,7 +179,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithAccessTokenBut
 	headers := http.Header{}
 	headers.Set("Authorization", "Bearer test-access")
 
-	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keyword", headers, nil)
+	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", headers, nil)
 	respBodyData, _ := ioutil.ReadAll(resp.Body)
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
 	_ = json.Unmarshal(respBodyData, &parsedRespBody)
@@ -192,7 +192,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithAccessTokenBut
 	headers, _ := testFile.CreateMultipartPayload("")
 	headers.Set("Authorization", "Bearer test-access")
 
-	resp := testHttp.PerformFileUploadRequest(s.engine, "POST", "/api/v1/keyword", headers, &bytes.Buffer{})
+	resp := testHttp.PerformFileUploadRequest(s.engine, "POST", "/api/v1/keywords", headers, &bytes.Buffer{})
 	respBodyData, _ := ioutil.ReadAll(resp.Body)
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
 	_ = json.Unmarshal(respBodyData, &parsedRespBody)
