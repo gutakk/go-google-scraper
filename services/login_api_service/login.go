@@ -17,5 +17,6 @@ func PasswordAuthorizationHandler(username string, password string) (userID stri
 	if err := models.ValidatePassword(user.Password, password); err != nil {
 		return "", errors.ErrInvalidClient
 	}
+
 	return fmt.Sprint(user.ID), nil
 }
