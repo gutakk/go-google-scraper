@@ -67,6 +67,7 @@ func (s *OAuthControllerDbTestSuite) TestGenerateClientWithValidBasicAuth() {
 	respBodyData, _ := ioutil.ReadAll(resp.Body)
 	var parsedRespBody map[string]api_helper.DataResponseObject
 	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+	v, _ := parsedRespBody["data"].Attributes.(map[string]interface{})
 
 	var data []byte
 	row := db.GetDB().Table("oauth2_clients").Select("data").Row()
@@ -76,8 +77,8 @@ func (s *OAuthControllerDbTestSuite) TestGenerateClientWithValidBasicAuth() {
 	_ = json.Unmarshal(data, &dataVal)
 
 	assert.Equal(s.T(), http.StatusCreated, resp.Code)
-	assert.Equal(s.T(), parsedRespBody["data"].Attributes["client_id"], dataVal["ID"])
-	assert.Equal(s.T(), parsedRespBody["data"].Attributes["client_secret"], dataVal["Secret"])
+	assert.Equal(s.T(), v["client_id"], dataVal["ID"])
+	assert.Equal(s.T(), v["client_secret"], dataVal["Secret"])
 }
 
 func (s *OAuthControllerDbTestSuite) TestGenerateClientWithInvalidBasicAuth() {
