@@ -30,19 +30,19 @@ func (k KeywordStatus) Value() (driver.Value, error) {
 }
 
 type Keyword struct {
-	gorm.Model
-	Keyword                 string        `gorm:"notNull;index"`
-	Status                  KeywordStatus `gorm:"default:pending;type:keyword_status"`
-	LinksCount              int
-	NonAdwordsCount         int
-	NonAdwordLinks          datatypes.JSON
-	TopPositionAdwordsCount int
-	TopPositionAdwordLinks  datatypes.JSON
-	TotalAdwordsCount       int
-	UserID                  uint
-	HtmlCode                string
-	FailedReason            string
-	User                    User
+	*gorm.Model             `json:"model,omitempty"`
+	Keyword                 string         `gorm:"notNull;index" json:"keyword,omitempty"`
+	Status                  KeywordStatus  `gorm:"default:pending;type:keyword_status,omitempty"`
+	LinksCount              int            `json:"links_count"`
+	NonAdwordsCount         int            `json:"non_adwords_count,omitempty"`
+	NonAdwordLinks          datatypes.JSON `json:"non_adword_links,omitempty"`
+	TopPositionAdwordsCount int            `json:"top_position_adwords_count,omitempty"`
+	TopPositionAdwordLinks  datatypes.JSON `json:"top_position_adword_links,omitempty"`
+	TotalAdwordsCount       int            `json:"total_adwords_count,omitempty"`
+	UserID                  uint           `json:"user_id,omitempty"`
+	HtmlCode                string         `json:"html_code,omitempty"`
+	FailedReason            string         `json:"failed_reason,omitempty"`
+	User                    *User          `json:"user,omitempty"`
 }
 
 func GetKeywordBy(condition map[string]interface{}) (Keyword, error) {
