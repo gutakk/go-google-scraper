@@ -3,12 +3,14 @@ package api_v1_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/bxcodec/faker/v3"
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/controllers"
 	"github.com/gutakk/go-google-scraper/controllers/api_v1"
@@ -22,6 +24,7 @@ import (
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 	"github.com/gutakk/go-google-scraper/tests/oauth_test"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-oauth2/oauth2/v4/errors"
@@ -40,24 +43,31 @@ func init() {
 
 	config.LoadEnv()
 	_ = oauth.SetupOAuthServer()
+	db.SetupRedisPool()
+
 	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	db.GetDB = func() *gorm.DB {
 		return database
 	}
 
+	testDB.InitKeywordStatusEnum(db.GetDB())
 	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
 }
 
 type KeywordAPIControllerDbTestSuite struct {
 	suite.Suite
 	engine *gin.Engine
-	// user        models.User
-	// oauthClient oauth_test.OAuthClient
+	user   models.User
 }
 
 func (s *KeywordAPIControllerDbTestSuite) SetupTest() {
 	s.engine = testConfig.GetRouter(false)
 	new(api_v1.KeywordAPIController).ApplyRoutes(controllers.PrivateAPIGroup(s.engine.Group("/api/v1")))
+
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
+	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
+	db.GetDB().Create(&user)
+	s.user = user
 
 	tokenItem := &oauth_test.TokenStoreItem{
 		CreatedAt: time.Now(),
@@ -67,7 +77,10 @@ func (s *KeywordAPIControllerDbTestSuite) SetupTest() {
 		Refresh:   "test-refresh",
 	}
 
-	data, _ := json.Marshal(tokenItem)
+	data, _ := json.Marshal(&oauth_test.TokenData{
+		Access: tokenItem.Access,
+		UserID: fmt.Sprint(s.user.ID),
+	})
 	tokenItem.Data = data
 
 	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
@@ -78,30 +91,11 @@ func (s *KeywordAPIControllerDbTestSuite) SetupTest() {
 		tokenItem.Refresh,
 		tokenItem.Data,
 	)
-
-	// hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
-	// user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
-	// db.GetDB().Create(&user)
-	// s.user = user
-
-	// s.oauthClient = oauth_test.OAuthClient{
-	// 	ID:     "client-id",
-	// 	Secret: "client-secret",
-	// 	Domain: "http://localhost:8080",
-	// }
-	// data, _ := json.Marshal(s.oauthClient)
-	// s.oauthClient.Data = data
-
-	// db.GetDB().Exec("INSERT INTO oauth2_clients VALUES(?, ?, ?, ?)",
-	// 	s.oauthClient.ID,
-	// 	s.oauthClient.Secret,
-	// 	s.oauthClient.Domain,
-	// 	s.oauthClient.Data,
-	// )
 }
 
 func (s *KeywordAPIControllerDbTestSuite) TearDownTest() {
-	// db.GetDB().Exec("DELETE FROM users")
+	db.GetDB().Exec("DELETE FROM keywords")
+	db.GetDB().Exec("DELETE FROM users")
 	db.GetDB().Exec("DELETE FROM oauth2_tokens")
 }
 
@@ -109,7 +103,16 @@ func TestKeywordAPIControllerDbTestSuite(t *testing.T) {
 	suite.Run(t, new(KeywordAPIControllerDbTestSuite))
 }
 
-func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordWithoutAuthorizationHeader() {
+func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithValidParams() {
+	headers, payload := testFile.CreateMultipartPayload("tests/fixture/adword_keywords.csv")
+	headers.Set("Authorization", "Bearer test-access")
+
+	resp := testHttp.PerformFileUploadRequest(s.engine, "POST", "/api/v1/keyword", headers, payload)
+
+	assert.Equal(s.T(), http.StatusNoContent, resp.Code)
+}
+
+func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithoutAuthorizationHeader() {
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keyword", nil, nil)
 	respBodyData, _ := ioutil.ReadAll(resp.Body)
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
@@ -119,7 +122,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordWithoutAuthorizationH
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
 }
 
-func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordWithInvalidAccessToken() {
+func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithInvalidAccessToken() {
 	headers := http.Header{}
 	headers.Set("Authorization", "invalid_token")
 
@@ -132,7 +135,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordWithInvalidAccessToke
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
 }
 
-func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordWithExpiredAccessToken() {
+func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithExpiredAccessToken() {
 	db.GetDB().Exec("DELETE FROM oauth2_tokens")
 
 	tokenItem := &oauth_test.TokenStoreItem{
@@ -170,7 +173,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordWithExpiredAccessToke
 	assert.Equal(s.T(), errors.ErrExpiredAccessToken.Error(), parsedRespBody["errors"][0].Detail)
 }
 
-func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordWithAccessTokenButNoFileFormInTheRequest() {
+func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithAccessTokenButNoFileFormInTheRequest() {
 	headers := http.Header{}
 	headers.Set("Authorization", "Bearer test-access")
 
@@ -183,7 +186,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordWithAccessTokenButNoF
 	assert.Equal(s.T(), "invalid file", parsedRespBody["errors"][0].Detail)
 }
 
-func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordWithAccessTokenButBlankPayload() {
+func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithAccessTokenButBlankPayload() {
 	headers, _ := testFile.CreateMultipartPayload("")
 	headers.Set("Authorization", "Bearer test-access")
 
