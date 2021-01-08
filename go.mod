@@ -8,6 +8,7 @@ require (
 	github.com/cosmtrek/air v1.15.1 // indirect
 	github.com/creack/pty v1.1.11 // indirect
 	github.com/dnaeon/go-vcr v1.1.0
+	github.com/fatih/camelcase v1.0.0
 	github.com/fatih/color v1.10.0 // indirect
 	github.com/foolin/goview v0.3.0
 	github.com/gin-contrib/sessions v0.0.3
