@@ -150,7 +150,7 @@ func (s *KeywordServiceTestSuite) TestReadFileWithFileNotFound() {
 	result, err := s.keywordService.ReadFile("")
 
 	assert.Equal(s.T(), nil, result)
-	assert.Equal(s.T(), "something went wrong, please try again", err.Error())
+	assert.Equal(s.T(), "file cannot be opened", err.Error())
 }
 
 func (s *KeywordServiceTestSuite) TestValidateCSVLengthWithMinRowAllowed() {
