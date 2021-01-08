@@ -16,7 +16,7 @@ func (oa *OAuthController) ApplyRoutes(engine *gin.RouterGroup) {
 }
 
 func (oa *OAuthController) generateClient(c *gin.Context) {
-	clientID, clientSecret, err := oauth_service.GenerateClient()
+	oauthClient, err := oauth_service.GenerateClient()
 	if err != nil {
 		errorResponse := &api_helper.ErrorResponseObject{
 			Detail: err.Error(),
@@ -25,12 +25,9 @@ func (oa *OAuthController) generateClient(c *gin.Context) {
 		c.JSON(errorResponse.Status, errorResponse.ConstructErrorResponse())
 	} else {
 		dataResponse := &api_helper.DataResponseObject{
-			ID:   clientID,
-			Type: "client",
-			Attributes: map[string]interface{}{
-				"client_id":     clientID,
-				"client_secret": clientSecret,
-			},
+			ID:         oauthClient.ClientID,
+			Type:       "client",
+			Attributes: oauthClient,
 		}
 		c.JSON(http.StatusCreated, dataResponse.ConstructDataResponse())
 	}

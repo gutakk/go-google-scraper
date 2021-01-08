@@ -20,9 +20,9 @@ func (e *ErrorResponseObject) ConstructErrorResponse() gin.H {
 }
 
 type DataResponseObject struct {
-	ID         string                 `json:"id"`
-	Type       string                 `json:"type"`
-	Attributes map[string]interface{} `json:"attributes"`
+	ID         string      `json:"id"`
+	Type       string      `json:"type"`
+	Attributes interface{} `json:"attributes"`
 }
 
 func (d *DataResponseObject) ConstructDataResponse() gin.H {

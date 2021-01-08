@@ -53,12 +53,12 @@ func TestOAuthControllerDbTestSuite(t *testing.T) {
 }
 
 func (s *OAuthControllerDbTestSuite) TestGenerateClient() {
-	clientID, clientSecret, err := oauth_service.GenerateClient()
+	oauthClient, err := oauth_service.GenerateClient()
 	var result OAuthClient
 	db.GetDB().Table("oauth2_clients").Select("id", "secret", "domain").Scan(&result)
 
-	assert.Equal(s.T(), clientID, result.ID)
-	assert.Equal(s.T(), clientSecret, result.Secret)
+	assert.Equal(s.T(), oauthClient.ClientID, result.ID)
+	assert.Equal(s.T(), oauthClient.ClientSecret, result.Secret)
 	assert.Equal(s.T(), fmt.Sprintf("http://localhost:%s", os.Getenv("PORT")), result.Domain)
 	assert.Equal(s.T(), nil, err)
 }

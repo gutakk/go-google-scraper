@@ -10,7 +10,12 @@ import (
 	"github.com/google/uuid"
 )
 
-func GenerateClient() (string, string, error) {
+type OAuthClient struct {
+	ClientID     string `json:"client_id,omitempty"`
+	ClientSecret string `json:"client_secret,omitempty"`
+}
+
+func GenerateClient() (OAuthClient, error) {
 	clientID := uuid.New().String()
 	clientSecret := uuid.New().String()
 
@@ -20,8 +25,8 @@ func GenerateClient() (string, string, error) {
 		Domain: fmt.Sprintf("http://localhost:%s", os.Getenv("PORT")),
 	})
 	if err != nil {
-		return "", "", err
+		return OAuthClient{}, err
 	}
 
-	return clientID, clientSecret, nil
+	return OAuthClient{ClientID: clientID, ClientSecret: clientSecret}, nil
 }
