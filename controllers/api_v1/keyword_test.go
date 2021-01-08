@@ -1,6 +1,7 @@
 package api_v1_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -17,6 +18,7 @@ import (
 	"github.com/gutakk/go-google-scraper/oauth"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	testFile "github.com/gutakk/go-google-scraper/tests/file"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 	"github.com/gutakk/go-google-scraper/tests/oauth_test"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
@@ -57,6 +59,26 @@ func (s *KeywordAPIControllerDbTestSuite) SetupTest() {
 	s.engine = testConfig.GetRouter(false)
 	new(api_v1.KeywordAPIController).ApplyRoutes(controllers.PrivateAPIGroup(s.engine.Group("/api/v1")))
 
+	tokenItem := &oauth_test.TokenStoreItem{
+		CreatedAt: time.Now(),
+		ExpiresAt: time.Now(),
+		Code:      "test-code",
+		Access:    "test-access",
+		Refresh:   "test-refresh",
+	}
+
+	data, _ := json.Marshal(tokenItem)
+	tokenItem.Data = data
+
+	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
+		tokenItem.CreatedAt,
+		tokenItem.ExpiresAt,
+		tokenItem.Code,
+		tokenItem.Access,
+		tokenItem.Refresh,
+		tokenItem.Data,
+	)
+
 	// hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
 	// user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
 	// db.GetDB().Create(&user)
@@ -80,7 +102,6 @@ func (s *KeywordAPIControllerDbTestSuite) SetupTest() {
 
 func (s *KeywordAPIControllerDbTestSuite) TearDownTest() {
 	// db.GetDB().Exec("DELETE FROM users")
-	// db.GetDB().Exec("DELETE FROM oauth2_clients")
 	db.GetDB().Exec("DELETE FROM oauth2_tokens")
 }
 
@@ -112,6 +133,8 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordWithInvalidAccessToke
 }
 
 func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordWithExpiredAccessToken() {
+	db.GetDB().Exec("DELETE FROM oauth2_tokens")
+
 	tokenItem := &oauth_test.TokenStoreItem{
 		CreatedAt: time.Now(),
 		ExpiresAt: time.Now(),
@@ -145,4 +168,30 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordWithExpiredAccessToke
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrExpiredAccessToken.Error(), parsedRespBody["errors"][0].Detail)
+}
+
+func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordWithAccessTokenButNoFileFormInTheRequest() {
+	headers := http.Header{}
+	headers.Set("Authorization", "Bearer test-access")
+
+	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keyword", headers, nil)
+	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	var parsedRespBody map[string][]api_helper.ErrorResponseObject
+	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+
+	assert.Equal(s.T(), http.StatusBadRequest, resp.Code)
+	assert.Equal(s.T(), "invalid file", parsedRespBody["errors"][0].Detail)
+}
+
+func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordWithAccessTokenButBlankPayload() {
+	headers, _ := testFile.CreateMultipartPayload("")
+	headers.Set("Authorization", "Bearer test-access")
+
+	resp := testHttp.PerformFileUploadRequest(s.engine, "POST", "/api/v1/keyword", headers, &bytes.Buffer{})
+	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	var parsedRespBody map[string][]api_helper.ErrorResponseObject
+	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+
+	assert.Equal(s.T(), http.StatusBadRequest, resp.Code)
+	assert.Equal(s.T(), "invalid file", parsedRespBody["errors"][0].Detail)
 }
