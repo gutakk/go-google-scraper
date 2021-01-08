@@ -6,6 +6,7 @@ import (
 
 	"github.com/gutakk/go-google-scraper/helpers/api_helper"
 	helpers "github.com/gutakk/go-google-scraper/helpers/user"
+	"github.com/gutakk/go-google-scraper/services/keyword_api_service"
 	"github.com/gutakk/go-google-scraper/services/keyword_service"
 
 	"github.com/gin-gonic/gin"
@@ -18,7 +19,49 @@ const (
 type KeywordAPIController struct{}
 
 func (kapi *KeywordAPIController) ApplyRoutes(engine *gin.RouterGroup) {
+	engine.GET("/keywords", kapi.fetchKeywords)
 	engine.POST("/keywords", kapi.uploadKeyword)
+}
+
+func (kapi *KeywordAPIController) fetchKeywords(c *gin.Context) {
+	currentUserID := helpers.GetCurrentUserID(c)
+	keywordService := keyword_service.KeywordService{CurrentUserID: currentUserID}
+
+	keywords, err := keywordService.GetAll()
+
+	if err != nil {
+		errorResponse := &api_helper.ErrorResponseObject{
+			Detail: err.Error(),
+			Status: http.StatusBadRequest,
+		}
+		c.JSON(errorResponse.Status, errorResponse.ConstructErrorResponse())
+		return
+	}
+
+	if len(keywords) == 0 {
+		errorResponse := &api_helper.ErrorResponseObject{
+			Detail: errors.New("keywords not found").Error(),
+			Status: http.StatusNotFound,
+		}
+		c.JSON(errorResponse.Status, errorResponse.ConstructErrorResponse())
+		return
+	}
+
+	keywordsResponse := keyword_api_service.KeywordsResponse{Keywords: keywords}
+	q := keywordsResponse.JSONAPIFormatKeywordsResponse()
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": q.Data,
+	})
+
+	// dataResponse := &api_helper.DataResponseObject{
+	// 	ID:   clientID,
+	// 	Type: "client",
+	// 	Attributes: map[string]interface{}{
+	// 		"client_id":     clientID,
+	// 		"client_secret": clientSecret,
+	// 	},
+	// }
 }
 
 func (kapi *KeywordAPIController) uploadKeyword(c *gin.Context) {
