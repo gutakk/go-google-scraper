@@ -13,7 +13,8 @@ import (
 )
 
 const (
-	invalidFileErr = "invalid file"
+	invalidFileErr      = "invalid file"
+	keywordsNotFoundErr = "keywords not found"
 )
 
 type KeywordAPIController struct{}
@@ -26,11 +27,10 @@ func (kapi *KeywordAPIController) ApplyRoutes(engine *gin.RouterGroup) {
 func (kapi *KeywordAPIController) fetchKeywords(c *gin.Context) {
 	currentUserID := helpers.GetCurrentUserID(c)
 	keywordService := keyword_service.KeywordService{CurrentUserID: currentUserID}
-
 	keywords, err := keywordService.GetAll()
 
 	if err != nil {
-		errorResponse := &api_helper.ErrorResponseObject{
+		errorResponse := api_helper.ErrorResponseObject{
 			Detail: err.Error(),
 			Status: http.StatusBadRequest,
 		}
@@ -39,8 +39,8 @@ func (kapi *KeywordAPIController) fetchKeywords(c *gin.Context) {
 	}
 
 	if len(keywords) == 0 {
-		errorResponse := &api_helper.ErrorResponseObject{
-			Detail: errors.New("keywords not found").Error(),
+		errorResponse := api_helper.ErrorResponseObject{
+			Detail: errors.New(keywordsNotFoundErr).Error(),
 			Status: http.StatusNotFound,
 		}
 		c.JSON(errorResponse.Status, errorResponse.ConstructErrorResponse())
@@ -48,20 +48,8 @@ func (kapi *KeywordAPIController) fetchKeywords(c *gin.Context) {
 	}
 
 	keywordsResponse := keyword_api_service.KeywordsResponse{Keywords: keywords}
-	q := keywordsResponse.JSONAPIFormatKeywordsResponse()
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": q.Data,
-	})
-
-	// dataResponse := &api_helper.DataResponseObject{
-	// 	ID:   clientID,
-	// 	Type: "client",
-	// 	Attributes: map[string]interface{}{
-	// 		"client_id":     clientID,
-	// 		"client_secret": clientSecret,
-	// 	},
-	// }
+	c.JSON(http.StatusOK, keywordsResponse.JSONAPIFormatKeywordsResponse())
 }
 
 func (kapi *KeywordAPIController) uploadKeyword(c *gin.Context) {
