@@ -9,12 +9,14 @@ import (
 
 type KeywordsResponse struct {
 	Keywords []models.Keyword
+	Hello    string
 }
 
-func (k *KeywordsResponse) JSONAPIFormatKeywordsResponse() *api_helper.DataResponseObjectArray {
-	formattedKeywords := &api_helper.DataResponseObjectArray{}
+func (k *KeywordsResponse) JSONAPIFormatKeywordsResponse() api_helper.DataResponseArray {
+	formattedKeywords := api_helper.DataResponseArray{}
+
 	for _, value := range k.Keywords {
-		keyword := &models.Keyword{
+		keyword := models.Keyword{
 			Keyword:                 value.Keyword,
 			Status:                  value.Status,
 			LinksCount:              value.LinksCount,
@@ -26,13 +28,21 @@ func (k *KeywordsResponse) JSONAPIFormatKeywordsResponse() *api_helper.DataRespo
 			HtmlCode:                value.HtmlCode,
 			FailedReason:            value.FailedReason,
 		}
-		x := api_helper.DataResponseObject{
+
+		relationships := api_helper.DataResponseObject{
+			ID:   fmt.Sprint(value.UserID),
+			Type: "user",
+		}
+
+		dataResponseObject := api_helper.DataResponseObject{
 			ID:            fmt.Sprint(value.ID),
 			Type:          "keyword",
 			Attributes:    keyword,
-			Relationships: "hello",
+			Relationships: relationships.GetRelationships(),
 		}
-		formattedKeywords.Data = append(formattedKeywords.Data, x)
+
+		formattedKeywords.Data = append(formattedKeywords.Data, dataResponseObject)
 	}
+
 	return formattedKeywords
 }
