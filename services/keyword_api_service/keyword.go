@@ -30,12 +30,12 @@ func (k *KeywordsResponse) JSONAPIFormatKeywordsResponse() api_helper.DataRespon
 
 		relationships := api_helper.DataResponseObject{
 			ID:   fmt.Sprint(value.UserID),
-			Type: "user",
+			Type: models.UserType,
 		}
 
 		dataResponseObject := api_helper.DataResponseObject{
 			ID:            fmt.Sprint(value.ID),
-			Type:          "keyword",
+			Type:          models.KeywordType,
 			Attributes:    keyword,
 			Relationships: relationships.GetRelationships(),
 		}

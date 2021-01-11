@@ -13,10 +13,12 @@ import (
 type KeywordStatus string
 
 const (
-	Pending    KeywordStatus = "pending"
-	Processing KeywordStatus = "processing"
-	Processed  KeywordStatus = "processed"
+	KeywordType = "keyword"
+
 	Failed     KeywordStatus = "failed"
+	Pending    KeywordStatus = "pending"
+	Processed  KeywordStatus = "processed"
+	Processing KeywordStatus = "processing"
 
 	InvalidKeywordStatusErr = "invalid keyword status"
 )

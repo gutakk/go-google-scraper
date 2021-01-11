@@ -9,6 +9,10 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	UserType = "user"
+)
+
 type User struct {
 	gorm.Model
 	Email    string `gorm:"unique;notNull;index"`
