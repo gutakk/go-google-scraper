@@ -20,24 +20,25 @@ func (e *ErrorResponseObject) NewErrorResponse() gin.H {
 }
 
 type DataResponseObject struct {
-	ID            string      `json:"id"`
-	Type          string      `json:"type"`
-	Attributes    interface{} `json:"attributes"`
-	Relationships string      `json:"relationships"`
+	ID            string      `json:"id,omitempty"`
+	Type          string      `json:"type,omitempty"`
+	Attributes    interface{} `json:"attributes,omitempty"`
+	Relationships interface{} `json:"relationships,omitempty"`
 }
 
-func (d *DataResponseObject) ConstructDataResponse() gin.H {
-	return gin.H{
-		"data": d,
+type DataResponse struct {
+	Data DataResponseObject `json:"data,omitempty"`
+}
+
+type DataResponseArray struct {
+	Data []DataResponseObject `json:"data,omitempty"`
+}
+
+func (d *DataResponseObject) GetRelationships() map[string]DataResponse {
+	relationships := make(map[string]DataResponse)
+	relationships[d.Type] = DataResponse{
+		Data: *d,
 	}
-}
 
-type DataResponseObjectArray struct {
-	Data []DataResponseObject
-}
-
-func (d *DataResponseObjectArray) ConstructDataArrayResponse() gin.H {
-	return gin.H{
-		"data": d.Data,
-	}
+	return relationships
 }
