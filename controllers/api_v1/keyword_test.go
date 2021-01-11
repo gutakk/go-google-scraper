@@ -127,6 +127,73 @@ func TestKeywordAPIControllerDbTestSuite(t *testing.T) {
 	suite.Run(t, new(KeywordAPIControllerDbTestSuite))
 }
 
+func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParams() {
+	keyword := models.Keyword{UserID: s.user.ID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	headers := http.Header{}
+	headers.Set("Authorization", "Bearer test-access")
+
+	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
+	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	var parsedRespBody map[string][]api_helper.ErrorResponseObject
+	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+
+	assert.Equal(s.T(), http.StatusOK, resp.Code)
+}
+
+func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNoKeywords() {
+	headers := http.Header{}
+	headers.Set("Authorization", "Bearer test-access")
+
+	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
+	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	var parsedRespBody map[string][]api_helper.ErrorResponseObject
+	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+
+	assert.Equal(s.T(), http.StatusNotFound, resp.Code)
+	assert.Equal(s.T(), "keywords not found", parsedRespBody["errors"][0].Detail)
+}
+
+func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNotTheResourceOwner() {
+	tokenItem := &oauth_test.TokenStoreItem{
+		CreatedAt: time.Now(),
+		ExpiresAt: time.Now(),
+		Code:      "test-code",
+		Access:    "test-not-resource-owner",
+		Refresh:   "test-refresh",
+	}
+
+	data, _ := json.Marshal(&oauth_test.TokenData{
+		Access: tokenItem.Access,
+		UserID: "invalidUserID",
+	})
+	tokenItem.Data = data
+
+	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
+		tokenItem.CreatedAt,
+		tokenItem.ExpiresAt,
+		tokenItem.Code,
+		tokenItem.Access,
+		tokenItem.Refresh,
+		tokenItem.Data,
+	)
+
+	keyword := models.Keyword{UserID: s.user.ID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	headers := http.Header{}
+	headers.Set("Authorization", "Bearer test-not-resource-owner")
+
+	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
+	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	var parsedRespBody map[string][]api_helper.ErrorResponseObject
+	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+
+	assert.Equal(s.T(), http.StatusNotFound, resp.Code)
+	assert.Equal(s.T(), "keywords not found", parsedRespBody["errors"][0].Detail)
+}
+
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithoutAuthorizationHeader() {
 	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", nil, nil)
 	respBodyData, _ := ioutil.ReadAll(resp.Body)
