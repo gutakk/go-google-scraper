@@ -40,34 +40,3 @@ func TestNewErrorResponseWithMissingSomeFieldOnErrorResponseObject(t *testing.T)
 
 	assert.Equal(t, expectedResult, errorResponse)
 }
-
-func TestConstructDataResponseWithValidDataResponseObject(t *testing.T) {
-	dataResponseObject := &api_helper.DataResponseObject{
-		ID:   "1",
-		Type: "test",
-		Attributes: map[string]interface{}{
-			"hello": "world",
-		},
-	}
-	dataResponse := dataResponseObject.ConstructDataResponse()
-	expectedResult := gin.H{
-		"data": dataResponseObject,
-	}
-
-	assert.Equal(t, expectedResult, dataResponse)
-}
-
-func TestConstructDataResponseWithMissingSomeFieldOnDataResponseObject(t *testing.T) {
-	dataResponseObject := &api_helper.DataResponseObject{
-		Type: "test",
-		Attributes: map[string]interface{}{
-			"hello": "world",
-		},
-	}
-	dataResponse := dataResponseObject.ConstructDataResponse()
-	expectedResult := gin.H{
-		"data": dataResponseObject,
-	}
-
-	assert.Equal(t, expectedResult, dataResponse)
-}
