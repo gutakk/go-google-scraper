@@ -5,8 +5,8 @@ import (
 )
 
 type ErrorResponseObject struct {
-	Detail string `json:"detail"`
-	Status int    `json:"status"`
+	Detail string `json:"detail,omitempty"`
+	Status int    `json:"status,omitempty"`
 }
 
 func (e *ErrorResponseObject) NewErrorResponse() gin.H {
