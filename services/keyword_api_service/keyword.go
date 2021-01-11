@@ -9,7 +9,6 @@ import (
 
 type KeywordsResponse struct {
 	Keywords []models.Keyword
-	Hello    string
 }
 
 func (k *KeywordsResponse) JSONAPIFormatKeywordsResponse() api_helper.DataResponseArray {
