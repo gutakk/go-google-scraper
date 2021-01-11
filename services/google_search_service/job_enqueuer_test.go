@@ -7,6 +7,7 @@ import (
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	"gorm.io/gorm"
 
 	"github.com/gocraft/work"
 	"github.com/gomodule/redigo/redis"
@@ -32,6 +33,7 @@ func TestJobEnqueuerTestSuite(t *testing.T) {
 
 func (s *JobEnqueuerTestSuite) TestEnqueueSearchJobWithValidSavedKeyword() {
 	savedKeyword := models.Keyword{
+		Model:   &gorm.Model{},
 		Keyword: "Hazard",
 	}
 

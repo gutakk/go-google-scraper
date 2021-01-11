@@ -32,7 +32,7 @@ func (k KeywordStatus) Value() (driver.Value, error) {
 type Keyword struct {
 	*gorm.Model             `json:"model,omitempty"`
 	Keyword                 string         `gorm:"notNull;index" json:"keyword,omitempty"`
-	Status                  KeywordStatus  `gorm:"default:pending;type:keyword_status,omitempty"`
+	Status                  KeywordStatus  `gorm:"default:pending;type:keyword_status" json:"status,omitempty"`
 	LinksCount              int            `json:"links_count"`
 	NonAdwordsCount         int            `json:"non_adwords_count,omitempty"`
 	NonAdwordLinks          datatypes.JSON `json:"non_adword_links,omitempty"`
