@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bxcodec/faker/v3"
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/controllers"
 	"github.com/gutakk/go-google-scraper/controllers/api_v1"
@@ -24,11 +23,12 @@ import (
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 	"github.com/gutakk/go-google-scraper/tests/oauth_test"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
-	"golang.org/x/crypto/bcrypt"
 
+	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/go-oauth2/oauth2/v4/errors"
 	"github.com/stretchr/testify/suite"
+	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
