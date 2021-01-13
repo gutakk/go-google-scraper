@@ -13,6 +13,16 @@
     </button>
   </form>
 
+  <form class="form-keyword-search space-y-6">
+    <div class="form-keyword-search__input-container space-x-6">
+      <div class="space-y-2">
+        <label>Keyword title</label>
+        <input name="name" type="text" placeholder="eg. apple">
+      </div>
+    </div>
+    <button type="submit">Search</button>
+  </form>
+
   {{ if .data.keywordPresenters }}
     <div class="list-keyword sm:rounded-lg">
       <table class="list-keyword__table divide-y divide-gray-200">
