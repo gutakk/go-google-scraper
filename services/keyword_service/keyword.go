@@ -3,10 +3,12 @@ package keyword_service
 import (
 	"encoding/csv"
 	"errors"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/gutakk/go-google-scraper/db"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
@@ -29,11 +31,10 @@ type KeywordService struct {
 	CurrentUserID uint
 }
 
-func (k *KeywordService) GetAll() ([]models.Keyword, error) {
-	condition := make(map[string]interface{})
-	condition["user_id"] = k.CurrentUserID
+func (k *KeywordService) GetAll(conditions []string) ([]models.Keyword, error) {
+	conditions = append(conditions, fmt.Sprintf("user_id = '%s'", fmt.Sprint(k.CurrentUserID)))
 
-	keywords, err := models.GetKeywordsBy(condition)
+	keywords, err := models.GetKeywordsBy(strings.Join(conditions, " AND "))
 	if err != nil {
 		return nil, errorHandler.DatabaseErrorMessage(err)
 	}

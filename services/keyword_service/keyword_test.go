@@ -69,7 +69,7 @@ func (s *KeywordServiceDbTestSuite) TestGetAllWithValidUser() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	result, err := s.keywordService.GetAll()
+	result, err := s.keywordService.GetAll(nil)
 
 	assert.Equal(s.T(), 1, len(result))
 	assert.Equal(s.T(), keyword.Keyword, result[0].Keyword)
@@ -81,7 +81,7 @@ func (s *KeywordServiceDbTestSuite) TestGetAllWithInvalidUser() {
 	db.GetDB().Create(&keyword)
 
 	keywordService := KeywordService{}
-	result, err := keywordService.GetAll()
+	result, err := keywordService.GetAll(nil)
 
 	assert.Equal(s.T(), 0, len(result))
 	assert.Equal(s.T(), nil, err)
