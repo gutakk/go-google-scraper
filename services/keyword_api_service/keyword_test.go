@@ -102,5 +102,5 @@ func TestJSONAPIFormatKeywordsResponseWithBlankKeywords(t *testing.T) {
 	keywords := keyword_api_service.KeywordsResponse{}
 	result := keywords.JSONAPIFormatKeywordsResponse()
 
-	assert.Equal(t, api_helper.DataResponseArray{}, result)
+	assert.Equal(t, api_helper.DataResponseArray{Data: []api_helper.DataResponseObject{}}, result)
 }

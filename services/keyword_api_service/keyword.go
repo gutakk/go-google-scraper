@@ -13,6 +13,7 @@ type KeywordsResponse struct {
 
 func (k *KeywordsResponse) JSONAPIFormatKeywordsResponse() api_helper.DataResponseArray {
 	formattedKeywords := api_helper.DataResponseArray{}
+	formattedKeywords.Data = []api_helper.DataResponseObject{}
 
 	for _, value := range k.Keywords {
 		keyword := models.Keyword{

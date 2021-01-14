@@ -135,9 +135,6 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParams() {
 	headers.Set("Authorization", "Bearer test-access")
 
 	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
-	respBodyData, _ := ioutil.ReadAll(resp.Body)
-	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	_ = json.Unmarshal(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusOK, resp.Code)
 }
@@ -148,11 +145,11 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNoK
 
 	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
 	respBodyData, _ := ioutil.ReadAll(resp.Body)
-	var parsedRespBody map[string][]api_helper.ErrorResponseObject
+	var parsedRespBody map[string][]api_helper.DataResponseObject
 	_ = json.Unmarshal(respBodyData, &parsedRespBody)
 
-	assert.Equal(s.T(), http.StatusNotFound, resp.Code)
-	assert.Equal(s.T(), "keywords not found", parsedRespBody["errors"][0].Detail)
+	assert.Equal(s.T(), http.StatusOK, resp.Code)
+	assert.Equal(s.T(), []api_helper.DataResponseObject{}, parsedRespBody["data"])
 }
 
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNotTheResourceOwner() {
@@ -187,11 +184,11 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNot
 
 	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
 	respBodyData, _ := ioutil.ReadAll(resp.Body)
-	var parsedRespBody map[string][]api_helper.ErrorResponseObject
+	var parsedRespBody map[string][]api_helper.DataResponseObject
 	_ = json.Unmarshal(respBodyData, &parsedRespBody)
 
-	assert.Equal(s.T(), http.StatusNotFound, resp.Code)
-	assert.Equal(s.T(), "keywords not found", parsedRespBody["errors"][0].Detail)
+	assert.Equal(s.T(), http.StatusOK, resp.Code)
+	assert.Equal(s.T(), []api_helper.DataResponseObject{}, parsedRespBody["data"])
 }
 
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithoutAuthorizationHeader() {

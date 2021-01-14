@@ -31,7 +31,7 @@ type DataResponse struct {
 }
 
 type DataResponseArray struct {
-	Data []DataResponseObject `json:"data,omitempty"`
+	Data []DataResponseObject `json:"data"`
 }
 
 func (d *DataResponseObject) GetRelationships() map[string]DataResponse {

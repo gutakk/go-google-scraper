@@ -13,8 +13,7 @@ import (
 )
 
 const (
-	invalidFileErr      = "invalid file"
-	keywordsNotFoundErr = "keywords not found"
+	invalidFileErr = "invalid file"
 )
 
 type KeywordAPIController struct{}
@@ -33,15 +32,6 @@ func (kapi *KeywordAPIController) fetchKeywords(c *gin.Context) {
 		errorResponse := api_helper.ErrorResponseObject{
 			Detail: err.Error(),
 			Status: http.StatusBadRequest,
-		}
-		c.JSON(errorResponse.Status, errorResponse.ConstructErrorResponse())
-		return
-	}
-
-	if len(keywords) == 0 {
-		errorResponse := api_helper.ErrorResponseObject{
-			Detail: errors.New(keywordsNotFoundErr).Error(),
-			Status: http.StatusNotFound,
 		}
 		c.JSON(errorResponse.Status, errorResponse.ConstructErrorResponse())
 		return
