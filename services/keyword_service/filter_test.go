@@ -23,7 +23,7 @@ func TestGetConditionFromQueryWithInvalidQueryStringKey(t *testing.T) {
 		"invalid-key": {"test"},
 	}
 	result := keyword_service.GetConditionFromQuery(queryString)
-	expectedResult := []string{}
+	var expectedResult []string
 
 	assert.Equal(t, expectedResult, result)
 }
@@ -31,14 +31,14 @@ func TestGetConditionFromQueryWithInvalidQueryStringKey(t *testing.T) {
 func TestGetConditionFromQueryWithEmptyQueryString(t *testing.T) {
 	queryString := map[string][]string{}
 	result := keyword_service.GetConditionFromQuery(queryString)
-	expectedResult := []string{}
+	var expectedResult []string
 
 	assert.Equal(t, expectedResult, result)
 }
 
 func TestGetConditionFromQueryWithNilQueryString(t *testing.T) {
 	result := keyword_service.GetConditionFromQuery(nil)
-	expectedResult := []string{}
+	var expectedResult []string
 
 	assert.Equal(t, expectedResult, result)
 }
