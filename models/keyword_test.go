@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/bxcodec/faker/v3"
@@ -189,7 +190,7 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByWithMoreThanOneRows() {
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordDBTestSuite) TestGetKeywordsByValidKeyword() {
+func (s *KeywordDBTestSuite) TestGetKeywordsByValidKeywordMapCondition() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
@@ -203,12 +204,37 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByValidKeyword() {
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidKeyword() {
+func (s *KeywordDBTestSuite) TestGetKeywordsByValidKeywordStringCondition() {
+	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	condition := fmt.Sprintf("keyword = '%s'", keyword.Keyword)
+
+	result, err := GetKeywordsBy(condition)
+
+	assert.Equal(s.T(), 1, len(result))
+	assert.Equal(s.T(), keyword.Keyword, result[0].Keyword)
+	assert.Equal(s.T(), nil, err)
+}
+
+func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidKeywordMapCondition() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
 	condition := make(map[string]interface{})
 	condition["keyword"] = "invalid"
+
+	result, err := GetKeywordsBy(condition)
+
+	assert.Equal(s.T(), 0, len(result))
+	assert.Equal(s.T(), nil, err)
+}
+
+func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidKeywordStringCondition() {
+	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	condition := "keyword = 'invalid'"
 
 	result, err := GetKeywordsBy(condition)
 
@@ -227,12 +253,26 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByWithoutKeyword() {
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidColumn() {
+func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidColumnMapCondition() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
 	condition := make(map[string]interface{})
 	condition["unknown_column"] = keyword.Keyword
+
+	result, err := GetKeywordsBy(condition)
+	_, isPgError := err.(*pgconn.PgError)
+
+	assert.Equal(s.T(), "ERROR: column \"unknown_column\" does not exist (SQLSTATE 42703)", err.Error())
+	assert.Equal(s.T(), true, isPgError)
+	assert.Equal(s.T(), nil, result)
+}
+
+func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidColumnStringCondition() {
+	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	condition := fmt.Sprintf("unknown_column = '%s'", keyword.Keyword)
 
 	result, err := GetKeywordsBy(condition)
 	_, isPgError := err.(*pgconn.PgError)
