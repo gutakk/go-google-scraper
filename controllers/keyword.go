@@ -127,7 +127,7 @@ func getKeywordResultData(keywordService keyword_service.KeywordService, keyword
 }
 
 func getKeywordsData(keywordService keyword_service.KeywordService, queryString map[string][]string) map[string]interface{} {
-	conditions := keyword_service.GetConditionFromQuery(queryString)
+	conditions := keyword_service.GetKeywordConditionsFromQueryStrings(queryString)
 	keywords, _ := keywordService.GetAll(conditions)
 	var keywordPresenters []presenters.KeywordPresenter
 

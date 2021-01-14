@@ -9,10 +9,10 @@ const (
 	keywordTitleDBCol = "keyword"
 )
 
-func GetConditionFromQuery(queryStrings map[string][]string) []string {
+func GetKeywordConditionsFromQueryStrings(queryStrings map[string][]string) []string {
 	var conditions []string
 
-	title := keywordTitle(queryStrings)
+	title := ensureQueryKeyExist(queryStrings, keywordTitleQuery)
 	if title != "" {
 		conditions = append(conditions, fmt.Sprintf("LOWER(%s) LIKE LOWER('%%%s%%')", keywordTitleDBCol, title))
 	}
@@ -20,8 +20,8 @@ func GetConditionFromQuery(queryStrings map[string][]string) []string {
 	return conditions
 }
 
-func keywordTitle(queryStrings map[string][]string) string {
-	v, found := queryStrings[keywordTitleQuery]
+func ensureQueryKeyExist(queryStrings map[string][]string, key string) string {
+	v, found := queryStrings[key]
 	if found {
 		return v[0]
 	}
