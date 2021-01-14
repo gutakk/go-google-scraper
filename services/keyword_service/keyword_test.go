@@ -76,6 +76,29 @@ func (s *KeywordServiceDbTestSuite) TestGetAllWithValidUser() {
 	assert.Equal(s.T(), nil, err)
 }
 
+func (s *KeywordServiceDbTestSuite) TestGetAllWithValidUserAndAdditionalConditions() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: "test"}
+	db.GetDB().Create(&keyword)
+
+	additionalCondition := []string{"keyword = 'test'"}
+	result, err := s.keywordService.GetAll(additionalCondition)
+
+	assert.Equal(s.T(), 1, len(result))
+	assert.Equal(s.T(), keyword.Keyword, result[0].Keyword)
+	assert.Equal(s.T(), nil, err)
+}
+
+func (s *KeywordServiceDbTestSuite) TestGetAllWithValidUserButInvalidAdditionalConditions() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: "test"}
+	db.GetDB().Create(&keyword)
+
+	additionalCondition := []string{"keyword = 'invalid'"}
+	result, err := s.keywordService.GetAll(additionalCondition)
+
+	assert.Equal(s.T(), 0, len(result))
+	assert.Equal(s.T(), nil, err)
+}
+
 func (s *KeywordServiceDbTestSuite) TestGetAllWithInvalidUser() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
