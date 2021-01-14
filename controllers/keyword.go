@@ -137,6 +137,7 @@ func getKeywordsData(keywordService keyword_service.KeywordService, queryString 
 
 	data := getCurrentUser(keywordService)
 	data["keywordPresenters"] = keywordPresenters
+	data["query"] = queryString
 
 	return data
 }
