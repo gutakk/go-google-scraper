@@ -22,7 +22,7 @@ func GenerateClient() (OAuthClient, error) {
 	err := oauth.GetClientStore().Create(&models.Client{
 		ID:     clientID,
 		Secret: clientSecret,
-		Domain: fmt.Sprintf("http://localhost:%s", os.Getenv("PORT")),
+		Domain: fmt.Sprintf("%s:%s", os.Getenv("APP_HOST"), os.Getenv("PORT")),
 	})
 	if err != nil {
 		return OAuthClient{}, err
