@@ -1,14 +1,12 @@
 {{ define "filter_keyword_input" }}
 
-<div class="form-keyword-search__input-container space-x-6">
-  <div class="space-y-2">
-    <label>{{ .filterLabel }}</label>
-    {{ $queryValue := "" }}
-    {{ if .query }}
-      {{ $queryValue = index .query .filterName 0 }}
-    {{ end }}
-    <input name={{ .filterName }} type="text" placeholder={{ .filterPlaceholder }} value={{ $queryValue }}>
-  </div>
+<div class="space-y-2">
+  <label>{{ .filterLabel }}</label>
+  {{ $queryValue := "" }}
+  {{ if .query }}
+    {{ $queryValue = index .query .filterName 0 }}
+  {{ end }}
+  <input name={{ .filterName }} type="text" placeholder={{ .filterPlaceholder }} value={{ $queryValue }}>
 </div>
 
 {{ end }}
