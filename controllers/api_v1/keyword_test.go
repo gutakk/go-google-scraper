@@ -135,8 +135,12 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParams() {
 	headers.Set("Authorization", "Bearer test-access")
 
 	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
+	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	var parsedRespBody map[string][]api_helper.DataResponseObject
+	_ = json.Unmarshal(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusOK, resp.Code)
+	assert.Equal(s.T(), 1, len(parsedRespBody["data"]))
 }
 
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNoKeywords() {
