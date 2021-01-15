@@ -8,7 +8,7 @@ import (
 	"gopkg.in/go-playground/assert.v1"
 )
 
-func TestGetKeywordConditionsFromQueryStringsWithValidQueryStringKeywordTitle(t *testing.T) {
+func TestGetKeywordConditionsFromQueryStringsWithValidKeywordTitle(t *testing.T) {
 	queryString := map[string][]string{
 		"keyword-title": {"test"},
 	}
@@ -18,7 +18,7 @@ func TestGetKeywordConditionsFromQueryStringsWithValidQueryStringKeywordTitle(t 
 	assert.Equal(t, expectedResult, result)
 }
 
-func TestGetKeywordConditionsFromQueryStringsWithInvalidQueryStringKey(t *testing.T) {
+func TestGetKeywordConditionsFromQueryStringsWithInvalidKey(t *testing.T) {
 	queryString := map[string][]string{
 		"invalid-key": {"test"},
 	}
