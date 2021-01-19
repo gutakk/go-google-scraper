@@ -122,7 +122,7 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordResultWithAuthenticatedUserButInv
 
 	response := testHttp.PerformRequest(s.engine, "GET", "/keyword/invalid-keyword", headers, nil)
 	p, err := ioutil.ReadAll(response.Body)
-	isNotFoundPage := err == nil && strings.Index(string(p), "<title>Not found</title>") > 0
+	isNotFoundPage := err == nil && strings.Index(string(p), "<title>Not Found</title>") > 0
 
 	assert.Equal(s.T(), http.StatusNotFound, response.Code)
 	assert.Equal(s.T(), true, isNotFoundPage)
