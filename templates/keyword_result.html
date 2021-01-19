@@ -1,6 +1,6 @@
 {{ define "content" }}
 
-<div class="result-keyword">
+<section class="result-keyword">
   <div class="result-keyword__header">
     <a class="result-keyword__google-link" href="/keyword/{{ .data.keyword.ID }}/html" target="_blank">
       <img src="/dist/svg/google.svg">
@@ -25,6 +25,6 @@
     {{ template "search_result" searchResultPartial "Total Non Adword Links" .data.keyword.NonAdwordsCount }}
     {{ template "list_search_result"  searchResultPartial "Non Adword Links" .data.keywordLinks.NonAdwordLinks }}
   </div>
-</div>
+</section>
 
 {{ end }}
