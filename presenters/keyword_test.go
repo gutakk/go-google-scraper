@@ -41,7 +41,7 @@ func TestKeywordResultWithValidKeywordModels(t *testing.T) {
 	}
 
 	keywordPresenter := KeywordPresenter{Keyword: keyword}
-	result := keywordPresenter.KeywordResult()
+	result := keywordPresenter.KeywordLinks()
 
 	assert.Equal(t, []string{"non-ad-link1", "non-ad-link2"}, result.NonAdwordLinks)
 	assert.Equal(t, []string{"top-ad-link1", "top-ad-link2"}, result.TopPositionAdwordLinks)

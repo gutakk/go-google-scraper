@@ -10,7 +10,7 @@ type KeywordPresenter struct {
 	Keyword models.Keyword
 }
 
-type KeywordResult struct {
+type KeywordLinks struct {
 	NonAdwordLinks         []string
 	TopPositionAdwordLinks []string
 }
@@ -19,14 +19,14 @@ func (kp *KeywordPresenter) FormattedCreatedAt() string {
 	return kp.Keyword.CreatedAt.Format("January 2, 2006")
 }
 
-func (kp *KeywordPresenter) KeywordResult() KeywordResult {
+func (kp *KeywordPresenter) KeywordLinks() KeywordLinks {
 	var nonAdwordLinks []string
 	_ = json.Unmarshal(kp.Keyword.NonAdwordLinks, &nonAdwordLinks)
 
 	var topPositionAdwordLinks []string
 	_ = json.Unmarshal(kp.Keyword.TopPositionAdwordLinks, &topPositionAdwordLinks)
 
-	return KeywordResult{
+	return KeywordLinks{
 		NonAdwordLinks:         nonAdwordLinks,
 		TopPositionAdwordLinks: topPositionAdwordLinks,
 	}
