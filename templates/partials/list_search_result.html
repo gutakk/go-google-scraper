@@ -5,16 +5,18 @@
     {{ .title }}
   </dt>
   {{ if .value }}
-    <ul class="list-search-result__value divide-y divide-gray-200">
-      {{ range $v := .value }}
-        <li class="list-search-result__item">
-          <img class="list-search-result__icon" src="/dist/svg/link.svg">
-          <a class="list-search-result__link" href="{{ $v }}" target="_blank">
-            {{ $v }}
-          </a>
-        </li>
-      {{ end }}
-    </ul>
+    <dd class="list-search-result__value divide-y divide-gray-200">
+      <ul>
+        {{ range $v := .value }}
+          <li class="list-search-result__item">
+            <img class="list-search-result__icon" src="/dist/svg/link.svg">
+            <a class="list-search-result__link" href="{{ $v }}" target="_blank">
+              {{ $v }}
+            </a>
+          </li>
+        {{ end }}
+      </ul>
+    </dd>
   {{ end }} 
 </div>
 
