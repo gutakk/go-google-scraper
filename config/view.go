@@ -31,3 +31,12 @@ func AuthenticationGoviewConfig() goview.Config {
 		DisableCache: false,
 	}
 }
+
+func ErrorGoviewConfig() goview.Config {
+	return goview.Config{
+		Root:         "templates",
+		Extension:    ".html",
+		Master:       "layouts/error",
+		DisableCache: false,
+	}
+}

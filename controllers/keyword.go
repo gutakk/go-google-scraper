@@ -48,7 +48,7 @@ func (k *KeywordController) displayKeywordResult(c *gin.Context) {
 	data, err := getKeywordResultData(keywordService, keywordID)
 
 	if err != nil {
-		html.RenderNotFound(c)
+		html.RenderErrorPage(c, http.StatusNotFound, NotFoundView, NotFoundTitle)
 		return
 	}
 
@@ -61,8 +61,7 @@ func (k *KeywordController) displayKeywordHTML(c *gin.Context) {
 	keyword, err := keywordService.GetKeywordResult(keywordID)
 
 	if err != nil || len(keyword.HtmlCode) == 0 {
-		html.RenderNotFound(c)
-
+		html.RenderErrorPage(c, http.StatusNotFound, NotFoundView, NotFoundTitle)
 	} else {
 		c.Writer.WriteHeader(http.StatusOK)
 		_, _ = c.Writer.Write([]byte(keyword.HtmlCode))

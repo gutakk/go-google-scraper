@@ -1,19 +1,8 @@
-<!DOCTYPE html>
-
-<html>
-  <head>
-    <meta charset='utf-8'>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link type="text/css" rel="stylesheet" href="/dist/stylesheets/index.css" />
-    <title>Not found</title>
-  </head>
-
-  <body class="not-found">
-    <main class="main-not-found">
-      <h2 class="main-not-found__title">404</h2>
-      <p class="main-not-found__sub-title">Page not found</p>
-      <p class="main-not-found__detail">The page you are looking for doesn't exist or other error occured</p>
-      <a class="main-not-found__link" href="/">Back to home</a>
-    </main>
-  </body>
-</html>
+{{ define "content" }}
+  <div class="error-details">
+    <h2 class="error-details__title">404</h2>
+    <p class="error-details__subtitle">Page not found</p>
+    <p class="error-details__detail">The page you are looking for doesn't exist or other error occured</p>
+    <a class="error-details__link" href="/">Back to home</a>
+  </div>
+{{ end }}

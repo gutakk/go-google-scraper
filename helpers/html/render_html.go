@@ -1,8 +1,7 @@
 package helpers
 
 import (
-	"io/ioutil"
-	"net/http"
+	"strings"
 
 	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-gonic/gin"
@@ -12,7 +11,7 @@ import (
 func RenderWithError(c *gin.Context, status int, view string, title string, err error, data map[string]interface{}) {
 	ginview.HTML(c, status, view, gin.H{
 		"title": title,
-		"view":  view,
+		"view":  strings.ReplaceAll(view, "_", "-"),
 		"error": err.Error(),
 		"data":  data,
 	})
@@ -21,19 +20,16 @@ func RenderWithError(c *gin.Context, status int, view string, title string, err 
 func RenderWithFlash(c *gin.Context, status int, view string, title string, data map[string]interface{}) {
 	ginview.HTML(c, status, view, gin.H{
 		"title":         title,
-		"view":          view,
+		"view":          strings.ReplaceAll(view, "_", "-"),
 		"noticeFlashes": session.Flashes(c, "notice"),
 		"errorFlashes":  session.Flashes(c, "error"),
 		"data":          data,
 	})
 }
 
-func RenderNotFound(c *gin.Context) {
-	html, err := ioutil.ReadFile("templates/not_found.html")
-	if err != nil {
-		panic(err)
-	}
-
-	c.Writer.WriteHeader(http.StatusNotFound)
-	_, _ = c.Writer.Write(html)
+func RenderErrorPage(c *gin.Context, status int, view string, title string) {
+	ginview.HTML(c, status, view, gin.H{
+		"title": title,
+		"view":  strings.ReplaceAll(view, "_", "-"),
+	})
 }

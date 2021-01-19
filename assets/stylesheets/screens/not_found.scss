@@ -1,12 +1,12 @@
 body.not-found {
-  .main-not-found {
+  .error-details {
     @apply text-center mt-16;
   
     &__title {
       @apply text-6xl;
     }
   
-    &__sub-title {
+    &__subtitle {
       @apply text-gray-600 text-2xl font-medium mb-8;
     }
   
