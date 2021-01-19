@@ -15,7 +15,7 @@ func AppGoviewConfig() goview.Config {
 		DisableCache: false,
 		Partials: []string{
 			"partials/search_result",
-			"partials/search_result_list",
+			"partials/list_search_result",
 		},
 		Funcs: template.FuncMap{
 			"searchResultPartial": view.SearchResultPartial,
