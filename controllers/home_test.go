@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 	"testing"
@@ -12,6 +13,7 @@ import (
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/fixture"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
+
 	"gopkg.in/go-playground/assert.v1"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -30,12 +32,18 @@ func TestDisplayHomeWithGuestUser(t *testing.T) {
 }
 
 func TestDisplayHomeWithAuthenticatedUser(t *testing.T) {
-	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	database, connectDBErr := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	if connectDBErr != nil {
+		log.Fatalf("Cannot connect to db: %s", connectDBErr)
+	}
 	db.GetDB = func() *gorm.DB {
 		return database
 	}
 
-	_ = db.GetDB().AutoMigrate(&models.User{})
+	migrateErr := db.GetDB().AutoMigrate(&models.User{})
+	if migrateErr != nil {
+		log.Fatalf("Cannot migrate db: %s", migrateErr)
+	}
 
 	engine := testConfig.GetRouter(true)
 	new(HomeController).applyRoutes(engine)
