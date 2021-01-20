@@ -4,14 +4,16 @@ import (
 	"mime/multipart"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	html "github.com/gutakk/go-google-scraper/helpers/html"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	helpers "github.com/gutakk/go-google-scraper/helpers/user"
 	"github.com/gutakk/go-google-scraper/presenters"
 	"github.com/gutakk/go-google-scraper/services/keyword_service"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	"github.com/golang/glog"
 )
 
 const (
@@ -84,7 +86,10 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 }
 
 func getKeywordsData(keywordService keyword_service.KeywordService) map[string]interface{} {
-	keywords, _ := keywordService.GetAll()
+	keywords, err := keywordService.GetAll()
+	if err != nil {
+		glog.Errorf("Cannot get keywords: %s", err)
+	}
 	var keywordPresenters []presenters.KeywordPresenter
 
 	for _, k := range keywords {
