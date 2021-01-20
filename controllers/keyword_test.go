@@ -3,7 +3,6 @@ package controllers
 import (
 	"bytes"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 	"testing"
@@ -19,6 +18,7 @@ import (
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
+	"github.com/golang/glog"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -37,7 +37,7 @@ func (s *KeywordDbTestSuite) SetupTest() {
 
 	database, connectDBErr := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	if connectDBErr != nil {
-		log.Fatalf("Cannot connect to db: %s", connectDBErr)
+		glog.Fatalf("Cannot connect to db: %s", connectDBErr)
 	}
 	db.GetDB = func() *gorm.DB {
 		return database
@@ -48,7 +48,7 @@ func (s *KeywordDbTestSuite) SetupTest() {
 	testDB.InitKeywordStatusEnum(db.GetDB())
 	migrateErr := db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
 	if migrateErr != nil {
-		log.Fatalf("Cannot migrate db: %s", migrateErr)
+		glog.Fatalf("Cannot migrate db: %s", migrateErr)
 	}
 
 	s.engine = testConfig.GetRouter(true)
@@ -69,7 +69,7 @@ func (s *KeywordDbTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM users")
 	_, delRedisErr := db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
 	if delRedisErr != nil {
-		log.Fatalf("Cannot delete redis job: %s", delRedisErr)
+		glog.Fatalf("Cannot delete redis job: %s", delRedisErr)
 	}
 }
 
