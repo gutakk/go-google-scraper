@@ -55,7 +55,11 @@ func (s *KeywordServiceDbTestSuite) SetupTest() {
 		glog.Fatalf("Cannot migrate db: %s", migrateErr)
 	}
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
+	hashedPassword, hashPasswordErr := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
+	if hashPasswordErr != nil {
+		glog.Errorf("Cannot hash password: %s", hashPasswordErr)
+	}
+
 	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
 	db.GetDB().Create(&user)
 

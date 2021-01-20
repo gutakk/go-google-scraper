@@ -69,7 +69,11 @@ func (s *KeywordScraperDBTestSuite) SetupTest() {
 
 	setupMocks()
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
+	hashedPassword, hashPasswordErr := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
+	if hashPasswordErr != nil {
+		glog.Errorf("Cannot hash password: %s", hashPasswordErr)
+	}
+
 	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
 	db.GetDB().Create(&user)
 	s.userID = user.ID
