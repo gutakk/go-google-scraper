@@ -7,7 +7,12 @@ body.keyword-result {
     }
 
     &__google-link {
-      @apply w-16 h-16 p-2 mr-4 bg-white shadow overflow-hidden rounded-lg;
+      @apply w-20 h-24 p-2 mr-4 bg-white shadow overflow-hidden rounded-lg;
+    }
+
+    &__google-link-text {
+      @apply mt-2;
+      font-size: 8px;
     }
 
     &__content-group {
