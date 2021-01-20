@@ -1,11 +1,12 @@
 package config
 
 import (
+	"github.com/gutakk/go-google-scraper/middlewares"
+
 	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"github.com/gutakk/go-google-scraper/middlewares"
 )
 
 func SetupRouter() *gin.Engine {
