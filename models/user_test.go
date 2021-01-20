@@ -3,9 +3,11 @@ package models
 import (
 	"testing"
 
-	"github.com/bxcodec/faker/v3"
 	"github.com/gutakk/go-google-scraper/db"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+
+	"github.com/bxcodec/faker/v3"
+	"github.com/golang/glog"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -21,12 +23,18 @@ type UserDBTestSuite struct {
 }
 
 func (s *UserDBTestSuite) SetupTest() {
-	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	database, connectDBErr := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	if connectDBErr != nil {
+		glog.Fatalf("Cannot connect to db: %s", connectDBErr)
+	}
 	db.GetDB = func() *gorm.DB {
 		return database
 	}
 
-	_ = db.GetDB().AutoMigrate(&User{})
+	migrateErr := db.GetDB().AutoMigrate(&User{})
+	if migrateErr != nil {
+		glog.Fatalf("Cannot migrate db: %s", migrateErr)
+	}
 
 	s.email = faker.Email()
 	s.password = faker.Password()
@@ -110,21 +118,31 @@ func (s *UserDBTestSuite) TestFindUserByIDWithInvalidID() {
 }
 
 func TestHashPassword(t *testing.T) {
-	hashedPassword, _ := hashPassword("password")
+	hashedPassword, hashPasswordErr := hashPassword("password")
+	if hashPasswordErr != nil {
+		glog.Errorf("Cannot hash password: %s", hashPasswordErr)
+	}
+
 	result := bcrypt.CompareHashAndPassword(hashedPassword, []byte("password"))
 
 	assert.Equal(t, nil, result)
 }
 
 func TestValidatePasswordWithValidPassword(t *testing.T) {
-	hashedPassword, _ := hashPassword("password")
+	hashedPassword, hashPasswordErr := hashPassword("password")
+	if hashPasswordErr != nil {
+		glog.Errorf("Cannot hash password: %s", hashPasswordErr)
+	}
 	result := ValidatePassword(string(hashedPassword), "password")
 
 	assert.Equal(t, nil, result)
 }
 
 func TestValidatePasswordWithInvalidPassword(t *testing.T) {
-	hashedPassword, _ := hashPassword("password")
+	hashedPassword, hashPasswordErr := hashPassword("password")
+	if hashPasswordErr != nil {
+		glog.Errorf("Cannot hash password: %s", hashPasswordErr)
+	}
 	result := ValidatePassword(string(hashedPassword), "drowssap")
 
 	assert.NotEqual(t, nil, result)
