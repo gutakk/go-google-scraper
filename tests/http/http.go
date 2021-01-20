@@ -1,4 +1,4 @@
-package tests
+package http
 
 import (
 	"bytes"
@@ -6,15 +6,23 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"strings"
+
+	"github.com/golang/glog"
 )
 
 func PerformRequest(r http.Handler, method, path string, headers http.Header, payload url.Values) *httptest.ResponseRecorder {
-	req, _ := http.NewRequest(method, path, strings.NewReader(payload.Encode()))
+	req, requesterErr := http.NewRequest(method, path, strings.NewReader(payload.Encode()))
+	if requesterErr != nil {
+		glog.Errorf("Cannot init requester: %s", requesterErr)
+	}
 	return perform(req, r, headers)
 }
 
 func PerformFileUploadRequest(r http.Handler, method, path string, headers http.Header, payload *bytes.Buffer) *httptest.ResponseRecorder {
-	req, _ := http.NewRequest(method, path, payload)
+	req, requesterErr := http.NewRequest(method, path, payload)
+	if requesterErr != nil {
+		glog.Errorf("Cannot init requester: %s", requesterErr)
+	}
 	return perform(req, r, headers)
 }
 
