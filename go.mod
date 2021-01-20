@@ -14,6 +14,7 @@ require (
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.2.0
 	github.com/gocraft/work v0.5.1
+	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/gorilla/securecookie v1.1.1
 	github.com/imdario/mergo v0.3.11 // indirect
