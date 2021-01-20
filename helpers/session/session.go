@@ -3,22 +3,30 @@ package session
 import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/golang/glog"
 )
 
 const (
+	cannotSaveSession   = "Cannot save the session: %s"
 	sessionTimeoutInSec = 60 * 60 * 24 // 24 hours
 )
 
 func AddFlash(c *gin.Context, value interface{}, key string) {
 	session := sessions.Default(c)
 	session.AddFlash(value, key)
-	_ = session.Save()
+	err := session.Save()
+	if err != nil {
+		glog.Errorf(cannotSaveSession, err)
+	}
 }
 
 func Flashes(c *gin.Context, key string) []interface{} {
 	session := sessions.Default(c)
 	flashes := session.Flashes(key)
-	_ = session.Save()
+	err := session.Save()
+	if err != nil {
+		glog.Errorf(cannotSaveSession, err)
+	}
 
 	return flashes
 }
@@ -35,11 +43,17 @@ func Set(c *gin.Context, key string, value interface{}) {
 	})
 
 	session.Set(key, value)
-	_ = session.Save()
+	err := session.Save()
+	if err != nil {
+		glog.Errorf(cannotSaveSession, err)
+	}
 }
 
 func Delete(c *gin.Context, key string) {
 	session := sessions.Default(c)
 	session.Delete(key)
-	_ = session.Save()
+	err := session.Save()
+	if err != nil {
+		glog.Errorf(cannotSaveSession, err)
+	}
 }
