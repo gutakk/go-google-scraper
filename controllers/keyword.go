@@ -46,8 +46,9 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 	data := getKeywordsData(keywordService)
 
 	form := &UploadFileForm{}
-	if err := c.ShouldBind(form); err != nil {
-		for _, fieldErr := range err.(validator.ValidationErrors) {
+	bindFormErr := c.ShouldBind(form)
+	if bindFormErr != nil {
+		for _, fieldErr := range bindFormErr.(validator.ValidationErrors) {
 			html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, errorHandler.ValidationErrorMessage(fieldErr), data)
 			return
 		}
