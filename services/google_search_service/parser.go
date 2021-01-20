@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/golang/glog"
 )
 
 type GoogleResponseParser struct {
@@ -53,7 +54,10 @@ var ParseGoogleResponse = func(googleResp *http.Response) (ParsingResult, error)
 	go fetchNonAdwordLinks(doc, parsingCh.fetchNonAdwordLinksCh)
 	go fetchTopPositionAdwordLinks(doc, parsingCh.fetchTopPositionAdwordLinksCh)
 
-	htmlCode, _ := doc.Html()
+	htmlCode, getHTMLErr := doc.Html()
+	if getHTMLErr != nil {
+		glog.Errorf("Cannot get html from doc: %s", getHTMLErr)
+	}
 
 	parsingResult := parsingCh.getParsingResultFromChannel()
 	parsingResult.HtmlCode = htmlCode
