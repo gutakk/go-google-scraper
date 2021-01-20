@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/golang/glog"
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/controllers"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/migration"
+
+	"github.com/golang/glog"
 )
 
 func main() {
@@ -21,7 +22,8 @@ func main() {
 	r := config.SetupRouter()
 	controllers.CombineRoutes(r)
 
-	if error := r.Run(fmt.Sprint(":", os.Getenv("PORT"))); error != nil {
-		glog.Fatalf("Failed to start the server %s", error)
+	err := r.Run(fmt.Sprint(":", os.Getenv("PORT")))
+	if err != nil {
+		glog.Fatalf("Failed to start the server %s", err)
 	}
 }
