@@ -7,14 +7,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/bxcodec/faker/v3"
-	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/fixture"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
+
+	"github.com/bxcodec/faker/v3"
+	"github.com/gin-gonic/gin"
+	"github.com/golang/glog"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -32,12 +34,18 @@ type LoginDbTestSuite struct {
 }
 
 func (s *LoginDbTestSuite) SetupTest() {
-	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	database, connectDBErr := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	if connectDBErr != nil {
+		glog.Fatalf("Cannot connect to db: %s", connectDBErr)
+	}
 	db.GetDB = func() *gorm.DB {
 		return database
 	}
 
-	_ = db.GetDB().AutoMigrate(&models.User{})
+	migrateErr := db.GetDB().AutoMigrate(&models.User{})
+	if migrateErr != nil {
+		glog.Fatalf("Cannot migrate db: %s", migrateErr)
+	}
 
 	s.engine = testConfig.GetRouter(true)
 	new(LoginController).applyRoutes(EnsureGuestUserGroup(s.engine))
