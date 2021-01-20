@@ -4,11 +4,11 @@ import (
 	"errors"
 	"time"
 
-	"github.com/golang/glog"
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/services/google_search_service"
 
 	"github.com/gocraft/work"
+	"github.com/golang/glog"
 )
 
 const (
