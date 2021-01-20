@@ -1,8 +1,13 @@
 .list-search-result {
   @apply px-6 py-5 grid grid-cols-3 gap-4;
 
+  &__title,
+  &__item {
+    @apply text-sm;
+  }
+
   &__title {
-    @apply text-sm font-medium text-gray-500;
+    @apply font-medium text-gray-500;
   }
 
   &__value {
@@ -10,7 +15,7 @@
   }
 
   &__item {
-    @apply pl-3 pr-4 py-3 flex items-center text-sm;
+    @apply pl-3 pr-4 py-3 flex items-center;
   }
 
   &__icon {
