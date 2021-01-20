@@ -5,18 +5,32 @@ import (
 	"testing"
 
 	"github.com/dnaeon/go-vcr/recorder"
+	"github.com/golang/glog"
 	"gopkg.in/go-playground/assert.v1"
 )
 
 func TestParserWithValidGoogleResponse(t *testing.T) {
-	r, _ := recorder.New("tests/fixture/vcr/valid_keyword")
+	r, recorderErr := recorder.New("tests/fixture/vcr/valid_keyword")
+	if recorderErr != nil {
+		glog.Errorf("Cannot init recorder: %s", recorderErr)
+	}
 
 	url := "https://www.google.com/search?q=AWS"
 	client := &http.Client{Transport: r}
-	req, _ := http.NewRequest("GET", url, nil)
-	resp, _ := client.Do(req)
+	req, requesterErr := http.NewRequest("GET", url, nil)
+	if requesterErr != nil {
+		glog.Errorf("Cannot init requester: %s", requesterErr)
+	}
 
-	_ = r.Stop()
+	resp, requestErr := client.Do(req)
+	if requestErr != nil {
+		glog.Errorf("Cannot make a request: %s", requestErr)
+	}
+
+	stopRecorderErr := r.Stop()
+	if stopRecorderErr != nil {
+		glog.Errorf("Cannot stop the recorder: %s", stopRecorderErr)
+	}
 
 	parsingResult, err := ParseGoogleResponse(resp)
 
@@ -31,14 +45,27 @@ func TestParserWithValidGoogleResponse(t *testing.T) {
 }
 
 func TestParserWithNotGoogleSearchPage(t *testing.T) {
-	r, _ := recorder.New("tests/fixture/vcr/invalid_site")
+	r, recorderErr := recorder.New("tests/fixture/vcr/invalid_site")
+	if recorderErr != nil {
+		glog.Errorf("Cannot init recorder: %s", recorderErr)
+	}
 
 	url := "https://www.golang.org"
 	client := &http.Client{Transport: r}
-	req, _ := http.NewRequest("GET", url, nil)
-	resp, _ := client.Do(req)
+	req, requesterErr := http.NewRequest("GET", url, nil)
+	if requesterErr != nil {
+		glog.Errorf("Cannot init requester: %s", requesterErr)
+	}
 
-	_ = r.Stop()
+	resp, requestErr := client.Do(req)
+	if requestErr != nil {
+		glog.Errorf("Cannot make a request: %s", requestErr)
+	}
+
+	stopRecorderErr := r.Stop()
+	if stopRecorderErr != nil {
+		glog.Errorf("Cannot stop the recorder: %s", stopRecorderErr)
+	}
 
 	parsingResult, err := ParseGoogleResponse(resp)
 
