@@ -3,12 +3,11 @@ package controllers
 import (
 	"bytes"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 	"testing"
 
-	"github.com/bxcodec/faker/v3"
-	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
@@ -17,6 +16,9 @@ import (
 	testFile "github.com/gutakk/go-google-scraper/tests/file"
 	"github.com/gutakk/go-google-scraper/tests/fixture"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
+
+	"github.com/bxcodec/faker/v3"
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -33,7 +35,10 @@ type KeywordDbTestSuite struct {
 func (s *KeywordDbTestSuite) SetupTest() {
 	config.LoadEnv()
 
-	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	database, connectDBErr := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	if connectDBErr != nil {
+		log.Fatalf("Cannot connect to db: %s", connectDBErr)
+	}
 	db.GetDB = func() *gorm.DB {
 		return database
 	}
@@ -41,7 +46,10 @@ func (s *KeywordDbTestSuite) SetupTest() {
 	db.SetupRedisPool()
 
 	testDB.InitKeywordStatusEnum(db.GetDB())
-	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
+	migrateErr := db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
+	if migrateErr != nil {
+		log.Fatalf("Cannot migrate db: %s", migrateErr)
+	}
 
 	s.engine = testConfig.GetRouter(true)
 	new(LoginController).applyRoutes(EnsureGuestUserGroup(s.engine))
@@ -59,7 +67,10 @@ func (s *KeywordDbTestSuite) SetupTest() {
 func (s *KeywordDbTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM keywords")
 	db.GetDB().Exec("DELETE FROM users")
-	_, _ = db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
+	_, delRedisErr := db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
+	if delRedisErr != nil {
+		log.Fatalf("Cannot delete redis job: %s", delRedisErr)
+	}
 }
 
 func TestKeywordDbTestSuite(t *testing.T) {
