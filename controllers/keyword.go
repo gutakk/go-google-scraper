@@ -4,7 +4,7 @@ import (
 	"mime/multipart"
 	"net/http"
 
-	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	"github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/helpers/html"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	helpers "github.com/gutakk/go-google-scraper/helpers/user"
@@ -49,7 +49,7 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 	bindFormErr := c.ShouldBind(form)
 	if bindFormErr != nil {
 		for _, fieldErr := range bindFormErr.(validator.ValidationErrors) {
-			html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, errorHandler.ValidationErrorMessage(fieldErr), data)
+			html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, error_handler.ValidationErrorMessage(fieldErr), data)
 			return
 		}
 	}

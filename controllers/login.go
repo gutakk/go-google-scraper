@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	"github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/helpers/html"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
@@ -42,7 +42,7 @@ func (l *LoginController) login(c *gin.Context) {
 	bindFormErr := c.ShouldBind(form)
 	if bindFormErr != nil {
 		for _, fieldErr := range bindFormErr.(validator.ValidationErrors) {
-			renderLoginWithError(c, http.StatusBadRequest, errorHandler.ValidationErrorMessage(fieldErr), form)
+			renderLoginWithError(c, http.StatusBadRequest, error_handler.ValidationErrorMessage(fieldErr), form)
 			return
 		}
 	}

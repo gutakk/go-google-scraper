@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/gutakk/go-google-scraper/db"
-	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	"github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/services/google_search_service"
 
@@ -34,7 +34,7 @@ func (k *KeywordService) GetAll() ([]models.Keyword, error) {
 
 	keywords, err := models.GetKeywordsBy(condition)
 	if err != nil {
-		return nil, errorHandler.DatabaseErrorMessage(err)
+		return nil, error_handler.DatabaseErrorMessage(err)
 	}
 
 	return keywords, nil
@@ -52,7 +52,7 @@ func (k *KeywordService) Save(parsedKeywordList []string) error {
 		txErr := db.GetDB().Transaction(func(tx *gorm.DB) error {
 			savedKeyword, err := models.SaveKeyword(keyword, tx)
 			if err != nil {
-				return errorHandler.DatabaseErrorMessage(err)
+				return error_handler.DatabaseErrorMessage(err)
 			}
 
 			enqueueErr := google_search_service.EnqueueSearchJob(savedKeyword)

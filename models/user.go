@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/gutakk/go-google-scraper/db"
-	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	"github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -28,7 +28,7 @@ func SaveUser(email string, password string) error {
 	hashedPassword, _ := hashPassword(password)
 
 	if result := db.GetDB().Create(&User{Email: email, Password: string(hashedPassword)}); result.Error != nil {
-		return errorHandler.DatabaseErrorMessage(result.Error)
+		return error_handler.DatabaseErrorMessage(result.Error)
 	}
 	return nil
 }
