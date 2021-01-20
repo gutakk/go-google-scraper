@@ -3,9 +3,9 @@ package jobs
 import (
 	"errors"
 	"fmt"
-	"log"
 	"time"
 
+	"github.com/golang/glog"
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/services/google_search_service"
 
@@ -22,7 +22,7 @@ const (
 type Context struct{}
 
 func (c *Context) Log(job *work.Job, next work.NextMiddlewareFunc) error {
-	log.Printf("Starting %v job for keyword %v", job.Name, job.ArgString("keyword"))
+	glog.Infof("Starting %v job for keyword %v", job.Name, job.ArgString("keyword"))
 	return next()
 }
 
@@ -33,7 +33,7 @@ func (c *Context) PerformSearchJob(job *work.Job) error {
 	keywordID := uint(job.ArgInt64("keywordID"))
 	keyword := job.ArgString("keyword")
 	if keywordID == 0 {
-		log.Printf("Cannot perform job (reason: %v)", invalidKeywordIDError)
+		glog.Infof("Cannot perform job (reason: %v)", invalidKeywordIDError)
 		return errors.New(invalidKeywordIDError)
 	}
 
@@ -72,7 +72,7 @@ func (c *Context) PerformSearchJob(job *work.Job) error {
 	}
 
 	end := time.Since(start)
-	log.Printf("Job %v for keyword %v done in %v", jobName, keyword, end.String())
+	glog.Infof("Job %v for keyword %v done in %v", jobName, keyword, end.String())
 
 	time.Sleep(1 * time.Second)
 	return nil
@@ -88,6 +88,6 @@ func updateStatusToFailed(jobFails int64, jobName string, keywordID uint, keywor
 			panic(fmt.Sprintf("Cannot update keyword status (reason: %v)", updateStatusErr))
 		}
 
-		log.Printf("Job %v for keyword %v reached maximum fails (reason: %v)", jobName, keyword, err.Error())
+		glog.Infof("Job %v for keyword %v reached maximum fails (reason: %v)", jobName, keyword, err.Error())
 	}
 }

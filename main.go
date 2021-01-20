@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
+	"github.com/golang/glog"
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/controllers"
 	"github.com/gutakk/go-google-scraper/db"
@@ -22,6 +22,6 @@ func main() {
 	controllers.CombineRoutes(r)
 
 	if error := r.Run(fmt.Sprint(":", os.Getenv("PORT"))); error != nil {
-		log.Fatal(fmt.Sprintf("Failed to start the server %v", error))
+		glog.Fatalf("Failed to start the server %s", error)
 	}
 }
