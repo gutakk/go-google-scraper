@@ -3,12 +3,13 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	html "github.com/gutakk/go-google-scraper/helpers/html"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 const (
@@ -38,15 +39,17 @@ func (r *RegisterController) displayRegister(c *gin.Context) {
 func (r *RegisterController) register(c *gin.Context) {
 	form := &RegisterForm{}
 
-	if err := c.ShouldBind(form); err != nil {
-		for _, fieldErr := range err.(validator.ValidationErrors) {
+	bindFormErr := c.ShouldBind(form)
+	if bindFormErr != nil {
+		for _, fieldErr := range bindFormErr.(validator.ValidationErrors) {
 			renderRegisterWithError(c, http.StatusBadRequest, errorHandler.ValidationErrorMessage(fieldErr), form)
 			return
 		}
 	}
 
-	if err := models.SaveUser(form.Email, form.Password); err != nil {
-		renderRegisterWithError(c, http.StatusBadRequest, err, form)
+	saveUserErr := models.SaveUser(form.Email, form.Password)
+	if saveUserErr != nil {
+		renderRegisterWithError(c, http.StatusBadRequest, saveUserErr, form)
 		return
 	}
 
