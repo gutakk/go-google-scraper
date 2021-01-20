@@ -14,7 +14,8 @@ import (
 func TestMain(m *testing.M) {
 	gin.SetMode(gin.TestMode)
 
-	if err := os.Chdir(path_test.GetRoot()); err != nil {
+	err := os.Chdir(path_test.GetRoot())
+	if err != nil {
 		glog.Fatal(err)
 	}
 
