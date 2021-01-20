@@ -7,7 +7,6 @@ import (
 
 	"github.com/gutakk/go-google-scraper/models"
 
-	"github.com/bxcodec/faker/v3"
 	"gopkg.in/go-playground/assert.v1"
 	"gorm.io/gorm"
 )
@@ -30,7 +29,7 @@ func TestKeywordResultWithValidKeywordModels(t *testing.T) {
 	topPositionAdwordLinks, _ := json.Marshal([]string{"top-ad-link1", "top-ad-link2"})
 
 	keyword := models.Keyword{
-		Keyword:                 faker.Name(),
+		Keyword:                 "test-keyword",
 		Status:                  models.Pending,
 		LinksCount:              10,
 		NonAdwordLinks:          nonAdwordLinks,
@@ -43,6 +42,12 @@ func TestKeywordResultWithValidKeywordModels(t *testing.T) {
 	keywordPresenter := KeywordPresenter{Keyword: keyword}
 	result := keywordPresenter.KeywordLinks()
 
+	assert.Equal(t, "test-keyword", keywordPresenter.Keyword.Keyword)
+	assert.Equal(t, "pending", string(keywordPresenter.Keyword.Status))
+	assert.Equal(t, 10, keywordPresenter.Keyword.LinksCount)
 	assert.Equal(t, []string{"non-ad-link1", "non-ad-link2"}, result.NonAdwordLinks)
+	assert.Equal(t, 10, keywordPresenter.Keyword.TopPositionAdwordsCount)
 	assert.Equal(t, []string{"top-ad-link1", "top-ad-link2"}, result.TopPositionAdwordLinks)
+	assert.Equal(t, 10, keywordPresenter.Keyword.TotalAdwordsCount)
+	assert.Equal(t, "test-html", keywordPresenter.Keyword.HtmlCode)
 }
