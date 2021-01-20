@@ -1,9 +1,10 @@
 package html
 
 import (
+	"github.com/gutakk/go-google-scraper/helpers/session"
+
 	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-gonic/gin"
-	"github.com/gutakk/go-google-scraper/helpers/session"
 )
 
 func RenderWithError(c *gin.Context, status int, view string, title string, err error, data map[string]interface{}) {
