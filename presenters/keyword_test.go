@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gutakk/go-google-scraper/models"
+
 	"gopkg.in/go-playground/assert.v1"
 	"gorm.io/gorm"
 )
