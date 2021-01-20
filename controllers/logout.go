@@ -3,7 +3,7 @@ package controllers
 import (
 	"net/http"
 
-	session "github.com/gutakk/go-google-scraper/helpers/session"
+	"github.com/gutakk/go-google-scraper/helpers/session"
 
 	"github.com/gin-gonic/gin"
 )

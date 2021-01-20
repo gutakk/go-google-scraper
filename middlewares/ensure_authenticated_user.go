@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	session "github.com/gutakk/go-google-scraper/helpers/session"
+	"github.com/gutakk/go-google-scraper/helpers/session"
 )
 
 func EnsureAuthenticatedUser(c *gin.Context) {

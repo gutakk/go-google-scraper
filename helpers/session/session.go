@@ -1,4 +1,4 @@
-package helpers
+package session
 
 import (
 	"github.com/gin-contrib/sessions"

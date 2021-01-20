@@ -5,7 +5,7 @@ import (
 
 	"github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/helpers/html"
-	session "github.com/gutakk/go-google-scraper/helpers/session"
+	"github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
 
 	"github.com/gin-gonic/gin"
