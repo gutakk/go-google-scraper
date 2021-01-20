@@ -62,7 +62,10 @@ func (s *KeywordScraperDBTestSuite) SetupTest() {
 	db.SetupRedisPool()
 
 	testDB.InitKeywordStatusEnum(db.GetDB())
-	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
+	migrateErr := db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
+	if migrateErr != nil {
+		glog.Fatalf("Cannot migrate db: %s", migrateErr)
+	}
 
 	setupMocks()
 

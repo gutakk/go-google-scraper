@@ -32,7 +32,10 @@ func (s *DBUpdaterDBTestSuite) SetupTest() {
 	}
 
 	testDB.InitKeywordStatusEnum(db.GetDB())
-	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
+	migrateErr := db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
+	if migrateErr != nil {
+		glog.Fatalf("Cannot migrate db: %s", migrateErr)
+	}
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
 	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
