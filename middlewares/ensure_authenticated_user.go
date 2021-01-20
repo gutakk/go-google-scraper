@@ -3,8 +3,9 @@ package middlewares
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/helpers/session"
+
+	"github.com/gin-gonic/gin"
 )
 
 func EnsureAuthenticatedUser(c *gin.Context) {
