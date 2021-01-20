@@ -3,11 +3,11 @@ package google_search_service
 import (
 	"errors"
 
-	"github.com/golang/glog"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
 
 	"github.com/gocraft/work"
+	"github.com/golang/glog"
 )
 
 const (
