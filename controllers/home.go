@@ -3,9 +3,10 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	html "github.com/gutakk/go-google-scraper/helpers/html"
 	helpers "github.com/gutakk/go-google-scraper/helpers/user"
+
+	"github.com/gin-gonic/gin"
 )
 
 const (
