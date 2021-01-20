@@ -60,7 +60,11 @@ func (s *LoginDbTestSuite) SetupTest() {
 	s.formData.Set("email", s.email)
 	s.formData.Set("password", s.password)
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(s.password), bcrypt.DefaultCost)
+	hashedPassword, hashPasswordErr := bcrypt.GenerateFromPassword([]byte(s.password), bcrypt.DefaultCost)
+	if hashPasswordErr != nil {
+		glog.Errorf("Cannot hash password: %s", hashPasswordErr)
+	}
+
 	db.GetDB().Create(&models.User{Email: s.email, Password: string(hashedPassword)})
 }
 

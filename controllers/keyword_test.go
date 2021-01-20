@@ -58,7 +58,11 @@ func (s *KeywordDbTestSuite) SetupTest() {
 	email := faker.Email()
 	password := faker.Password()
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	hashedPassword, hashPasswordErr := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if hashPasswordErr != nil {
+		glog.Errorf("Cannot hash password: %s", hashPasswordErr)
+	}
+
 	user := models.User{Email: email, Password: string(hashedPassword)}
 	db.GetDB().Create(&user)
 	s.userID = user.ID
