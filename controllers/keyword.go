@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
-	html "github.com/gutakk/go-google-scraper/helpers/html"
+	"github.com/gutakk/go-google-scraper/helpers/html"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	helpers "github.com/gutakk/go-google-scraper/helpers/user"
 	"github.com/gutakk/go-google-scraper/presenters"

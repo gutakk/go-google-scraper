@@ -1,4 +1,4 @@
-package helpers
+package html
 
 import (
 	"github.com/foolin/goview/supports/ginview"

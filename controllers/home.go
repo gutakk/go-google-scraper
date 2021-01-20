@@ -3,7 +3,7 @@ package controllers
 import (
 	"net/http"
 
-	html "github.com/gutakk/go-google-scraper/helpers/html"
+	"github.com/gutakk/go-google-scraper/helpers/html"
 	helpers "github.com/gutakk/go-google-scraper/helpers/user"
 
 	"github.com/gin-gonic/gin"
