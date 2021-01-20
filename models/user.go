@@ -5,6 +5,8 @@ import (
 
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/helpers/error_handler"
+
+	"github.com/golang/glog"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -25,9 +27,13 @@ func SaveUser(email string, password string) error {
 		return errors.New("Email or password cannot be blank")
 	}
 
-	hashedPassword, _ := hashPassword(password)
+	hashedPassword, hashPasswordErr := hashPassword(password)
+	if hashPasswordErr != nil {
+		glog.Errorf("Cannot hash password: %s", hashPasswordErr)
+	}
 
-	if result := db.GetDB().Create(&User{Email: email, Password: string(hashedPassword)}); result.Error != nil {
+	result := db.GetDB().Create(&User{Email: email, Password: string(hashedPassword)})
+	if result.Error != nil {
 		return error_handler.DatabaseErrorMessage(result.Error)
 	}
 	return nil
