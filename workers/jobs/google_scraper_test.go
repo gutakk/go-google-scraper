@@ -6,7 +6,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/golang/glog"
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
@@ -17,6 +16,7 @@ import (
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/gocraft/work"
+	"github.com/golang/glog"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -27,7 +27,8 @@ import (
 func init() {
 	gin.SetMode(gin.TestMode)
 
-	if err := os.Chdir(path_test.GetRoot()); err != nil {
+	err := os.Chdir(path_test.GetRoot())
+	if err != nil {
 		glog.Fatal(err)
 	}
 
@@ -84,7 +85,10 @@ func (s *KeywordScraperDBTestSuite) SetupTest() {
 func (s *KeywordScraperDBTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM keywords")
 	db.GetDB().Exec("DELETE FROM users")
-	_, _ = db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("test-job", "search"))
+	_, delRedisErr := db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("test-job", "search"))
+	if delRedisErr != nil {
+		glog.Fatalf("Cannot delete redis job: %s", delRedisErr)
+	}
 }
 
 func TestKeywordScraperDBTestSuite(t *testing.T) {
@@ -95,13 +99,16 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithValidJob() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job, _ := s.enqueuer.Enqueue(
+	job, enqueueErr := s.enqueuer.Enqueue(
 		"search",
 		work.Q{
 			"keywordID": keyword.ID,
 			"keyword":   keyword.Keyword,
 		},
 	)
+	if enqueueErr != nil {
+		glog.Errorf("Cannot enqueue job: %s", enqueueErr)
+	}
 
 	ctx := Context{}
 	err := ctx.PerformSearchJob(job)
@@ -117,12 +124,15 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithoutKeywordID() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job, _ := s.enqueuer.Enqueue(
+	job, enqueueErr := s.enqueuer.Enqueue(
 		"search",
 		work.Q{
 			"keyword": keyword.Keyword,
 		},
 	)
+	if enqueueErr != nil {
+		glog.Errorf("Cannot enqueue job: %s", enqueueErr)
+	}
 
 	ctx := Context{}
 	err := ctx.PerformSearchJob(job)
@@ -134,12 +144,15 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithoutKeywordAndReachMa
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job, _ := s.enqueuer.Enqueue(
+	job, enqueueErr := s.enqueuer.Enqueue(
 		"search",
 		work.Q{
 			"keywordID": keyword.ID,
 		},
 	)
+	if enqueueErr != nil {
+		glog.Errorf("Cannot enqueue job: %s", enqueueErr)
+	}
 
 	job.Fails = MaxFails
 	ctx := Context{}
@@ -161,13 +174,16 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithRequestErrorAndReach
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job, _ := s.enqueuer.Enqueue(
+	job, enqueueErr := s.enqueuer.Enqueue(
 		"search",
 		work.Q{
 			"keywordID": keyword.ID,
 			"keyword":   keyword.Keyword,
 		},
 	)
+	if enqueueErr != nil {
+		glog.Errorf("Cannot enqueue job: %s", enqueueErr)
+	}
 
 	job.Fails = MaxFails
 	ctx := Context{}
@@ -189,13 +205,16 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithParsingErrorAndReach
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job, _ := s.enqueuer.Enqueue(
+	job, enqueueErr := s.enqueuer.Enqueue(
 		"search",
 		work.Q{
 			"keywordID": keyword.ID,
 			"keyword":   keyword.Keyword,
 		},
 	)
+	if enqueueErr != nil {
+		glog.Errorf("Cannot enqueue job: %s", enqueueErr)
+	}
 
 	job.Fails = MaxFails
 	ctx := Context{}
