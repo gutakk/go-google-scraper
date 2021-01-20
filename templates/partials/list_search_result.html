@@ -5,6 +5,7 @@
     {{ .title }}
   </dt>
   {{ if .value }}
+    <!-- TODO: Update Tailwind to version 2 to move style class to css file -->
     <dd class="list-search-result__value divide-y divide-gray-200">
       <ul>
         {{ range $v := .value }}
