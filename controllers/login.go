@@ -4,12 +4,13 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	html "github.com/gutakk/go-google-scraper/helpers/html"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 const (
@@ -38,20 +39,22 @@ func (l *LoginController) displayLogin(c *gin.Context) {
 func (l *LoginController) login(c *gin.Context) {
 	form := &LoginForm{}
 
-	if err := c.ShouldBind(form); err != nil {
-		for _, fieldErr := range err.(validator.ValidationErrors) {
+	bindFormErr := c.ShouldBind(form)
+	if bindFormErr != nil {
+		for _, fieldErr := range bindFormErr.(validator.ValidationErrors) {
 			renderLoginWithError(c, http.StatusBadRequest, errorHandler.ValidationErrorMessage(fieldErr), form)
 			return
 		}
 	}
 
-	user, err := models.FindUserBy(&models.User{Email: form.Email})
-	if err != nil {
+	user, findUserErr := models.FindUserBy(&models.User{Email: form.Email})
+	if findUserErr != nil {
 		renderLoginWithError(c, http.StatusUnauthorized, errors.New(invalidUsernameOrPassword), form)
 		return
 	}
 
-	if err := models.ValidatePassword(user.Password, form.Password); err != nil {
+	validatePasswordErr := models.ValidatePassword(user.Password, form.Password)
+	if validatePasswordErr != nil {
 		renderLoginWithError(c, http.StatusUnauthorized, errors.New(invalidUsernameOrPassword), form)
 		return
 	}
