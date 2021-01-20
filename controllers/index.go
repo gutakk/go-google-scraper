@@ -1,10 +1,11 @@
 package controllers
 
 import (
-	"github.com/foolin/goview/supports/ginview"
-	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/middlewares"
+
+	"github.com/foolin/goview/supports/ginview"
+	"github.com/gin-gonic/gin"
 )
 
 func CombineRoutes(engine *gin.Engine) {
