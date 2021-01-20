@@ -4,10 +4,11 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	"github.com/gutakk/go-google-scraper/tests/fixture"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
+
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/go-playground/assert.v1"
 )
