@@ -5,7 +5,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/golang/glog"
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
@@ -15,6 +14,7 @@ import (
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
+	"github.com/golang/glog"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -26,7 +26,7 @@ func init() {
 	gin.SetMode(gin.TestMode)
 
 	if err := os.Chdir(path_test.GetRoot()); err != nil {
-		panic(err)
+		glog.Fatal(err)
 	}
 
 	config.LoadEnv()

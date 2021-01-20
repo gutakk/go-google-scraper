@@ -8,13 +8,14 @@ import (
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang/glog"
 )
 
 func TestMain(m *testing.M) {
 	gin.SetMode(gin.TestMode)
 
 	if err := os.Chdir(path_test.GetRoot()); err != nil {
-		panic(err)
+		glog.Fatal(err)
 	}
 
 	config.LoadEnv()

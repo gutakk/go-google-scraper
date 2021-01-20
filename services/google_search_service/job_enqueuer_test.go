@@ -48,7 +48,7 @@ func (s *JobEnqueuerTestSuite) TestEnqueueSearchJobWithValidSavedKeyword() {
 
 	rawJSON, redisErr := redis.Bytes(conn.Do("RPOP", redisKey))
 	if redisErr != nil {
-		panic("could not RPOP from job queue: " + redisErr.Error())
+		glog.Fatalf("Could not RPOP from job queue: %s", redisErr.Error())
 	}
 
 	var job work.Job

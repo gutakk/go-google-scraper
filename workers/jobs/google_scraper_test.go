@@ -28,7 +28,7 @@ func init() {
 	gin.SetMode(gin.TestMode)
 
 	if err := os.Chdir(path_test.GetRoot()); err != nil {
-		panic(err)
+		glog.Fatal(err)
 	}
 
 	config.LoadEnv()

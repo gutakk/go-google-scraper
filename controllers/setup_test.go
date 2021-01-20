@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang/glog"
 )
 
 func TestMain(m *testing.M) {
@@ -12,7 +13,7 @@ func TestMain(m *testing.M) {
 
 	err := os.Chdir("..")
 	if err != nil {
-		panic(err)
+		glog.Fatal(err)
 	}
 
 	os.Exit(m.Run())

@@ -2,7 +2,6 @@ package jobs
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/golang/glog"
@@ -85,7 +84,7 @@ func updateStatusToFailed(jobFails int64, jobName string, keywordID uint, keywor
 		updateStatusErr := google_search_service.UpdateKeywordStatus(keywordID, models.Failed, err)
 
 		if updateStatusErr != nil {
-			panic(fmt.Sprintf("Cannot update keyword status (reason: %v)", updateStatusErr))
+			glog.Fatalf("Cannot update keyword status (reason: %v)", updateStatusErr)
 		}
 
 		glog.Infof("Job %v for keyword %v reached maximum fails (reason: %v)", jobName, keyword, err.Error())
