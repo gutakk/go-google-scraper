@@ -10,7 +10,8 @@ import (
 func TestMain(m *testing.M) {
 	gin.SetMode(gin.TestMode)
 
-	if err := os.Chdir(".."); err != nil {
+	err := os.Chdir("..")
+	if err != nil {
 		panic(err)
 	}
 
