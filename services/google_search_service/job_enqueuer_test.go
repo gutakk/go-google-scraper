@@ -9,6 +9,7 @@ import (
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 
 	"github.com/gocraft/work"
+	"github.com/golang/glog"
 	"github.com/gomodule/redigo/redis"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/go-playground/assert.v1"
@@ -23,7 +24,10 @@ func (s *JobEnqueuerTestSuite) SetupTest() {
 }
 
 func (s *JobEnqueuerTestSuite) TearDownTest() {
-	_, _ = db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
+	_, delRedisErr := db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
+	if delRedisErr != nil {
+		glog.Fatalf("Cannot delete redis job: %s", delRedisErr)
+	}
 }
 
 func TestJobEnqueuerTestSuite(t *testing.T) {
@@ -48,7 +52,10 @@ func (s *JobEnqueuerTestSuite) TestEnqueueSearchJobWithValidSavedKeyword() {
 	}
 
 	var job work.Job
-	_ = json.Unmarshal(rawJSON, &job)
+	unmarshalErr := json.Unmarshal(rawJSON, &job)
+	if unmarshalErr != nil {
+		glog.Errorf("Cannot unmarshal JSON: %s", unmarshalErr)
+	}
 
 	assert.Equal(s.T(), nil, err)
 	assert.Equal(s.T(), "search", job.Name)
