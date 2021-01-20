@@ -7,7 +7,7 @@ import (
 	"github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/helpers/html"
 	"github.com/gutakk/go-google-scraper/helpers/session"
-	helpers "github.com/gutakk/go-google-scraper/helpers/user"
+	"github.com/gutakk/go-google-scraper/helpers/user"
 	"github.com/gutakk/go-google-scraper/presenters"
 	"github.com/gutakk/go-google-scraper/services/keyword_service"
 
@@ -103,6 +103,6 @@ func getKeywordsData(keywordService keyword_service.KeywordService) map[string]i
 }
 
 func initKeywordService(c *gin.Context) keyword_service.KeywordService {
-	currentUser := helpers.GetCurrentUser(c)
+	currentUser := user.GetCurrentUser(c)
 	return keyword_service.KeywordService{CurrentUserID: currentUser.ID}
 }

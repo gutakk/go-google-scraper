@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gutakk/go-google-scraper/helpers/html"
-	helpers "github.com/gutakk/go-google-scraper/helpers/user"
+	"github.com/gutakk/go-google-scraper/helpers/user"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,7 +21,7 @@ func (h *HomeController) applyRoutes(engine *gin.Engine) {
 }
 
 func (h *HomeController) displayHome(c *gin.Context) {
-	currentUser := helpers.GetCurrentUser(c)
+	currentUser := user.GetCurrentUser(c)
 
 	data := map[string]interface{}{
 		"authenticatedUser": currentUser.ID,

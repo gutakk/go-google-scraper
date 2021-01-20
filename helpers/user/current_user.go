@@ -1,8 +1,9 @@
-package helpers
+package user
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/models"
+
+	"github.com/gin-gonic/gin"
 )
 
 func GetCurrentUser(c *gin.Context) models.User {
