@@ -118,11 +118,21 @@ func (s *KeywordServiceDbTestSuite) TestGetKeywordResultWithWrongKeywordTypeButV
 	assert.Equal(s.T(), "invalid input", err.Error())
 }
 
-func (s *KeywordServiceDbTestSuite) TestGetKeywordResultWithInvalidKeywordIDButValidUser() {
+func (s *KeywordServiceDbTestSuite) TestGetKeywordResultWithInvalidKeywordIDStringButValidUser() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
 	result, err := s.keywordService.GetKeywordResult("999999")
+
+	assert.Equal(s.T(), models.Keyword{}, result)
+	assert.Equal(s.T(), "keyword not found", err.Error())
+}
+
+func (s *KeywordServiceDbTestSuite) TestGetKeywordResultWithInvalidKeywordIDIntegerButValidUser() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	result, err := s.keywordService.GetKeywordResult(999999)
 
 	assert.Equal(s.T(), models.Keyword{}, result)
 	assert.Equal(s.T(), "keyword not found", err.Error())
