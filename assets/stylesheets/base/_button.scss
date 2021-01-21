@@ -4,7 +4,7 @@ button {
   transition: 0.2s;
 
   &:hover {
-    @apply bg-indigo-700;
+    @apply bg-indigo-700 text-white;
   }
 
   &:focus {

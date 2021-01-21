@@ -1,0 +1,26 @@
+.navigation {
+  &__logo {
+    @apply w-40;
+  }
+
+  &__form {
+    @apply mt-0 inline-block;
+  }
+
+  &__button {
+    @apply text-indigo-600 font-semibold bg-transparent text-sm px-2 py-1 rounded;
+  }
+
+  &__link {
+    @apply inline-block px-2 py-1 rounded text-sm;
+    transition: 0.2s;
+
+    &:hover {
+      @apply bg-indigo-700 text-white;
+    }
+
+    &:not(:last-child) {
+      @apply border-r border-gray-200;
+    }
+  }
+}
