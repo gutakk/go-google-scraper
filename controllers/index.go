@@ -6,6 +6,7 @@ import (
 	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/config"
+	"github.com/gutakk/go-google-scraper/controllers/api"
 	html "github.com/gutakk/go-google-scraper/helpers/html"
 	"github.com/gutakk/go-google-scraper/middlewares"
 )
@@ -31,6 +32,13 @@ func CombineRoutes(engine *gin.Engine) {
 	// Ensure guest user group
 	new(RegisterController).applyRoutes(EnsureGuestUserGroup(engine))
 	new(LoginController).applyRoutes(EnsureGuestUserGroup(engine))
+
+	// Public API group
+	new(api.OAuthController).ApplyRoutes(PublicAPIGroup(engine))
+}
+
+func PublicAPIGroup(engine *gin.Engine) *gin.RouterGroup {
+	return engine.Group("/api")
 }
 
 func EnsureAuthenticatedUserGroup(engine *gin.Engine) *gin.RouterGroup {
