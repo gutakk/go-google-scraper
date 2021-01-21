@@ -1,4 +1,4 @@
-package api_test
+package api_v1_test
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/controllers"
-	"github.com/gutakk/go-google-scraper/controllers/api"
+	"github.com/gutakk/go-google-scraper/controllers/api_v1"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/oauth"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
@@ -53,7 +53,7 @@ type OAuthControllerDbTestSuite struct {
 
 func (s *OAuthControllerDbTestSuite) SetupTest() {
 	s.engine = testConfig.GetRouter(true)
-	new(api.OAuthController).ApplyRoutes(controllers.BasicAuthAPIGroup(s.engine))
+	new(api_v1.OAuthController).ApplyRoutes(controllers.BasicAuthAPIGroup(s.engine.Group("/api")))
 }
 
 func (s *OAuthControllerDbTestSuite) TearDownTest() {
