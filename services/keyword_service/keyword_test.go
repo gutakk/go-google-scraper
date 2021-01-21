@@ -53,7 +53,11 @@ func (s *KeywordServiceDbTestSuite) SetupTest() {
 	db.GetDB().Create(&user)
 
 	s.userID = user.ID
-	s.keywordService = KeywordService{CurrentUserID: user.ID}
+	s.keywordService = KeywordService{
+		CurrentUser: models.User{
+			Model: gorm.Model{ID: user.ID},
+		},
+	}
 }
 
 func (s *KeywordServiceDbTestSuite) TearDownTest() {
@@ -101,7 +105,11 @@ func (s *KeywordServiceDbTestSuite) TestGetKeywordResultWithValidKeywordButInval
 	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	keywordService := KeywordService{CurrentUserID: 999999}
+	keywordService := KeywordService{
+		CurrentUser: models.User{
+			Model: gorm.Model{ID: 999999},
+		},
+	}
 	result, err := keywordService.GetKeywordResult(keyword.ID)
 
 	assert.Equal(s.T(), models.Keyword{}, result)

@@ -119,11 +119,11 @@ func getKeywordResultData(keywordService keyword_service.KeywordService, keyword
 	}
 
 	keywordPresenter := presenters.KeywordPresenter{Keyword: keyword}
+	data := getCurrentUser(keywordService)
+	data["keyword"] = keyword
+	data["keywordLinks"] = keywordPresenter.KeywordLinks()
 
-	return map[string]interface{}{
-		"keyword":      keyword,
-		"keywordLinks": keywordPresenter.KeywordLinks(),
-	}, nil
+	return data, nil
 }
 
 func getKeywordsData(keywordService keyword_service.KeywordService) map[string]interface{} {
@@ -134,6 +134,13 @@ func getKeywordsData(keywordService keyword_service.KeywordService) map[string]i
 		keywordPresenters = append(keywordPresenters, presenters.KeywordPresenter{Keyword: k})
 	}
 
+	data := getCurrentUser(keywordService)
+	data["keywords"] = keywords
+
+	return data
+}
+
+func getCurrentUser(keywordService keyword_service.KeywordService) map[string]interface{} {
 	return map[string]interface{}{
 		"keywordPresenters": keywordPresenters,
 	}
@@ -141,5 +148,5 @@ func getKeywordsData(keywordService keyword_service.KeywordService) map[string]i
 
 func initKeywordService(c *gin.Context) keyword_service.KeywordService {
 	currentUser := helpers.GetCurrentUser(c)
-	return keyword_service.KeywordService{CurrentUserID: currentUser.ID}
+	return keyword_service.KeywordService{CurrentUser: currentUser}
 }
