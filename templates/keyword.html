@@ -33,7 +33,13 @@
               <td>
                 <span class="keyword-status keyword-status--{{ $k.Keyword.Status }}">{{ $k.Keyword.Status }}</span>
               </td>
-              <td></td>
+              <td class="keyword-action">
+                {{ if eq $k.Keyword.Status "processed" }}
+                  <a href="/keyword/{{ $k.Keyword.ID }}">
+                    <img src="/dist/svg/document.svg">
+                  </a>
+                {{ end }}
+              </td>
             </tr>
           {{ end }}
         </tbody>

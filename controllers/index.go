@@ -1,13 +1,26 @@
 package controllers
 
 import (
+	"net/http"
+
 	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/config"
+	html "github.com/gutakk/go-google-scraper/helpers/html"
 	"github.com/gutakk/go-google-scraper/middlewares"
 )
 
+const (
+	NotFoundTitle = "Not Found"
+	NotFoundView  = "not_found"
+)
+
 func CombineRoutes(engine *gin.Engine) {
+	// Not found
+	engine.NoRoute(func(c *gin.Context) {
+		html.RenderErrorPage(c, http.StatusNotFound, NotFoundView, NotFoundTitle)
+	}, ginview.NewMiddleware(config.ErrorGoviewConfig()))
+
 	// No group
 	new(HomeController).applyRoutes(engine)
 

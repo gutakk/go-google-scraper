@@ -15,8 +15,9 @@ import (
 )
 
 const (
-	keywordTitle = "Keyword"
-	keywordView  = "keyword"
+	keywordTitle      = "Keyword"
+	keywordView       = "keyword"
+	keywordResultView = "keyword_result"
 
 	uploadSuccessFlash = "CSV uploaded successfully"
 )
@@ -29,6 +30,8 @@ type UploadFileForm struct {
 
 func (k *KeywordController) applyRoutes(engine *gin.RouterGroup) {
 	engine.GET("/keyword", k.displayKeyword)
+	engine.GET("/keyword/:keyword_id", k.displayKeywordResult)
+	engine.GET("/keyword/:keyword_id/html", k.displayKeywordHTML)
 	engine.POST("/keyword", k.uploadKeyword)
 }
 
@@ -37,6 +40,32 @@ func (k *KeywordController) displayKeyword(c *gin.Context) {
 	data := getKeywordsData(keywordService)
 
 	html.RenderWithFlash(c, http.StatusOK, keywordView, keywordTitle, data)
+}
+
+func (k *KeywordController) displayKeywordResult(c *gin.Context) {
+	keywordService := initKeywordService(c)
+	keywordID := c.Param("keyword_id")
+	data, err := getKeywordResultData(keywordService, keywordID)
+
+	if err != nil {
+		html.RenderErrorPage(c, http.StatusNotFound, NotFoundView, NotFoundTitle)
+		return
+	}
+
+	html.RenderWithFlash(c, http.StatusOK, keywordResultView, keywordTitle, data)
+}
+
+func (k *KeywordController) displayKeywordHTML(c *gin.Context) {
+	keywordService := initKeywordService(c)
+	keywordID := c.Param("keyword_id")
+	keyword, err := keywordService.GetKeywordResult(keywordID)
+
+	if err != nil || len(keyword.HtmlCode) == 0 {
+		html.RenderErrorPage(c, http.StatusNotFound, NotFoundView, NotFoundTitle)
+	} else {
+		c.Writer.WriteHeader(http.StatusOK)
+		_, _ = c.Writer.Write([]byte(keyword.HtmlCode))
+	}
 }
 
 func (k *KeywordController) uploadKeyword(c *gin.Context) {
@@ -81,6 +110,20 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 
 	session.AddFlash(c, uploadSuccessFlash, "notice")
 	c.Redirect(http.StatusFound, "/keyword")
+}
+
+func getKeywordResultData(keywordService keyword_service.KeywordService, keywordID string) (map[string]interface{}, error) {
+	keyword, err := keywordService.GetKeywordResult(keywordID)
+	if err != nil {
+		return nil, err
+	}
+
+	keywordPresenter := presenters.KeywordPresenter{Keyword: keyword}
+
+	return map[string]interface{}{
+		"keyword":      keyword,
+		"keywordLinks": keywordPresenter.KeywordLinks(),
+	}, nil
 }
 
 func getKeywordsData(keywordService keyword_service.KeywordService) map[string]interface{} {

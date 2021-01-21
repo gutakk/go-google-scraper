@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgconn"
 	"gopkg.in/go-playground/assert.v1"
+	"gorm.io/gorm"
 )
 
 func TestMain(m *testing.M) {
@@ -94,6 +95,12 @@ func TestDatabaseErrorMessageForDefaultCode(t *testing.T) {
 	result := DatabaseErrorMessage(pgErr)
 
 	assert.Equal(t, "ERROR: Test (SQLSTATE 23506)", result.Error())
+}
+
+func TestDatabaseErrorMessageForNonPgErrorTypeWithNotFound(t *testing.T) {
+	result := DatabaseErrorMessage(gorm.ErrRecordNotFound)
+
+	assert.Equal(t, "keyword not found", result.Error())
 }
 
 func TestDatabaseErrorMessageForNonPgErrorType(t *testing.T) {

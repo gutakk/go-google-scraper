@@ -1,9 +1,9 @@
 .layout-application {
   body {
-    @apply flex min-h-screen;
+    @apply min-h-screen;
   }
   
   .app-main {
-    @apply py-10 px-16 flex-1;
+    @apply py-10 px-16;
   }
 }

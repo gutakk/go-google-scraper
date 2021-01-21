@@ -40,6 +40,19 @@ func (k *KeywordService) GetAll() ([]models.Keyword, error) {
 	return keywords, nil
 }
 
+func (k *KeywordService) GetKeywordResult(keywordID interface{}) (models.Keyword, error) {
+	condition := make(map[string]interface{})
+	condition["id"] = keywordID
+	condition["user_id"] = k.CurrentUserID
+
+	keyword, err := models.GetKeywordBy(condition)
+	if err != nil {
+		return models.Keyword{}, errorHandler.DatabaseErrorMessage(err)
+	}
+
+	return keyword, nil
+}
+
 func (k *KeywordService) Save(parsedKeywordList []string) error {
 	// Check if record is empty slices
 	if len(parsedKeywordList) == 0 {

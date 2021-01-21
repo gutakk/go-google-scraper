@@ -1,0 +1,22 @@
+body.keyword-result {
+  .result-keyword {
+    @apply bg-white shadow overflow-hidden rounded-lg;
+
+    &__header {
+      @apply px-6 py-5 flex items-center;
+    }
+
+    &__google-link {
+      @apply w-20 h-24 p-2 mr-4 bg-white shadow overflow-hidden rounded-lg;
+    }
+
+    &__google-link-text {
+      @apply mt-2;
+      font-size: 8px;
+    }
+
+    &__content-group {
+      @apply border-t border-gray-200;
+    }
+  }
+}

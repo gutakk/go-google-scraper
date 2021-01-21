@@ -1,7 +1,10 @@
 package config
 
 import (
+	"html/template"
+
 	"github.com/foolin/goview"
+	"github.com/gutakk/go-google-scraper/helpers/view"
 )
 
 func AppGoviewConfig() goview.Config {
@@ -10,6 +13,13 @@ func AppGoviewConfig() goview.Config {
 		Extension:    ".html",
 		Master:       "layouts/application",
 		DisableCache: false,
+		Partials: []string{
+			"partials/search_result",
+			"partials/list_search_result",
+		},
+		Funcs: template.FuncMap{
+			"searchResultPartial": view.SearchResultPartial,
+		},
 	}
 }
 
@@ -18,6 +28,15 @@ func AuthenticationGoviewConfig() goview.Config {
 		Root:         "templates",
 		Extension:    ".html",
 		Master:       "layouts/authentication",
+		DisableCache: false,
+	}
+}
+
+func ErrorGoviewConfig() goview.Config {
+	return goview.Config{
+		Root:         "templates",
+		Extension:    ".html",
+		Master:       "layouts/error",
 		DisableCache: false,
 	}
 }

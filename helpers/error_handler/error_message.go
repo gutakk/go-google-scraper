@@ -5,19 +5,23 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgconn"
+	"gorm.io/gorm"
 )
 
 const (
 	commonFieldError        = "%s is not valid"
 	emailFormatError        = "invalid email format"
 	emailDuplicateError     = "email already exists"
+	invalidInputError       = "invalid input"
+	keywordNotFoundError    = "keyword not found"
 	minError                = "%s must be longer than %s"
 	passwordEqError         = "passwords do not match"
 	requiredError           = "%s is required"
 	somethingWentWrongError = "something went wrong, please try again"
 
-	foreignKeyErrorCode = "23503"
-	duplicateErrorCode  = "23505"
+	foreignKeyErrorCode   = "23503"
+	duplicateErrorCode    = "23505"
+	invalidInputErrorCode = "22P02"
 )
 
 // interface from github.com/go-playground/validator/v10
@@ -51,9 +55,15 @@ func DatabaseErrorMessage(err error) error {
 			return errors.New(somethingWentWrongError)
 		case duplicateErrorCode:
 			return errors.New(emailDuplicateError)
+		case invalidInputErrorCode:
+			return errors.New(invalidInputError)
 		}
 		return errors.New(pgErr.Error())
 	} else {
+		switch err {
+		case gorm.ErrRecordNotFound:
+			return errors.New(keywordNotFoundError)
+		}
 		return errors.New(somethingWentWrongError)
 	}
 }

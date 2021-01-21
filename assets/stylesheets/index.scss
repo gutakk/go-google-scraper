@@ -6,16 +6,19 @@
 // Base
 @import 'base/button';
 @import 'base/form';
-@import 'base/nav';
 @import 'base/table';
 @import 'base/typography';
 
 // Components
 @import 'components/alert';
+@import 'components/list-search-result';
+@import 'components/search-result';
 
 // Layouts
 @import 'layouts/application';
 @import 'layouts/authentication';
 
 // Screens
-@import 'screens/keyword.scss';
+@import 'screens/keyword-result';
+@import 'screens/keyword';
+@import 'screens/not-found';

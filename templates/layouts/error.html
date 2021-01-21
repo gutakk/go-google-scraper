@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html class="layout-application">
+<html class="layout-error">
   <head>
     <meta charset='utf-8'>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -9,12 +9,6 @@
   </head>
 
   <body class="{{ .view }}">
-    <main class="app-main">
-      <div class="app-main__content">
-        {{ template "content" . }}
-      </div>
-    </main>
-    
-    <script src="/dist/javascripts/index.js"></script>
+    {{ template "content" . }}
   </body>
 </html>
