@@ -6,19 +6,19 @@ import (
 	"testing"
 
 	"github.com/dnaeon/go-vcr/recorder"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/go-playground/assert.v1"
 )
 
 func TestRequestWithValidKeyword(t *testing.T) {
 	r, recorderErr := recorder.New("tests/fixture/vcr/valid_keyword")
 	if recorderErr != nil {
-		glog.Errorf("Cannot init recorder: %s", recorderErr)
+		log.Errorf("Cannot init recorder: %s", recorderErr)
 	}
 
 	resp, requestErr := Request("AWS", r)
 	if requestErr != nil {
-		glog.Errorf("Cannot make a request: %s", requestErr)
+		log.Errorf("Cannot make a request: %s", requestErr)
 	}
 
 	p, err := ioutil.ReadAll(resp.Body)
@@ -29,19 +29,19 @@ func TestRequestWithValidKeyword(t *testing.T) {
 
 	stopRecorderErr := r.Stop()
 	if stopRecorderErr != nil {
-		glog.Errorf("Cannot stop the recorder: %s", stopRecorderErr)
+		log.Errorf("Cannot stop the recorder: %s", stopRecorderErr)
 	}
 }
 
 func TestRequestWithBlankSpaceKeyword(t *testing.T) {
 	r, recorderErr := recorder.New("tests/fixture/vcr/blank_space_keyword")
 	if recorderErr != nil {
-		glog.Errorf("Cannot init recorder: %s", recorderErr)
+		log.Errorf("Cannot init recorder: %s", recorderErr)
 	}
 
 	resp, requestErr := Request("A W S", r)
 	if requestErr != nil {
-		glog.Errorf("Cannot make a request: %s", requestErr)
+		log.Errorf("Cannot make a request: %s", requestErr)
 	}
 
 	p, err := ioutil.ReadAll(resp.Body)
@@ -52,19 +52,19 @@ func TestRequestWithBlankSpaceKeyword(t *testing.T) {
 
 	stopRecorderErr := r.Stop()
 	if stopRecorderErr != nil {
-		glog.Errorf("Cannot stop the recorder: %s", stopRecorderErr)
+		log.Errorf("Cannot stop the recorder: %s", stopRecorderErr)
 	}
 }
 
 func TestRequestWithThaiKeyword(t *testing.T) {
 	r, recorderErr := recorder.New("tests/fixture/vcr/thai_keyword")
 	if recorderErr != nil {
-		glog.Errorf("Cannot init recorder: %s", recorderErr)
+		log.Errorf("Cannot init recorder: %s", recorderErr)
 	}
 
 	resp, requestErr := Request("สวัสดี", r)
 	if requestErr != nil {
-		glog.Errorf("Cannot make a request: %s", requestErr)
+		log.Errorf("Cannot make a request: %s", requestErr)
 	}
 
 	p, err := ioutil.ReadAll(resp.Body)
@@ -75,6 +75,6 @@ func TestRequestWithThaiKeyword(t *testing.T) {
 
 	stopRecorderErr := r.Stop()
 	if stopRecorderErr != nil {
-		glog.Errorf("Cannot stop the recorder: %s", stopRecorderErr)
+		log.Errorf("Cannot stop the recorder: %s", stopRecorderErr)
 	}
 }

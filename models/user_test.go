@@ -7,7 +7,7 @@ import (
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 
 	"github.com/bxcodec/faker/v3"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -25,7 +25,7 @@ type UserDBTestSuite struct {
 func (s *UserDBTestSuite) SetupTest() {
 	database, connectDBErr := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	if connectDBErr != nil {
-		glog.Fatalf("Cannot connect to db: %s", connectDBErr)
+		log.Fatalf("Cannot connect to db: %s", connectDBErr)
 	}
 	db.GetDB = func() *gorm.DB {
 		return database
@@ -33,7 +33,7 @@ func (s *UserDBTestSuite) SetupTest() {
 
 	migrateErr := db.GetDB().AutoMigrate(&User{})
 	if migrateErr != nil {
-		glog.Fatalf("Cannot migrate db: %s", migrateErr)
+		log.Fatalf("Cannot migrate db: %s", migrateErr)
 	}
 
 	s.email = faker.Email()
@@ -120,7 +120,7 @@ func (s *UserDBTestSuite) TestFindUserByIDWithInvalidID() {
 func TestHashPassword(t *testing.T) {
 	hashedPassword, hashPasswordErr := hashPassword("password")
 	if hashPasswordErr != nil {
-		glog.Errorf("Cannot hash password: %s", hashPasswordErr)
+		log.Errorf("Cannot hash password: %s", hashPasswordErr)
 	}
 
 	result := bcrypt.CompareHashAndPassword(hashedPassword, []byte("password"))
@@ -131,7 +131,7 @@ func TestHashPassword(t *testing.T) {
 func TestValidatePasswordWithValidPassword(t *testing.T) {
 	hashedPassword, hashPasswordErr := hashPassword("password")
 	if hashPasswordErr != nil {
-		glog.Errorf("Cannot hash password: %s", hashPasswordErr)
+		log.Errorf("Cannot hash password: %s", hashPasswordErr)
 	}
 	result := ValidatePassword(string(hashedPassword), "password")
 
@@ -141,7 +141,7 @@ func TestValidatePasswordWithValidPassword(t *testing.T) {
 func TestValidatePasswordWithInvalidPassword(t *testing.T) {
 	hashedPassword, hashPasswordErr := hashPassword("password")
 	if hashPasswordErr != nil {
-		glog.Errorf("Cannot hash password: %s", hashPasswordErr)
+		log.Errorf("Cannot hash password: %s", hashPasswordErr)
 	}
 	result := ValidatePassword(string(hashedPassword), "drowssap")
 

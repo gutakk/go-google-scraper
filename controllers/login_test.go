@@ -16,7 +16,7 @@ import (
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -36,7 +36,7 @@ type LoginDbTestSuite struct {
 func (s *LoginDbTestSuite) SetupTest() {
 	database, connectDBErr := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	if connectDBErr != nil {
-		glog.Fatalf("Cannot connect to db: %s", connectDBErr)
+		log.Fatalf("Cannot connect to db: %s", connectDBErr)
 	}
 	db.GetDB = func() *gorm.DB {
 		return database
@@ -44,7 +44,7 @@ func (s *LoginDbTestSuite) SetupTest() {
 
 	migrateErr := db.GetDB().AutoMigrate(&models.User{})
 	if migrateErr != nil {
-		glog.Fatalf("Cannot migrate db: %s", migrateErr)
+		log.Fatalf("Cannot migrate db: %s", migrateErr)
 	}
 
 	s.engine = testConfig.GetRouter(true)
@@ -62,7 +62,7 @@ func (s *LoginDbTestSuite) SetupTest() {
 
 	hashedPassword, hashPasswordErr := bcrypt.GenerateFromPassword([]byte(s.password), bcrypt.DefaultCost)
 	if hashPasswordErr != nil {
-		glog.Errorf("Cannot hash password: %s", hashPasswordErr)
+		log.Errorf("Cannot hash password: %s", hashPasswordErr)
 	}
 
 	db.GetDB().Create(&models.User{Email: s.email, Password: string(hashedPassword)})

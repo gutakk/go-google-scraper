@@ -3,8 +3,8 @@ package fixture
 import (
 	"net/http"
 
-	"github.com/golang/glog"
 	"github.com/gorilla/securecookie"
+	log "github.com/sirupsen/logrus"
 )
 
 func GenerateCookie(key interface{}, value interface{}) *http.Cookie {
@@ -13,7 +13,7 @@ func GenerateCookie(key interface{}, value interface{}) *http.Cookie {
 	data[key] = value
 	encoded, encodeMultiErr := securecookie.EncodeMulti("go-google-scraper", data, codecs...)
 	if encodeMultiErr != nil {
-		glog.Errorf("Cannot encode multi: %s", encodeMultiErr)
+		log.Errorf("Cannot encode multi: %s", encodeMultiErr)
 	}
 
 	cookie := http.Cookie{

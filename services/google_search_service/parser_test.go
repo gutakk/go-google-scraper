@@ -5,31 +5,31 @@ import (
 	"testing"
 
 	"github.com/dnaeon/go-vcr/recorder"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/go-playground/assert.v1"
 )
 
 func TestParserWithValidGoogleResponse(t *testing.T) {
 	r, recorderErr := recorder.New("tests/fixture/vcr/valid_keyword")
 	if recorderErr != nil {
-		glog.Errorf("Cannot init recorder: %s", recorderErr)
+		log.Errorf("Cannot init recorder: %s", recorderErr)
 	}
 
 	url := "https://www.google.com/search?q=AWS"
 	client := &http.Client{Transport: r}
 	req, requesterErr := http.NewRequest("GET", url, nil)
 	if requesterErr != nil {
-		glog.Errorf("Cannot init requester: %s", requesterErr)
+		log.Errorf("Cannot init requester: %s", requesterErr)
 	}
 
 	resp, requestErr := client.Do(req)
 	if requestErr != nil {
-		glog.Errorf("Cannot make a request: %s", requestErr)
+		log.Errorf("Cannot make a request: %s", requestErr)
 	}
 
 	stopRecorderErr := r.Stop()
 	if stopRecorderErr != nil {
-		glog.Errorf("Cannot stop the recorder: %s", stopRecorderErr)
+		log.Errorf("Cannot stop the recorder: %s", stopRecorderErr)
 	}
 
 	parsingResult, err := ParseGoogleResponse(resp)
@@ -47,24 +47,24 @@ func TestParserWithValidGoogleResponse(t *testing.T) {
 func TestParserWithNotGoogleSearchPage(t *testing.T) {
 	r, recorderErr := recorder.New("tests/fixture/vcr/invalid_site")
 	if recorderErr != nil {
-		glog.Errorf("Cannot init recorder: %s", recorderErr)
+		log.Errorf("Cannot init recorder: %s", recorderErr)
 	}
 
 	url := "https://www.golang.org"
 	client := &http.Client{Transport: r}
 	req, requesterErr := http.NewRequest("GET", url, nil)
 	if requesterErr != nil {
-		glog.Errorf("Cannot init requester: %s", requesterErr)
+		log.Errorf("Cannot init requester: %s", requesterErr)
 	}
 
 	resp, requestErr := client.Do(req)
 	if requestErr != nil {
-		glog.Errorf("Cannot make a request: %s", requestErr)
+		log.Errorf("Cannot make a request: %s", requestErr)
 	}
 
 	stopRecorderErr := r.Stop()
 	if stopRecorderErr != nil {
-		glog.Errorf("Cannot stop the recorder: %s", stopRecorderErr)
+		log.Errorf("Cannot stop the recorder: %s", stopRecorderErr)
 	}
 
 	parsingResult, err := ParseGoogleResponse(resp)

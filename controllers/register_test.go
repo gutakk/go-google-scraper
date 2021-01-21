@@ -16,7 +16,7 @@ import (
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/go-playground/assert.v1"
 	"gorm.io/driver/postgres"
@@ -35,7 +35,7 @@ type RegisterDbTestSuite struct {
 func (s *RegisterDbTestSuite) SetupTest() {
 	database, connectDBErr := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	if connectDBErr != nil {
-		glog.Fatalf("Cannot connect to db: %s", connectDBErr)
+		log.Fatalf("Cannot connect to db: %s", connectDBErr)
 	}
 	db.GetDB = func() *gorm.DB {
 		return database
@@ -43,7 +43,7 @@ func (s *RegisterDbTestSuite) SetupTest() {
 
 	migrateErr := db.GetDB().AutoMigrate(&models.User{})
 	if migrateErr != nil {
-		glog.Fatalf("Cannot migrate db: %s", migrateErr)
+		log.Fatalf("Cannot migrate db: %s", migrateErr)
 	}
 
 	s.engine = testConfig.GetRouter(true)

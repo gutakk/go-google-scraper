@@ -5,7 +5,7 @@ import (
 	"reflect"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 )
 
 type GoogleResponseParser struct {
@@ -56,7 +56,7 @@ var ParseGoogleResponse = func(googleResp *http.Response) (ParsingResult, error)
 
 	htmlCode, getHTMLErr := doc.Html()
 	if getHTMLErr != nil {
-		glog.Errorf("Cannot get html from doc: %s", getHTMLErr)
+		log.Errorf("Cannot get html from doc: %s", getHTMLErr)
 	}
 
 	parsingResult := parsingCh.getParsingResultFromChannel()

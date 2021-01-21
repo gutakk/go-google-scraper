@@ -9,7 +9,7 @@ import (
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/migration"
 
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -24,6 +24,6 @@ func main() {
 
 	err := r.Run(fmt.Sprint(":", os.Getenv("PORT")))
 	if err != nil {
-		glog.Fatalf("Failed to start the server %s", err)
+		log.Fatalf("Failed to start the server %s", err)
 	}
 }

@@ -3,25 +3,25 @@ package migration
 import (
 	"github.com/gutakk/go-google-scraper/models"
 
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
 func Migrate(db *gorm.DB) {
 	migrateUserErr := db.AutoMigrate(&models.User{})
 	if migrateUserErr != nil {
-		glog.Fatalf("Failed to migrate %s", migrateUserErr)
+		log.Fatalf("Failed to migrate %s", migrateUserErr)
 	} else {
-		glog.Info("Migrate user schema successfully")
+		log.Info("Migrate user schema successfully")
 	}
 
 	InitKeywordStatusEnum(db)
 
 	migrateKeywordErr := db.AutoMigrate(&models.Keyword{})
 	if migrateKeywordErr != nil {
-		glog.Fatalf("Failed to migrate %s", migrateKeywordErr)
+		log.Fatalf("Failed to migrate %s", migrateKeywordErr)
 	} else {
-		glog.Info("Migrate keyword schema successfully")
+		log.Info("Migrate keyword schema successfully")
 	}
 }
 

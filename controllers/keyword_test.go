@@ -18,7 +18,7 @@ import (
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -37,7 +37,7 @@ func (s *KeywordDbTestSuite) SetupTest() {
 
 	database, connectDBErr := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	if connectDBErr != nil {
-		glog.Fatalf("Cannot connect to db: %s", connectDBErr)
+		log.Fatalf("Cannot connect to db: %s", connectDBErr)
 	}
 	db.GetDB = func() *gorm.DB {
 		return database
@@ -48,7 +48,7 @@ func (s *KeywordDbTestSuite) SetupTest() {
 	testDB.InitKeywordStatusEnum(db.GetDB())
 	migrateErr := db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
 	if migrateErr != nil {
-		glog.Fatalf("Cannot migrate db: %s", migrateErr)
+		log.Fatalf("Cannot migrate db: %s", migrateErr)
 	}
 
 	s.engine = testConfig.GetRouter(true)
@@ -60,7 +60,7 @@ func (s *KeywordDbTestSuite) SetupTest() {
 
 	hashedPassword, hashPasswordErr := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if hashPasswordErr != nil {
-		glog.Errorf("Cannot hash password: %s", hashPasswordErr)
+		log.Errorf("Cannot hash password: %s", hashPasswordErr)
 	}
 
 	user := models.User{Email: email, Password: string(hashedPassword)}
@@ -73,7 +73,7 @@ func (s *KeywordDbTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM users")
 	_, delRedisErr := db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
 	if delRedisErr != nil {
-		glog.Fatalf("Cannot delete redis job: %s", delRedisErr)
+		log.Fatalf("Cannot delete redis job: %s", delRedisErr)
 	}
 }
 

@@ -13,7 +13,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -89,7 +89,7 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 func getKeywordsData(keywordService keyword_service.KeywordService) map[string]interface{} {
 	keywords, err := keywordService.GetAll()
 	if err != nil {
-		glog.Errorf("Cannot get keywords: %s", err)
+		log.Errorf("Cannot get keywords: %s", err)
 	}
 	var keywordPresenters []presenters.KeywordPresenter
 

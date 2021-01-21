@@ -6,7 +6,7 @@ import (
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/helpers/error_handler"
 
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -29,7 +29,7 @@ func SaveUser(email string, password string) error {
 
 	hashedPassword, hashPasswordErr := hashPassword(password)
 	if hashPasswordErr != nil {
-		glog.Errorf("Cannot hash password: %s", hashPasswordErr)
+		log.Errorf("Cannot hash password: %s", hashPasswordErr)
 	}
 
 	result := db.GetDB().Create(&User{Email: email, Password: string(hashedPassword)})

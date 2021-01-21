@@ -8,7 +8,7 @@ import (
 	"github.com/gutakk/go-google-scraper/services/google_search_service"
 
 	"github.com/gocraft/work"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -21,7 +21,7 @@ const (
 type Context struct{}
 
 func (c *Context) Log(job *work.Job, next work.NextMiddlewareFunc) error {
-	glog.Infof("Starting %v job for keyword %v", job.Name, job.ArgString("keyword"))
+	log.Infof("Starting %v job for keyword %v", job.Name, job.ArgString("keyword"))
 	return next()
 }
 
@@ -32,7 +32,7 @@ func (c *Context) PerformSearchJob(job *work.Job) error {
 	keywordID := uint(job.ArgInt64("keywordID"))
 	keyword := job.ArgString("keyword")
 	if keywordID == 0 {
-		glog.Infof("Cannot perform job (reason: %v)", invalidKeywordIDError)
+		log.Errorf("Cannot perform job (reason: %v)", invalidKeywordIDError)
 		return errors.New(invalidKeywordIDError)
 	}
 
@@ -71,7 +71,7 @@ func (c *Context) PerformSearchJob(job *work.Job) error {
 	}
 
 	end := time.Since(start)
-	glog.Infof("Job %v for keyword %v done in %v", jobName, keyword, end.String())
+	log.Infof("Job %v for keyword %v done in %v", jobName, keyword, end.String())
 
 	time.Sleep(1 * time.Second)
 	return nil
@@ -84,9 +84,9 @@ func updateStatusToFailed(jobFails int64, jobName string, keywordID uint, keywor
 		updateStatusErr := google_search_service.UpdateKeywordStatus(keywordID, models.Failed, err)
 
 		if updateStatusErr != nil {
-			glog.Fatalf("Cannot update keyword status (reason: %v)", updateStatusErr)
+			log.Errorf("Cannot update keyword status (reason: %v)", updateStatusErr)
 		}
 
-		glog.Infof("Job %v for keyword %v reached maximum fails (reason: %v)", jobName, keyword, err.Error())
+		log.Errorf("Job %v for keyword %v reached maximum fails (reason: %v)", jobName, keyword, err.Error())
 	}
 }

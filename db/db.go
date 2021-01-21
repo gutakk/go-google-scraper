@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -16,9 +16,9 @@ func ConnectDB() (db *gorm.DB) {
 	db, err := gorm.Open(postgres.Open(constructDsn()), &gorm.Config{})
 
 	if err != nil {
-		glog.Fatalf("Failed to connect to database %s", err)
+		log.Fatalf("Failed to connect to database %s", err)
 	} else {
-		glog.Info("Connect to database successfully")
+		log.Info("Connect to database successfully")
 	}
 
 	DB = db

@@ -7,13 +7,13 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 )
 
 func PerformRequest(r http.Handler, method, path string, headers http.Header, payload url.Values) *httptest.ResponseRecorder {
 	req, requesterErr := http.NewRequest(method, path, strings.NewReader(payload.Encode()))
 	if requesterErr != nil {
-		glog.Errorf("Cannot init requester: %s", requesterErr)
+		log.Errorf("Cannot init requester: %s", requesterErr)
 	}
 	return perform(req, r, headers)
 }
@@ -21,7 +21,7 @@ func PerformRequest(r http.Handler, method, path string, headers http.Header, pa
 func PerformFileUploadRequest(r http.Handler, method, path string, headers http.Header, payload *bytes.Buffer) *httptest.ResponseRecorder {
 	req, requesterErr := http.NewRequest(method, path, payload)
 	if requesterErr != nil {
-		glog.Errorf("Cannot init requester: %s", requesterErr)
+		log.Errorf("Cannot init requester: %s", requesterErr)
 	}
 	return perform(req, r, headers)
 }

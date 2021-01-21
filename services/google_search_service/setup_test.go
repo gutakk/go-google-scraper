@@ -8,7 +8,7 @@ import (
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 )
 
 func TestMain(m *testing.M) {
@@ -16,7 +16,7 @@ func TestMain(m *testing.M) {
 
 	err := os.Chdir(path_test.GetRoot())
 	if err != nil {
-		glog.Fatal(err)
+		log.Fatal(err)
 	}
 
 	config.LoadEnv()

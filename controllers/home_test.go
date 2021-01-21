@@ -13,7 +13,7 @@ import (
 	"github.com/gutakk/go-google-scraper/tests/fixture"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/go-playground/assert.v1"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -34,7 +34,7 @@ func TestDisplayHomeWithGuestUser(t *testing.T) {
 func TestDisplayHomeWithAuthenticatedUser(t *testing.T) {
 	database, connectDBErr := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	if connectDBErr != nil {
-		glog.Fatalf("Cannot connect to db: %s", connectDBErr)
+		log.Fatalf("Cannot connect to db: %s", connectDBErr)
 	}
 	db.GetDB = func() *gorm.DB {
 		return database
@@ -42,7 +42,7 @@ func TestDisplayHomeWithAuthenticatedUser(t *testing.T) {
 
 	migrateErr := db.GetDB().AutoMigrate(&models.User{})
 	if migrateErr != nil {
-		glog.Fatalf("Cannot migrate db: %s", migrateErr)
+		log.Fatalf("Cannot migrate db: %s", migrateErr)
 	}
 
 	engine := testConfig.GetRouter(true)

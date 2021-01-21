@@ -7,7 +7,7 @@ import (
 	"github.com/gutakk/go-google-scraper/models"
 
 	"github.com/gocraft/work"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -33,7 +33,7 @@ var EnqueueSearchJob = func(savedKeyword models.Keyword) error {
 		return err
 	}
 
-	glog.Infof("Enqueued %v job for keyword %v", job.Name, job.ArgString("keyword"))
+	log.Infof("Enqueued %v job for keyword %v", job.Name, job.ArgString("keyword"))
 
 	return nil
 }

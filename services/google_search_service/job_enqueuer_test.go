@@ -9,8 +9,8 @@ import (
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 
 	"github.com/gocraft/work"
-	"github.com/golang/glog"
 	"github.com/gomodule/redigo/redis"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/go-playground/assert.v1"
 )
@@ -26,7 +26,7 @@ func (s *JobEnqueuerTestSuite) SetupTest() {
 func (s *JobEnqueuerTestSuite) TearDownTest() {
 	_, delRedisErr := db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
 	if delRedisErr != nil {
-		glog.Fatalf("Cannot delete redis job: %s", delRedisErr)
+		log.Fatalf("Cannot delete redis job: %s", delRedisErr)
 	}
 }
 
@@ -48,13 +48,13 @@ func (s *JobEnqueuerTestSuite) TestEnqueueSearchJobWithValidSavedKeyword() {
 
 	rawJSON, redisErr := redis.Bytes(conn.Do("RPOP", redisKey))
 	if redisErr != nil {
-		glog.Fatalf("Could not RPOP from job queue: %s", redisErr.Error())
+		log.Fatalf("Could not RPOP from job queue: %s", redisErr.Error())
 	}
 
 	var job work.Job
 	unmarshalErr := json.Unmarshal(rawJSON, &job)
 	if unmarshalErr != nil {
-		glog.Errorf("Cannot unmarshal JSON: %s", unmarshalErr)
+		log.Errorf("Cannot unmarshal JSON: %s", unmarshalErr)
 	}
 
 	assert.Equal(s.T(), nil, err)

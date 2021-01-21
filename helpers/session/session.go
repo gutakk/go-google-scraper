@@ -3,7 +3,7 @@ package session
 import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -16,7 +16,7 @@ func AddFlash(c *gin.Context, value interface{}, key string) {
 	session.AddFlash(value, key)
 	err := session.Save()
 	if err != nil {
-		glog.Errorf(cannotSaveSession, err)
+		log.Errorf(cannotSaveSession, err)
 	}
 }
 
@@ -25,7 +25,7 @@ func Flashes(c *gin.Context, key string) []interface{} {
 	flashes := session.Flashes(key)
 	err := session.Save()
 	if err != nil {
-		glog.Errorf(cannotSaveSession, err)
+		log.Errorf(cannotSaveSession, err)
 	}
 
 	return flashes
@@ -45,7 +45,7 @@ func Set(c *gin.Context, key string, value interface{}) {
 	session.Set(key, value)
 	err := session.Save()
 	if err != nil {
-		glog.Errorf(cannotSaveSession, err)
+		log.Errorf(cannotSaveSession, err)
 	}
 }
 
@@ -54,6 +54,6 @@ func Delete(c *gin.Context, key string) {
 	session.Delete(key)
 	err := session.Save()
 	if err != nil {
-		glog.Errorf(cannotSaveSession, err)
+		log.Errorf(cannotSaveSession, err)
 	}
 }

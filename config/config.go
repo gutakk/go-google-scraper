@@ -2,8 +2,8 @@ package config
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/golang/glog"
 	"github.com/joho/godotenv"
+	log "github.com/sirupsen/logrus"
 )
 
 func LoadEnv() {
@@ -18,11 +18,11 @@ func LoadEnv() {
 	}
 
 	if err != nil {
-		glog.Fatalf("Load %s env error: %s", gin.Mode(), err)
+		log.Fatalf("Load %s env error: %s", gin.Mode(), err)
 	}
 
 	err = godotenv.Load()
 	if err != nil {
-		glog.Fatalf("Load env error: %s", err)
+		log.Fatalf("Load env error: %s", err)
 	}
 }

@@ -10,7 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 )
 
 func createFormFile(w *multipart.Writer, fieldname, filename string) (io.Writer, error) {
@@ -24,7 +24,7 @@ func CreateMultipartPayload(filename string) (http.Header, *bytes.Buffer) {
 	path := filename
 	file, openFileErr := os.Open(path)
 	if openFileErr != nil {
-		glog.Errorf("Cannot open file: %s", openFileErr)
+		log.Errorf("Cannot open file: %s", openFileErr)
 	}
 	defer file.Close()
 
@@ -32,12 +32,12 @@ func CreateMultipartPayload(filename string) (http.Header, *bytes.Buffer) {
 	writer := multipart.NewWriter(body)
 	part, createFormFileErr := createFormFile(writer, "file", filepath.Base(path))
 	if createFormFileErr != nil {
-		glog.Errorf("Cannot create form file: %s", createFormFileErr)
+		log.Errorf("Cannot create form file: %s", createFormFileErr)
 	}
 
 	_, copyErr := io.Copy(part, file)
 	if copyErr != nil {
-		glog.Errorf("Cannot copy file part: %s", copyErr)
+		log.Errorf("Cannot copy file part: %s", copyErr)
 	}
 	writer.Close()
 

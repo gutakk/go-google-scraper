@@ -14,7 +14,7 @@ import (
 	"github.com/gutakk/go-google-scraper/services/google_search_service"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -97,13 +97,13 @@ func (k *KeywordService) UploadFile(c *gin.Context, file *multipart.FileHeader) 
 	path := "dist/"
 	mkDirErr := os.Mkdir(path, 0755)
 	if mkDirErr != nil {
-		glog.Errorf("Cannot make directory: %s", mkDirErr)
+		log.Warnf("Cannot make directory: %s", mkDirErr)
 	}
 
 	filename := filepath.Join(path, filepath.Base(file.Filename))
 	saveUploadedFileErr := c.SaveUploadedFile(file, filename)
 	if saveUploadedFileErr != nil {
-		glog.Errorf("Cannot save uploaded file: %s", saveUploadedFileErr)
+		log.Errorf("Cannot save uploaded file: %s", saveUploadedFileErr)
 	}
 
 	return filename
