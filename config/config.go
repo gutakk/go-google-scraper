@@ -18,11 +18,11 @@ func LoadEnv() {
 	}
 
 	if err != nil {
-		log.Fatalf("Load %s env error: %s", gin.Mode(), err)
+		log.Errorf("Load %s env error: %s", gin.Mode(), err)
 	}
 
 	err = godotenv.Load()
 	if err != nil {
-		log.Fatalf("Load env error: %s", err)
+		log.Errorf("Load env error: %s", err)
 	}
 }
