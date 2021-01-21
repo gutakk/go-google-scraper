@@ -37,7 +37,7 @@ func (k *KeywordController) applyRoutes(engine *gin.RouterGroup) {
 
 func (k *KeywordController) displayKeyword(c *gin.Context) {
 	keywordService := initKeywordService(c)
-	data := getKeywordsData(keywordService)
+	data := getKeywordsData(keywordService, c.Request.URL.Query())
 
 	html.RenderWithFlash(c, http.StatusOK, keywordView, keywordTitle, data)
 }
@@ -70,7 +70,7 @@ func (k *KeywordController) displayKeywordHTML(c *gin.Context) {
 
 func (k *KeywordController) uploadKeyword(c *gin.Context) {
 	keywordService := initKeywordService(c)
-	data := getKeywordsData(keywordService)
+	data := getKeywordsData(keywordService, nil)
 
 	form := &UploadFileForm{}
 	if err := c.ShouldBind(form); err != nil {
@@ -126,8 +126,9 @@ func getKeywordResultData(keywordService keyword_service.KeywordService, keyword
 	return data, nil
 }
 
-func getKeywordsData(keywordService keyword_service.KeywordService) map[string]interface{} {
-	keywords, _ := keywordService.GetAll()
+func getKeywordsData(keywordService keyword_service.KeywordService, queryString map[string][]string) map[string]interface{} {
+	conditions := keyword_service.GetConditionFromQuery(queryString)
+	keywords, _ := keywordService.GetAll(conditions)
 	var keywordPresenters []presenters.KeywordPresenter
 
 	for _, k := range keywords {
