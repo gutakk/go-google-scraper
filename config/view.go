@@ -20,8 +20,8 @@ func AppGoviewConfig() goview.Config {
 			"partials/filter_keyword_input",
 		},
 		Funcs: template.FuncMap{
-			"searchResultPartial":  view.SearchResultPartial,
-			"filterKeywordPartial": view.FilterKeywordPartial,
+			"searchResultPartial":       view.SearchResultPartial,
+			"filterKeywordPartialInput": view.FilterKeywordPartialInput,
 		},
 	}
 }
