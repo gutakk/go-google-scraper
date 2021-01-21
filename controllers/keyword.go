@@ -148,5 +148,5 @@ func getCurrentUser(keywordService keyword_service.KeywordService) map[string]in
 
 func initKeywordService(c *gin.Context) keyword_service.KeywordService {
 	currentUser := helpers.GetCurrentUser(c)
-	return keyword_service.KeywordService{CurrentUserID: currentUser.ID}
+	return keyword_service.KeywordService{CurrentUser: currentUser}
 }
