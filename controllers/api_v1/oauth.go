@@ -22,7 +22,7 @@ func (oa *OAuthController) generateClient(c *gin.Context) {
 			Detail: err.Error(),
 			Status: http.StatusUnprocessableEntity,
 		}
-		c.JSON(errorResponse.Status, errorResponse.ConstructErrorResponse())
+		c.JSON(errorResponse.Status, errorResponse.NewErrorResponse())
 	} else {
 		dataResponse := &api_helper.DataResponseObject{
 			ID:         oauthClient.ClientID,

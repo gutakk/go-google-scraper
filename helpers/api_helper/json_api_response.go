@@ -8,7 +8,7 @@ type ErrorResponseObject struct {
 	Status int    `json:"status"`
 }
 
-func (e *ErrorResponseObject) ConstructErrorResponse() gin.H {
+func (e *ErrorResponseObject) NewErrorResponse() gin.H {
 	errorResponse := []ErrorResponseObject{{
 		Title:  e.Title,
 		Detail: e.Detail,

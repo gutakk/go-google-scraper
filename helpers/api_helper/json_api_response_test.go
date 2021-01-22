@@ -9,13 +9,13 @@ import (
 	"gopkg.in/go-playground/assert.v1"
 )
 
-func TestConstructErrorResponseWithValidErrorResponseObject(t *testing.T) {
+func TestNewErrorResponseWithValidErrorResponseObject(t *testing.T) {
 	errorResponseObject := &api_helper.ErrorResponseObject{
 		Title:  "test-error",
 		Detail: "test-detail",
 		Status: 999,
 	}
-	errorResponse := errorResponseObject.ConstructErrorResponse()
+	errorResponse := errorResponseObject.NewErrorResponse()
 	expectedResult := gin.H{
 		"errors": []api_helper.ErrorResponseObject{{
 			Title:  "test-error",
@@ -27,12 +27,12 @@ func TestConstructErrorResponseWithValidErrorResponseObject(t *testing.T) {
 	assert.Equal(t, expectedResult, errorResponse)
 }
 
-func TestConstructErrorResponseWithMissingSomeFieldOnErrorResponseObject(t *testing.T) {
+func TestNewErrorResponseWithMissingSomeFieldOnErrorResponseObject(t *testing.T) {
 	errorResponseObject := &api_helper.ErrorResponseObject{
 		Detail: "test-detail",
 		Status: 999,
 	}
-	errorResponse := errorResponseObject.ConstructErrorResponse()
+	errorResponse := errorResponseObject.NewErrorResponse()
 	expectedResult := gin.H{
 		"errors": []api_helper.ErrorResponseObject{{
 			Detail: "test-detail",
