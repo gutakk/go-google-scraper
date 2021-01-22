@@ -2,12 +2,15 @@ package controllers
 
 import (
 	"net/http"
+	"os"
+
+	"github.com/gutakk/go-google-scraper/config"
+	"github.com/gutakk/go-google-scraper/controllers/api_v1"
+	html "github.com/gutakk/go-google-scraper/helpers/html"
+	"github.com/gutakk/go-google-scraper/middlewares"
 
 	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-gonic/gin"
-	"github.com/gutakk/go-google-scraper/config"
-	html "github.com/gutakk/go-google-scraper/helpers/html"
-	"github.com/gutakk/go-google-scraper/middlewares"
 )
 
 const (
@@ -31,6 +34,31 @@ func CombineRoutes(engine *gin.Engine) {
 	// Ensure guest user group
 	new(RegisterController).applyRoutes(EnsureGuestUserGroup(engine))
 	new(LoginController).applyRoutes(EnsureGuestUserGroup(engine))
+
+	// V1 API group
+	v1 := engine.Group("/api/v1")
+	// Basic Auth API group
+	new(api_v1.OAuthController).ApplyRoutes(BasicAuthAPIGroup(v1))
+	// Public API group
+	new(api_v1.TokenAPIController).ApplyRoutes(PublicAPIGroup(v1))
+	// Private API group
+}
+
+func BasicAuthAPIGroup(apiVersion *gin.RouterGroup) *gin.RouterGroup {
+	return apiVersion.Group("", gin.BasicAuth(gin.Accounts{
+		os.Getenv("BASIC_AUTHENTICATION_USERNAME"): os.Getenv("BASIC_AUTHENTICATION_PASSWORD"),
+	}))
+}
+
+func PublicAPIGroup(apiVersion *gin.RouterGroup) *gin.RouterGroup {
+	return apiVersion.Group("")
+}
+
+func PrivateAPIGroup(apiVersion *gin.RouterGroup) *gin.RouterGroup {
+	privateAPIGroup := apiVersion.Group("")
+	privateAPIGroup.Use(middlewares.ValidateToken)
+
+	return privateAPIGroup
 }
 
 func EnsureAuthenticatedUserGroup(engine *gin.Engine) *gin.RouterGroup {

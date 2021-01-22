@@ -9,6 +9,11 @@ import (
 	"github.com/gutakk/go-google-scraper/controllers"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/migration"
+	"github.com/gutakk/go-google-scraper/oauth"
+)
+
+const (
+	startServerFailureError = "Failed to start the server %v"
 )
 
 func main() {
@@ -17,11 +22,15 @@ func main() {
 	migration.Migrate(database)
 
 	db.SetupRedisPool()
+	oauthServerErr := oauth.SetupOAuthServer()
+	if oauthServerErr != nil {
+		log.Fatal(fmt.Sprintf(startServerFailureError, oauthServerErr))
+	}
 
 	r := config.SetupRouter()
 	controllers.CombineRoutes(r)
 
 	if error := r.Run(fmt.Sprint(":", os.Getenv("PORT"))); error != nil {
-		log.Fatal(fmt.Sprintf("Failed to start the server %v", error))
+		log.Fatal(fmt.Sprintf(startServerFailureError, error))
 	}
 }
