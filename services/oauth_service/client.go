@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/gutakk/go-google-scraper/oauth"
-	"github.com/gutakk/go-google-scraper/services/login_api_service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-oauth2/oauth2/v4/models"
@@ -36,7 +35,7 @@ func GenerateClient() (OAuthClient, error) {
 
 func GenerateToken(c *gin.Context) {
 	server := oauth.GetOAuthServer()
-	server.SetPasswordAuthorizationHandler(login_api_service.PasswordAuthorizationHandler)
+	server.SetPasswordAuthorizationHandler(PasswordAuthorizationHandler)
 
 	err := server.HandleTokenRequest(c.Writer, c.Request)
 	if err != nil {

@@ -1,4 +1,4 @@
-package login_api_service
+package oauth_service
 
 import (
 	"fmt"

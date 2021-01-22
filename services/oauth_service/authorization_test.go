@@ -1,4 +1,4 @@
-package login_api_service_test
+package oauth_service_test
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/oauth"
-	"github.com/gutakk/go-google-scraper/services/login_api_service"
+	"github.com/gutakk/go-google-scraper/services/oauth_service"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/oauth_test"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
@@ -76,21 +76,21 @@ func TestLoginAPIServiceDbTestSuite(t *testing.T) {
 }
 
 func (s *LoginAPIServiceDbTestSuite) TestPasswordAuthorizationHandlerWithValidParams() {
-	userID, err := login_api_service.PasswordAuthorizationHandler(s.user.Email, "password")
+	userID, err := oauth_service.PasswordAuthorizationHandler(s.user.Email, "password")
 
 	assert.Equal(s.T(), fmt.Sprint(s.user.ID), userID)
 	assert.Equal(s.T(), nil, err)
 }
 
 func (s *LoginAPIServiceDbTestSuite) TestPasswordAuthorizationHandlerInvalidEmail() {
-	userID, err := login_api_service.PasswordAuthorizationHandler("invalidEmail", "password")
+	userID, err := oauth_service.PasswordAuthorizationHandler("invalidEmail", "password")
 
 	assert.Equal(s.T(), "", userID)
 	assert.Equal(s.T(), errors.ErrInvalidClient, err)
 }
 
 func (s *LoginAPIServiceDbTestSuite) TestPasswordAuthorizationHandlerInvalidPassword() {
-	userID, err := login_api_service.PasswordAuthorizationHandler(s.user.Email, "invalidPassword")
+	userID, err := oauth_service.PasswordAuthorizationHandler(s.user.Email, "invalidPassword")
 
 	assert.Equal(s.T(), "", userID)
 	assert.Equal(s.T(), errors.ErrInvalidClient, err)
