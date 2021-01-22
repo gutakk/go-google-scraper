@@ -33,7 +33,7 @@ func (kapi *KeywordAPIController) fetchKeywords(c *gin.Context) {
 			Detail: err.Error(),
 			Status: http.StatusBadRequest,
 		}
-		c.JSON(errorResponse.Status, errorResponse.ConstructErrorResponse())
+		c.JSON(errorResponse.Status, errorResponse.NewErrorResponse())
 		return
 	}
 
