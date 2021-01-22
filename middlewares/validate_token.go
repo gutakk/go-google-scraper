@@ -24,7 +24,7 @@ func ValidateToken(c *gin.Context) {
 			errorResponse.Detail = err.Error()
 		}
 
-		c.JSON(http.StatusUnauthorized, errorResponse.ConstructErrorResponse())
+		c.JSON(http.StatusUnauthorized, errorResponse.NewErrorResponse())
 		c.Abort()
 		return
 	}

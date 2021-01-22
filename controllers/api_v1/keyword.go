@@ -28,7 +28,7 @@ func (kapi *KeywordAPIController) uploadKeyword(c *gin.Context) {
 			Detail: errors.New(invalidFileErr).Error(),
 			Status: http.StatusBadRequest,
 		}
-		c.JSON(http.StatusBadRequest, errorResponse.ConstructErrorResponse())
+		c.JSON(http.StatusBadRequest, errorResponse.NewErrorResponse())
 		return
 	}
 
@@ -41,7 +41,7 @@ func (kapi *KeywordAPIController) uploadKeyword(c *gin.Context) {
 			Detail: validateTypeErr.Error(),
 			Status: http.StatusBadRequest,
 		}
-		c.JSON(errorResponse.Status, errorResponse.ConstructErrorResponse())
+		c.JSON(errorResponse.Status, errorResponse.NewErrorResponse())
 		return
 	}
 
@@ -53,7 +53,7 @@ func (kapi *KeywordAPIController) uploadKeyword(c *gin.Context) {
 			Detail: readFileErr.Error(),
 			Status: http.StatusUnprocessableEntity,
 		}
-		c.JSON(errorResponse.Status, errorResponse.ConstructErrorResponse())
+		c.JSON(errorResponse.Status, errorResponse.NewErrorResponse())
 		return
 	}
 
@@ -64,7 +64,7 @@ func (kapi *KeywordAPIController) uploadKeyword(c *gin.Context) {
 			Detail: validateLengthErr.Error(),
 			Status: http.StatusBadRequest,
 		}
-		c.JSON(errorResponse.Status, errorResponse.ConstructErrorResponse())
+		c.JSON(errorResponse.Status, errorResponse.NewErrorResponse())
 		return
 	}
 
@@ -75,7 +75,7 @@ func (kapi *KeywordAPIController) uploadKeyword(c *gin.Context) {
 			Detail: saveKeywordsErr.Error(),
 			Status: http.StatusBadRequest,
 		}
-		c.JSON(errorResponse.Status, errorResponse.ConstructErrorResponse())
+		c.JSON(errorResponse.Status, errorResponse.NewErrorResponse())
 		return
 	}
 
