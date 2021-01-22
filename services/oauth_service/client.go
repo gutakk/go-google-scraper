@@ -2,10 +2,12 @@ package oauth_service
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 
 	"github.com/gutakk/go-google-scraper/oauth"
 
+	"github.com/gin-gonic/gin"
 	"github.com/go-oauth2/oauth2/v4/models"
 	"github.com/google/uuid"
 )
@@ -29,4 +31,11 @@ func GenerateClient() (OAuthClient, error) {
 	}
 
 	return OAuthClient{ClientID: clientID, ClientSecret: clientSecret}, nil
+}
+
+func GenerateToken(c *gin.Context) {
+	err := oauth.GetOAuthServer().HandleTokenRequest(c.Writer, c.Request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, nil)
+	}
 }
