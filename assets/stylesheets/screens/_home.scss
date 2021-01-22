@@ -1,0 +1,38 @@
+body.home {
+  @apply text-center;
+
+  .display-title {
+    @screen sm {
+      @apply text-5xl;
+    }
+
+    @screen md {
+      @apply text-6xl;
+    }
+
+    &__highlight {
+      @apply text-indigo-600;
+    }
+  }
+
+  .display-subtitle {
+    @apply mt-3;
+
+    @screen sm {
+      @apply mt-5;
+    }
+
+    @screen md {
+      @apply text-xl;
+    }
+  }
+
+  .button-primary {
+    @apply py-2 px-4 mt-5;
+    width: fit-content;
+
+    @screen sm {
+      @apply mt-8 px-8 py-4 text-lg;
+    }
+  }
+}
