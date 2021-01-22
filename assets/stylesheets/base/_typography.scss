@@ -2,6 +2,14 @@ a {
   @apply text-indigo-600 font-semibold;
 }
 
+h1 {
+  @apply text-4xl font-extrabold text-gray-900;
+}
+
 h2 {
   @apply text-3xl font-extrabold text-gray-900;
+}
+
+h4 {
+  @apply text-lg text-gray-500;
 }
