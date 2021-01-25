@@ -2,11 +2,7 @@
 
 <div class="space-y-2">
   <label>{{ .filterLabel }}</label>
-  {{ $filterValue := "" }}
-  {{ if .filter }}
-    {{ $filterValue = index .filter .filterName 0 }}
-  {{ end }}
-  <input name={{ .filterName }} type="text" placeholder={{ .filterPlaceholder }} value={{ $filterValue }}>
+  <input name={{ .filterName }} type="text" placeholder={{ .filterPlaceholder }} value={{ .filter }}>
 </div>
 
 {{ end }}

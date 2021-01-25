@@ -10,12 +10,12 @@ import (
 
 func TestFilterKeywordPartialInputWithValidParams(t *testing.T) {
 	filter := map[string][]string{
-		"testFilter": {"Lorem Ipsum"},
+		"filter[test]": {"Lorem Ipsum"},
 	}
-	result := view.FilterKeywordPartialInput(filter, "testLabel", "testName", "testPlaceholder")
+	result := view.FilterKeywordPartialInput(filter, "testLabel", "filter[test]", "testPlaceholder")
 
-	assert.Equal(t, map[string][]string{"testFilter": {"Lorem Ipsum"}}, result["filter"])
+	assert.Equal(t, "Lorem Ipsum", result["filter"])
 	assert.Equal(t, "testLabel", result["filterLabel"])
-	assert.Equal(t, "testName", result["filterName"])
+	assert.Equal(t, "filter[test]", result["filterName"])
 	assert.Equal(t, "testPlaceholder", result["filterPlaceholder"])
 }
