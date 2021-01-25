@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gutakk/go-google-scraper/helpers/api_helper"
+	errorHelpers "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	helpers "github.com/gutakk/go-google-scraper/helpers/user"
 	"github.com/gutakk/go-google-scraper/serializers"
 	"github.com/gutakk/go-google-scraper/services/keyword_service"
@@ -31,9 +32,16 @@ func (kapi *KeywordAPIController) fetchKeyword(c *gin.Context) {
 
 	keyword, err := keywordService.GetKeywordResult(keywordID)
 	if err != nil {
+		var status int
+		if err.Error() == errorHelpers.KeywordNotFoundError {
+			status = http.StatusNotFound
+		} else {
+			status = http.StatusBadRequest
+		}
+
 		errorResponse := api_helper.ErrorResponseObject{
 			Detail: err.Error(),
-			Status: http.StatusBadRequest,
+			Status: status,
 		}
 		c.JSON(errorResponse.Status, errorResponse.NewErrorResponse())
 		return
