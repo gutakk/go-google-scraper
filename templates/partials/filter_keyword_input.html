@@ -2,11 +2,11 @@
 
 <div class="space-y-2">
   <label>{{ .filterLabel }}</label>
-  {{ $queryValue := "" }}
-  {{ if .query }}
-    {{ $queryValue = index .query .filterName 0 }}
+  {{ $filterValue := "" }}
+  {{ if .filter }}
+    {{ $filterValue = index .filter .filterName 0 }}
   {{ end }}
-  <input name={{ .filterName }} type="text" placeholder={{ .filterPlaceholder }} value={{ $queryValue }}>
+  <input name={{ .filterName }} type="text" placeholder={{ .filterPlaceholder }} value={{ $filterValue }}>
 </div>
 
 {{ end }}
