@@ -127,6 +127,189 @@ func TestKeywordAPIControllerDbTestSuite(t *testing.T) {
 	suite.Run(t, new(KeywordAPIControllerDbTestSuite))
 }
 
+func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParams() {
+	keyword := models.Keyword{
+		Model:                   &gorm.Model{ID: 1},
+		Keyword:                 "testKeyword",
+		Status:                  models.Pending,
+		LinksCount:              1,
+		NonAdwordsCount:         1,
+		TopPositionAdwordsCount: 1,
+		TotalAdwordsCount:       1,
+		UserID:                  s.user.ID,
+		HtmlCode:                "testHTML",
+		FailedReason:            "",
+	}
+	db.GetDB().Create(&keyword)
+
+	headers := http.Header{}
+	headers.Set("Authorization", "Bearer test-access")
+
+	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", headers, nil)
+	respBodyData, _ := ioutil.ReadAll(resp.Body)
+
+	expectedResp := `{` +
+		`"data":{` +
+		`"id":"1",` +
+		`"type":"keyword",` +
+		`"attributes":{` +
+		`"keyword":"testKeyword",` +
+		`"status":"pending",` +
+		`"links_count":1,` +
+		`"non_adwords_count":1,` +
+		`"top_position_adwords_count":1,` +
+		`"total_adwords_count":1,` +
+		`"html_code":"testHTML"` +
+		`},` +
+		`"relationships":{` +
+		`"user":{` +
+		`"data":{` +
+		fmt.Sprintf(`"id":"%v",`, fmt.Sprint(s.user.ID)) +
+		`"type":"user"` +
+		`}}}}}`
+
+	assert.Equal(s.T(), http.StatusOK, resp.Code)
+	assert.Equal(s.T(), expectedResp, string(respBodyData))
+}
+
+func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithInvalidKeywordID() {
+	keyword := models.Keyword{
+		Model:                   &gorm.Model{ID: 1},
+		Keyword:                 "testKeyword",
+		Status:                  models.Pending,
+		LinksCount:              1,
+		NonAdwordsCount:         1,
+		TopPositionAdwordsCount: 1,
+		TotalAdwordsCount:       1,
+		UserID:                  s.user.ID,
+		HtmlCode:                "testHTML",
+		FailedReason:            "",
+	}
+	db.GetDB().Create(&keyword)
+
+	headers := http.Header{}
+	headers.Set("Authorization", "Bearer test-access")
+
+	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/9999", headers, nil)
+	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	var parsedRespBody map[string][]api_helper.ErrorResponseObject
+	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+
+	assert.Equal(s.T(), http.StatusNotFound, resp.Code)
+	assert.Equal(s.T(), "keyword not found", parsedRespBody["errors"][0].Detail)
+}
+
+func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParamsButNotTheResourceOwner() {
+	tokenItem := &oauth_test.TokenStoreItem{
+		CreatedAt: time.Now(),
+		ExpiresAt: time.Now(),
+		Code:      "test-code",
+		Access:    "test-not-resource-owner",
+		Refresh:   "test-refresh",
+	}
+
+	data, _ := json.Marshal(&oauth_test.TokenData{
+		Access: tokenItem.Access,
+		UserID: "invalidUserID",
+	})
+	tokenItem.Data = data
+
+	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
+		tokenItem.CreatedAt,
+		tokenItem.ExpiresAt,
+		tokenItem.Code,
+		tokenItem.Access,
+		tokenItem.Refresh,
+		tokenItem.Data,
+	)
+
+	keyword := models.Keyword{
+		Model:                   &gorm.Model{ID: 1},
+		Keyword:                 "testKeyword",
+		Status:                  models.Pending,
+		LinksCount:              1,
+		NonAdwordsCount:         1,
+		TopPositionAdwordsCount: 1,
+		TotalAdwordsCount:       1,
+		UserID:                  s.user.ID,
+		HtmlCode:                "testHTML",
+		FailedReason:            "",
+	}
+	db.GetDB().Create(&keyword)
+
+	headers := http.Header{}
+	headers.Set("Authorization", "Bearer test-not-resource-owner")
+
+	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", headers, nil)
+	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	var parsedRespBody map[string][]api_helper.ErrorResponseObject
+	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+
+	assert.Equal(s.T(), http.StatusNotFound, resp.Code)
+	assert.Equal(s.T(), "keyword not found", parsedRespBody["errors"][0].Detail)
+}
+
+func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithoutAuthorizationHeader() {
+	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", nil, nil)
+	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	var parsedRespBody map[string][]api_helper.ErrorResponseObject
+	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+
+	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
+	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
+}
+
+func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithInvalidAccessToken() {
+	headers := http.Header{}
+	headers.Set("Authorization", "invalid_token")
+
+	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", headers, nil)
+	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	var parsedRespBody map[string][]api_helper.ErrorResponseObject
+	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+
+	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
+	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
+}
+
+func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithExpiredAccessToken() {
+	db.GetDB().Exec("DELETE FROM oauth2_tokens")
+
+	tokenItem := &oauth_test.TokenStoreItem{
+		CreatedAt: time.Now(),
+		ExpiresAt: time.Now(),
+		Code:      "test-code",
+		Access:    "test-access",
+		Refresh:   "test-refresh",
+	}
+
+	data, _ := json.Marshal(&oauth_test.TokenData{
+		AccessExpiresIn: 1,
+		Access:          tokenItem.Access,
+	})
+	tokenItem.Data = data
+
+	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
+		tokenItem.CreatedAt,
+		tokenItem.ExpiresAt,
+		tokenItem.Code,
+		tokenItem.Access,
+		tokenItem.Refresh,
+		tokenItem.Data,
+	)
+
+	headers := http.Header{}
+	headers.Set("Authorization", "Bearer test-access")
+
+	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", headers, nil)
+	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	var parsedRespBody map[string][]api_helper.ErrorResponseObject
+	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+
+	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
+	assert.Equal(s.T(), errors.ErrExpiredAccessToken.Error(), parsedRespBody["errors"][0].Detail)
+}
+
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParams() {
 	keyword := models.Keyword{UserID: s.user.ID, Keyword: "testKeyword"}
 	db.GetDB().Create(&keyword)
