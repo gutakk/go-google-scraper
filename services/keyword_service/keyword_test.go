@@ -65,46 +65,46 @@ func TestKeywordServiceDbTestSuite(t *testing.T) {
 	suite.Run(t, new(KeywordServiceDbTestSuite))
 }
 
-func (s *KeywordServiceDbTestSuite) TestGetAllWithValidUser() {
+func (s *KeywordServiceDbTestSuite) TestGetKeywordsWithValidUser() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	result, err := s.keywordService.GetAll(nil)
+	result, err := s.keywordService.GetKeywords(nil)
 
 	assert.Equal(s.T(), 1, len(result))
 	assert.Equal(s.T(), keyword.Keyword, result[0].Keyword)
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordServiceDbTestSuite) TestGetAllWithValidUserAndAdditionalConditions() {
+func (s *KeywordServiceDbTestSuite) TestGetKeywordsWithValidUserAndAdditionalConditions() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: "test"}
 	db.GetDB().Create(&keyword)
 
 	additionalCondition := []string{"keyword = 'test'"}
-	result, err := s.keywordService.GetAll(additionalCondition)
+	result, err := s.keywordService.GetKeywords(additionalCondition)
 
 	assert.Equal(s.T(), 1, len(result))
 	assert.Equal(s.T(), keyword.Keyword, result[0].Keyword)
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordServiceDbTestSuite) TestGetAllWithValidUserButInvalidAdditionalConditions() {
+func (s *KeywordServiceDbTestSuite) TestGetKeywordsWithValidUserButInvalidAdditionalConditions() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: "test"}
 	db.GetDB().Create(&keyword)
 
 	additionalCondition := []string{"keyword = 'invalid'"}
-	result, err := s.keywordService.GetAll(additionalCondition)
+	result, err := s.keywordService.GetKeywords(additionalCondition)
 
 	assert.Equal(s.T(), 0, len(result))
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordServiceDbTestSuite) TestGetAllWithInvalidUser() {
+func (s *KeywordServiceDbTestSuite) TestGetKeywordsWithInvalidUser() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
 	keywordService := KeywordService{}
-	result, err := keywordService.GetAll(nil)
+	result, err := keywordService.GetKeywords(nil)
 
 	assert.Equal(s.T(), 0, len(result))
 	assert.Equal(s.T(), nil, err)

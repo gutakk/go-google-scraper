@@ -31,7 +31,7 @@ type KeywordService struct {
 	CurrentUserID uint
 }
 
-func (k *KeywordService) GetAll(conditions []string) ([]models.Keyword, error) {
+func (k *KeywordService) GetKeywords(conditions []string) ([]models.Keyword, error) {
 	conditions = append(conditions, fmt.Sprintf("user_id = '%s'", fmt.Sprint(k.CurrentUserID)))
 
 	keywords, err := models.GetKeywordsBy(strings.Join(conditions, " AND "))
