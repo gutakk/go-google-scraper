@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql/driver"
 	"errors"
+	"strings"
 
 	"github.com/gutakk/go-google-scraper/db"
 
@@ -58,13 +59,11 @@ func GetKeywordBy(condition map[string]interface{}) (Keyword, error) {
 	return keyword, nil
 }
 
-func GetKeywordsBy(condition interface{}) ([]Keyword, error) {
-	if condition == nil {
-		condition = make(map[string]interface{})
-	}
+func GetKeywordsBy(conditions []string) ([]Keyword, error) {
+	joinedConditions := strings.Join(conditions, " AND ")
 	var keywords []Keyword
 
-	err := db.GetDB().Where(condition).Order("keyword").Find(&keywords).Error
+	err := db.GetDB().Where(joinedConditions).Order("keyword").Find(&keywords).Error
 	if err != nil {
 		return nil, err
 	}

@@ -190,51 +190,24 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByWithMoreThanOneRows() {
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordDBTestSuite) TestGetKeywordsByValidKeywordMapCondition() {
-	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
-	db.GetDB().Create(&keyword)
-
-	condition := make(map[string]interface{})
-	condition["keyword"] = keyword.Keyword
-
-	result, err := GetKeywordsBy(condition)
-
-	assert.Equal(s.T(), 1, len(result))
-	assert.Equal(s.T(), keyword.Keyword, result[0].Keyword)
-	assert.Equal(s.T(), nil, err)
-}
-
 func (s *KeywordDBTestSuite) TestGetKeywordsByValidKeywordStringCondition() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	condition := fmt.Sprintf("keyword = '%s'", keyword.Keyword)
+	conditions := []string{fmt.Sprintf("keyword = '%s'", keyword.Keyword)}
 
-	result, err := GetKeywordsBy(condition)
+	result, err := GetKeywordsBy(conditions)
 
 	assert.Equal(s.T(), 1, len(result))
 	assert.Equal(s.T(), keyword.Keyword, result[0].Keyword)
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidKeywordMapCondition() {
+func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidKeywordCondition() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	condition := make(map[string]interface{})
-	condition["keyword"] = "invalid"
-
-	result, err := GetKeywordsBy(condition)
-
-	assert.Equal(s.T(), 0, len(result))
-	assert.Equal(s.T(), nil, err)
-}
-
-func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidKeywordStringCondition() {
-	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
-	db.GetDB().Create(&keyword)
-
-	condition := "keyword = 'invalid'"
+	condition := []string{"keyword = 'invalid'"}
 
 	result, err := GetKeywordsBy(condition)
 
@@ -253,28 +226,13 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByWithoutKeyword() {
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidColumnMapCondition() {
+func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidColumnCondition() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	condition := make(map[string]interface{})
-	condition["unknown_column"] = keyword.Keyword
+	conditions := []string{fmt.Sprintf("unknown_column = '%s'", keyword.Keyword)}
 
-	result, err := GetKeywordsBy(condition)
-	_, isPgError := err.(*pgconn.PgError)
-
-	assert.Equal(s.T(), "ERROR: column \"unknown_column\" does not exist (SQLSTATE 42703)", err.Error())
-	assert.Equal(s.T(), true, isPgError)
-	assert.Equal(s.T(), nil, result)
-}
-
-func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidColumnStringCondition() {
-	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
-	db.GetDB().Create(&keyword)
-
-	condition := fmt.Sprintf("unknown_column = '%s'", keyword.Keyword)
-
-	result, err := GetKeywordsBy(condition)
+	result, err := GetKeywordsBy(conditions)
 	_, isPgError := err.(*pgconn.PgError)
 
 	assert.Equal(s.T(), "ERROR: column \"unknown_column\" does not exist (SQLSTATE 42703)", err.Error())

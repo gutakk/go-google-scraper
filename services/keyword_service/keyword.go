@@ -8,7 +8,6 @@ import (
 	"mime/multipart"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/gutakk/go-google-scraper/db"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
@@ -34,7 +33,7 @@ type KeywordService struct {
 func (k *KeywordService) GetKeywords(conditions []string) ([]models.Keyword, error) {
 	conditions = append(conditions, fmt.Sprintf("user_id = '%s'", fmt.Sprint(k.CurrentUserID)))
 
-	keywords, err := models.GetKeywordsBy(strings.Join(conditions, " AND "))
+	keywords, err := models.GetKeywordsBy(conditions)
 	if err != nil {
 		return nil, errorHandler.DatabaseErrorMessage(err)
 	}
