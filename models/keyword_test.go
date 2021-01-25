@@ -193,11 +193,11 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByValidKeywordStringCondition() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	conditions := []map[string]string{
+	conditions := []Condition{
 		{
-			"column": "keyword",
-			"value":  keyword.Keyword,
-			"type":   Equal,
+			ConditionName: "keyword",
+			Value:         keyword.Keyword,
+			Type:          Equal,
 		},
 	}
 
@@ -212,11 +212,11 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidKeywordCondition() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	conditions := []map[string]string{
+	conditions := []Condition{
 		{
-			"column": "keyword",
-			"value":  "invalid",
-			"type":   Equal,
+			ConditionName: "keyword",
+			Value:         "invalid",
+			Type:          Equal,
 		},
 	}
 
@@ -241,19 +241,17 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidColumnCondition() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	conditions := []map[string]string{
+	conditions := []Condition{
 		{
-			"column": "unknown_column",
-			"value":  keyword.Keyword,
-			"type":   Equal,
+			ConditionName: "unknown_column",
+			Value:         keyword.Keyword,
+			Type:          Equal,
 		},
 	}
 
 	result, err := GetKeywordsBy(conditions)
-	_, isPgError := err.(*pgconn.PgError)
 
-	assert.Equal(s.T(), "ERROR: column \"unknown_column\" does not exist (SQLSTATE 42703)", err.Error())
-	assert.Equal(s.T(), true, isPgError)
+	assert.Equal(s.T(), "could not join conditions", err.Error())
 	assert.Equal(s.T(), nil, result)
 }
 
@@ -319,38 +317,38 @@ func (s *KeywordDBTestSuite) TestUpdateKeywordWithInvalidStatus() {
 }
 
 func TestGetJoinedConditionsWithValidConditionsMap(t *testing.T) {
-	conditions := []map[string]string{
+	conditions := []Condition{
 		{
-			"column": "columnA",
-			"value":  "testA",
-			"type":   Equal,
+			ConditionName: "keyword",
+			Value:         "testKeyword",
+			Type:          Like,
 		},
 		{
-			"column": "columnB",
-			"value":  "testB",
-			"type":   Equal,
+			ConditionName: "user_id",
+			Value:         "testUserID",
+			Type:          Equal,
 		},
 	}
 
 	result, err := getJoinedConditions(conditions)
 
-	expected := "columnA = 'testA' AND columnB = 'testB'"
+	expected := "LOWER(keyword) LIKE LOWER('%testKeyword%') AND user_id = 'testUserID'"
 
 	assert.Equal(t, expected, result)
 	assert.Equal(t, nil, err)
 }
 
-func TestGetJoinedConditionsWithInvalidType(t *testing.T) {
-	conditions := []map[string]string{
+func TestGetJoinedConditionsWithInvalidFilter(t *testing.T) {
+	conditions := []Condition{
 		{
-			"column": "columnA",
-			"value":  "testA",
-			"type":   "invalid",
+			ConditionName: "invalid",
+			Value:         "testKeyword",
+			Type:          Like,
 		},
 		{
-			"column": "columnB",
-			"value":  "testB",
-			"type":   "invalid",
+			ConditionName: "invalid",
+			Value:         "testUserID",
+			Type:          Equal,
 		},
 	}
 
@@ -360,17 +358,37 @@ func TestGetJoinedConditionsWithInvalidType(t *testing.T) {
 	assert.Equal(t, "could not join conditions", err.Error())
 }
 
-func TestGetJoinedConditionsWithInvalidKey(t *testing.T) {
-	conditions := []map[string]string{
+func TestGetJoinedConditionsWithBlankValue(t *testing.T) {
+	conditions := []Condition{
 		{
-			"invalidConditionKey": "columnA",
-			"invalidValueKey":     "testA",
-			"type":                Equal,
+			ConditionName: "keyword",
+			Value:         "",
+			Type:          Like,
 		},
 		{
-			"invalidConditionKey": "columnB",
-			"invalidValueKey":     "testB",
-			"type":                Equal,
+			ConditionName: "user_id",
+			Value:         "",
+			Type:          Equal,
+		},
+	}
+
+	result, err := getJoinedConditions(conditions)
+
+	assert.Equal(t, "", result)
+	assert.Equal(t, "could not join conditions", err.Error())
+}
+
+func TestGetJoinedConditionsWithInvalidType(t *testing.T) {
+	conditions := []Condition{
+		{
+			ConditionName: "keyword",
+			Value:         "testKeyword",
+			Type:          "invalid",
+		},
+		{
+			ConditionName: "user_id",
+			Value:         "testUserID",
+			Type:          "invalid",
 		},
 	}
 

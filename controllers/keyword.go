@@ -24,11 +24,11 @@ const (
 	uploadSuccessFlash = "CSV uploaded successfully"
 )
 
-var FilterMapper = []map[string]string{
+var FilterList = []map[string]string{
 	{
-		"queryString":    "filter[keyword]",
-		"dbColumn":       "keyword",
-		"constraintType": models.Like,
+		"queryString": "filter[keyword]",
+		"filter":      "keyword",
+		"type":        models.Like,
 	},
 }
 
@@ -152,16 +152,16 @@ func getKeywordsData(keywordService keyword_service.KeywordService, queryString 
 	return data
 }
 
-func validateValidConditions(queryString map[string][]string) []map[string]string {
-	var validConditions []map[string]string
+func validateValidConditions(queryString map[string][]string) []models.Condition {
+	var validConditions []models.Condition
 
-	for _, f := range FilterMapper {
+	for _, f := range FilterList {
 		queryStringValue := queryString[f["queryString"]]
 		if queryStringValue != nil && queryStringValue[0] != "" {
-			validConditions = append(validConditions, map[string]string{
-				"column": f["dbColumn"],
-				"value":  queryStringValue[0],
-				"type":   f["constraintType"],
+			validConditions = append(validConditions, models.Condition{
+				ConditionName: f["filter"],
+				Value:         queryStringValue[0],
+				Type:          f["type"],
 			})
 		}
 	}

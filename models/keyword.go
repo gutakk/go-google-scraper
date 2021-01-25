@@ -26,9 +26,15 @@ const (
 	couldNotJoinConditionError = "could not join conditions"
 )
 
-var Condition = map[string]string{
+var WhereStatement = map[string]string{
 	Equal: "%s = '%s'",
 	Like:  "LOWER(%s) LIKE LOWER('%%%s%%')",
+}
+
+// Map query string filter to db column
+var ConditionMapper = map[string]string{
+	"keyword": "keyword",
+	"user_id": "user_id",
 }
 
 func (k KeywordStatus) Value() (driver.Value, error) {
@@ -37,6 +43,12 @@ func (k KeywordStatus) Value() (driver.Value, error) {
 		return string(k), nil
 	}
 	return nil, errors.New(InvalidKeywordStatusErr)
+}
+
+type Condition struct {
+	ConditionName string
+	Value         string
+	Type          string
 }
 
 type Keyword struct {
@@ -66,7 +78,7 @@ func GetKeywordBy(condition map[string]interface{}) (Keyword, error) {
 	return keyword, nil
 }
 
-func GetKeywordsBy(conditions []map[string]string) ([]Keyword, error) {
+func GetKeywordsBy(conditions []Condition) ([]Keyword, error) {
 	var keywords []Keyword
 
 	joinedConditions, err := getJoinedConditions(conditions)
@@ -107,16 +119,18 @@ func UpdateKeyword(keywordID uint, newKeyword Keyword) error {
 	return nil
 }
 
-func getJoinedConditions(conditions []map[string]string) (string, error) {
+func getJoinedConditions(conditions []Condition) (string, error) {
 	var formattedConditions []string
 
 	for _, c := range conditions {
-		conditionType := Condition[c["type"]]
-		conditionColumn := c["column"]
-		conditionValue := c["value"]
+		conditionName := c.ConditionName
+		conditionValue := c.Value
+		whereType := c.Type
+		dbColumn := ConditionMapper[conditionName]
+		whereStatement := WhereStatement[whereType]
 
-		if conditionType != "" && conditionColumn != "" && conditionValue != "" {
-			formattedConditions = append(formattedConditions, fmt.Sprintf(conditionType, conditionColumn, conditionValue))
+		if conditionValue != "" && dbColumn != "" && whereStatement != "" {
+			formattedConditions = append(formattedConditions, fmt.Sprintf(whereStatement, dbColumn, conditionValue))
 		} else {
 			return "", errors.New(couldNotJoinConditionError)
 		}

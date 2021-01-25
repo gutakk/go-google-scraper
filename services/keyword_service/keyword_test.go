@@ -80,11 +80,11 @@ func (s *KeywordServiceDbTestSuite) TestGetKeywordsWithValidUserAndAdditionalCon
 	keyword := models.Keyword{UserID: s.userID, Keyword: "test"}
 	db.GetDB().Create(&keyword)
 
-	additionalCondition := []map[string]string{
+	additionalCondition := []models.Condition{
 		{
-			"column": "keyword",
-			"value":  "test",
-			"type":   models.Equal,
+			ConditionName: "keyword",
+			Value:         "test",
+			Type:          models.Equal,
 		},
 	}
 	result, err := s.keywordService.GetKeywords(additionalCondition)
@@ -98,11 +98,11 @@ func (s *KeywordServiceDbTestSuite) TestGetKeywordsWithValidUserButInvalidAdditi
 	keyword := models.Keyword{UserID: s.userID, Keyword: "test"}
 	db.GetDB().Create(&keyword)
 
-	additionalCondition := []map[string]string{
+	additionalCondition := []models.Condition{
 		{
-			"column": "keyword",
-			"value":  "invalid",
-			"type":   models.Equal,
+			ConditionName: "keyword",
+			Value:         "invalid",
+			Type:          models.Equal,
 		},
 	}
 	result, err := s.keywordService.GetKeywords(additionalCondition)

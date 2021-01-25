@@ -256,11 +256,11 @@ func TestValidateValidConditionsWithValidQueryString(t *testing.T) {
 
 	result := validateValidConditions(queryString)
 
-	expected := []map[string]string{
+	expected := []models.Condition{
 		{
-			"column": "keyword",
-			"value":  "test",
-			"type":   "like",
+			ConditionName: "keyword",
+			Value:         "test",
+			Type:          "like",
 		},
 	}
 
@@ -270,7 +270,7 @@ func TestValidateValidConditionsWithValidQueryString(t *testing.T) {
 func TestValidateValidConditionsWithoutQueryString(t *testing.T) {
 	result := validateValidConditions(nil)
 
-	var expected []map[string]string
+	var expected []models.Condition
 
 	assert.Equal(t, expected, result)
 }
@@ -282,7 +282,7 @@ func TestValidateValidConditionsWithInvalidQueryString(t *testing.T) {
 
 	result := validateValidConditions(queryString)
 
-	var expected []map[string]string
+	var expected []models.Condition
 
 	assert.Equal(t, expected, result)
 }
@@ -294,7 +294,7 @@ func TestValidateValidConditionsWithBlankQueryStringValue(t *testing.T) {
 
 	result := validateValidConditions(queryString)
 
-	var expected []map[string]string
+	var expected []models.Condition
 
 	assert.Equal(t, expected, result)
 }

@@ -30,11 +30,11 @@ type KeywordService struct {
 	CurrentUserID uint
 }
 
-func (k *KeywordService) GetKeywords(conditions []map[string]string) ([]models.Keyword, error) {
-	conditions = append(conditions, map[string]string{
-		"column": "user_id",
-		"value":  fmt.Sprint(k.CurrentUserID),
-		"type":   models.Equal,
+func (k *KeywordService) GetKeywords(conditions []models.Condition) ([]models.Keyword, error) {
+	conditions = append(conditions, models.Condition{
+		ConditionName: "user_id",
+		Value:         fmt.Sprint(k.CurrentUserID),
+		Type:          models.Equal,
 	})
 
 	keywords, err := models.GetKeywordsBy(conditions)
