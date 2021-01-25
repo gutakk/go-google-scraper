@@ -13,7 +13,7 @@ const (
 	emailFormatError        = "invalid email format"
 	emailDuplicateError     = "email already exists"
 	invalidInputError       = "invalid input"
-	keywordNotFoundError    = "keyword not found"
+	KeywordNotFoundError    = "keyword not found"
 	minError                = "%s must be longer than %s"
 	passwordEqError         = "passwords do not match"
 	requiredError           = "%s is required"
@@ -62,7 +62,7 @@ func DatabaseErrorMessage(err error) error {
 	} else {
 		switch err {
 		case gorm.ErrRecordNotFound:
-			return errors.New(keywordNotFoundError)
+			return errors.New(KeywordNotFoundError)
 		}
 		return errors.New(somethingWentWrongError)
 	}
