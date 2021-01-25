@@ -251,9 +251,50 @@ func TestUploadKeywordWithGuestUser(t *testing.T) {
 
 func TestValidateValidConditionsWithValidQueryString(t *testing.T) {
 	queryString := map[string][]string{
-		"filter[keyword]": []string{"test"},
+		"filter[keyword]": {"test"},
 	}
+
 	result := validateValidConditions(queryString)
 
-	assert.Equal(t,  ,result)
+	expected := []map[string]string{
+		{
+			"column": "keyword",
+			"value":  "test",
+			"type":   "like",
+		},
+	}
+
+	assert.Equal(t, expected, result)
+}
+
+func TestValidateValidConditionsWithoutQueryString(t *testing.T) {
+	result := validateValidConditions(nil)
+
+	var expected []map[string]string
+
+	assert.Equal(t, expected, result)
+}
+
+func TestValidateValidConditionsWithInvalidQueryString(t *testing.T) {
+	queryString := map[string][]string{
+		"filter[invalid]": {"test"},
+	}
+
+	result := validateValidConditions(queryString)
+
+	var expected []map[string]string
+
+	assert.Equal(t, expected, result)
+}
+
+func TestValidateValidConditionsWithBlankQueryStringValue(t *testing.T) {
+	queryString := map[string][]string{
+		"filter[keyword]": {""},
+	}
+
+	result := validateValidConditions(queryString)
+
+	var expected []map[string]string
+
+	assert.Equal(t, expected, result)
 }

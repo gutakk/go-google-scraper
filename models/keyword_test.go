@@ -317,3 +317,65 @@ func (s *KeywordDBTestSuite) TestUpdateKeywordWithInvalidStatus() {
 
 	assert.Equal(s.T(), "invalid keyword status", err.Error())
 }
+
+func TestGetJoinedConditionsWithValidConditionsMap(t *testing.T) {
+	conditions := []map[string]string{
+		{
+			"column": "columnA",
+			"value":  "testA",
+			"type":   Equal,
+		},
+		{
+			"column": "columnB",
+			"value":  "testB",
+			"type":   Equal,
+		},
+	}
+
+	result, err := getJoinedConditions(conditions)
+
+	expected := "columnA = 'testA' AND columnB = 'testB'"
+
+	assert.Equal(t, expected, result)
+	assert.Equal(t, nil, err)
+}
+
+func TestGetJoinedConditionsWithInvalidType(t *testing.T) {
+	conditions := []map[string]string{
+		{
+			"column": "columnA",
+			"value":  "testA",
+			"type":   "invalid",
+		},
+		{
+			"column": "columnB",
+			"value":  "testB",
+			"type":   "invalid",
+		},
+	}
+
+	result, err := getJoinedConditions(conditions)
+
+	assert.Equal(t, "", result)
+	assert.Equal(t, "could not join conditions", err.Error())
+}
+
+func TestGetJoinedConditionsWithInvalidKey(t *testing.T) {
+	conditions := []map[string]string{
+		{
+			"invalidConditionKey": "columnA",
+			"invalidValueKey":     "testA",
+			"type":                Equal,
+		},
+		{
+			"invalidConditionKey": "columnB",
+			"invalidValueKey":     "testB",
+			"type":                Equal,
+		},
+	}
+
+	result, err := getJoinedConditions(conditions)
+
+	assert.Equal(t, "", result)
+	assert.Equal(t, "could not join conditions", err.Error())
+}

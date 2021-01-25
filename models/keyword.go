@@ -22,7 +22,8 @@ const (
 	Processed  KeywordStatus = "processed"
 	Processing KeywordStatus = "processing"
 
-	InvalidKeywordStatusErr = "invalid keyword status"
+	InvalidKeywordStatusErr    = "invalid keyword status"
+	couldNotJoinConditionError = "could not join conditions"
 )
 
 var Condition = map[string]string{
@@ -66,16 +67,14 @@ func GetKeywordBy(condition map[string]interface{}) (Keyword, error) {
 }
 
 func GetKeywordsBy(conditions []map[string]string) ([]Keyword, error) {
-	var formattedConditions []string
-
-	for _, c := range conditions {
-		formattedConditions = append(formattedConditions, fmt.Sprintf(Condition[c["type"]], c["column"], c["value"]))
-	}
-
-	joinedConditions := strings.Join(formattedConditions, " AND ")
 	var keywords []Keyword
 
-	err := db.GetDB().Where(joinedConditions).Order("keyword").Find(&keywords).Error
+	joinedConditions, err := getJoinedConditions(conditions)
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.GetDB().Where(joinedConditions).Order("keyword").Find(&keywords).Error
 	if err != nil {
 		return nil, err
 	}
@@ -106,4 +105,24 @@ func UpdateKeyword(keywordID uint, newKeyword Keyword) error {
 	}
 
 	return nil
+}
+
+func getJoinedConditions(conditions []map[string]string) (string, error) {
+	var formattedConditions []string
+
+	for _, c := range conditions {
+		conditionType := Condition[c["type"]]
+		conditionColumn := c["column"]
+		conditionValue := c["value"]
+
+		if conditionType != "" && conditionColumn != "" && conditionValue != "" {
+			formattedConditions = append(formattedConditions, fmt.Sprintf(conditionType, conditionColumn, conditionValue))
+		} else {
+			return "", errors.New(couldNotJoinConditionError)
+		}
+	}
+
+	joinedConditions := strings.Join(formattedConditions, " AND ")
+
+	return joinedConditions, nil
 }
