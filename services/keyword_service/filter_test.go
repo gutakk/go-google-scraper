@@ -10,7 +10,7 @@ import (
 
 func TestGetKeywordConditionsFromQueryStringsWithValidKeywordTitle(t *testing.T) {
 	queryString := map[string][]string{
-		"keyword-title": {"test"},
+		"filter[keyword]": {"test"},
 	}
 	result := keyword_service.GetKeywordConditionsFromQueryStrings(queryString)
 	expectedResult := []string{"LOWER(keyword) LIKE LOWER('%test%')"}

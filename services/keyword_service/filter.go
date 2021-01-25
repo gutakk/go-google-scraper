@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	keywordTitleQuery = "keyword-title"
+	keywordTitleQuery = "filter[keyword]"
 	keywordTitleDBCol = "keyword"
 )
 
