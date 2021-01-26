@@ -16,8 +16,9 @@
   <form class="form-keyword-filter space-y-6" action="/keyword" method="GET">
     <div class="form-keyword-filter__input-container space-x-6">
       {{ template "filter_keyword_input" filterKeywordPartialInput .data.filter "Keyword title" "filter[keyword]" "eg. apple" }}
+      {{ template "filter_keyword_input" filterKeywordPartialInput .data.filter "URL in links" "filter[url]" "eg. wikipedia" }}
     </div>
-    <button type="submit">Search</button>
+    <button class="form-keyword-search__button" type="submit">Search</button>
   </form>
 
   {{ if .data.keywordPresenters }}
