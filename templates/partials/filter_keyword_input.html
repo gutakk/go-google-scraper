@@ -2,7 +2,7 @@
 
 <div class="space-y-2">
   <label>{{ .filterLabel }}</label>
-  <input name={{ .filterName }} type="text" placeholder={{ .filterPlaceholder }} value={{ .filter }}>
+  <input class={{ .className }} name={{ .filterName }} type={{ .inputType }} placeholder={{ .filterPlaceholder }} value={{ .filter }}>
 </div>
 
 {{ end }}
