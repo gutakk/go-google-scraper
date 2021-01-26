@@ -20,14 +20,14 @@ func (e *ErrorResponseObject) NewErrorResponse() gin.H {
 }
 
 type DataResponseObject struct {
-	ID            string      `json:"id,omitempty"`
-	Type          string      `json:"type,omitempty"`
-	Attributes    interface{} `json:"attributes,omitempty"`
+	ID            string      `json:"id"`
+	Type          string      `json:"type"`
+	Attributes    interface{} `json:"attributes"`
 	Relationships interface{} `json:"relationships,omitempty"`
 }
 
 type DataResponse struct {
-	Data DataResponseObject `json:"data,omitempty"`
+	Data DataResponseObject `json:"data"`
 }
 
 type DataResponseArray struct {
