@@ -6,6 +6,10 @@ import (
 	"strings"
 )
 
+const (
+	couldNotJoinConditionError = "could not join conditions"
+)
+
 type Condition struct {
 	ConditionName string
 	Value         string

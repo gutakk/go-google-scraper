@@ -20,8 +20,7 @@ const (
 	Processed  KeywordStatus = "processed"
 	Processing KeywordStatus = "processing"
 
-	InvalidKeywordStatusErr    = "invalid keyword status"
-	couldNotJoinConditionError = "could not join conditions"
+	InvalidKeywordStatusErr = "invalid keyword status"
 )
 
 func (k KeywordStatus) Value() (driver.Value, error) {
