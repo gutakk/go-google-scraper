@@ -15,6 +15,10 @@ func TestGetJoinedConditionsWithValidConditionsMap(t *testing.T) {
 			Value:         "testKeyword",
 		},
 		{
+			ConditionName: "url",
+			Value:         "testURL",
+		},
+		{
 			ConditionName: "user_id",
 			Value:         "testUserID",
 		},
@@ -22,7 +26,9 @@ func TestGetJoinedConditionsWithValidConditionsMap(t *testing.T) {
 
 	result, err := models.GetJoinedConditions(conditions)
 
-	expected := "LOWER(keyword) LIKE LOWER('%testKeyword%') AND user_id = 'testUserID'"
+	expected := "LOWER(keyword) LIKE LOWER('%testKeyword%') AND " +
+		"(LOWER(non_adword_links::text) LIKE '%testURL%' OR LOWER(top_position_adword_links::text) LIKE '%testURL%') AND " +
+		"user_id = 'testUserID'"
 
 	assert.Equal(t, expected, result)
 	assert.Equal(t, nil, err)
