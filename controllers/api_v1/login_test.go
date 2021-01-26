@@ -196,6 +196,7 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithInvalidClientID() {
 		log.Error(err)
 	}
 
+	// TODO: This need to be status unauthorized
 	assert.Equal(s.T(), http.StatusInternalServerError, resp.Code)
 	assert.Equal(s.T(), errors.ErrServerError.Error(), parsedRespBody["error"])
 }
