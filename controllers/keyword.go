@@ -26,8 +26,8 @@ const (
 
 var FilterList = []map[string]string{
 	{
-		"queryString": "filter[keyword]",
-		"filter":      "keyword",
+		"queryString":    "filter[keyword]",
+		"modelCondition": "keyword",
 	},
 }
 
@@ -158,7 +158,7 @@ func validateValidConditions(queryString map[string][]string) []models.Condition
 		queryStringValue := queryString[f["queryString"]]
 		if queryStringValue != nil && queryStringValue[0] != "" {
 			validConditions = append(validConditions, models.Condition{
-				ConditionName: f["filter"],
+				ConditionName: f["modelCondition"],
 				Value:         queryStringValue[0],
 			})
 		}
