@@ -17,7 +17,7 @@
     <div class="form-keyword-filter__input-container space-x-6">
       {{ template "filter_keyword_input" filterKeywordPartialInput .data.filter "Keyword title" "text" "form-keyword-filter__text-input" "filter[keyword]" "eg. apple" }}
       {{ template "filter_keyword_input" filterKeywordPartialInput .data.filter "URL in links" "text" "form-keyword-filter__text-input" "filter[url]" "eg. wikipedia" }}
-      {{ template "filter_keyword_input" filterKeywordPartialInput .data.filter "Adwords" "checkbox" "form-keyword-filter__checkbox-input" "filter[adwords]" "" }}
+      {{ template "filter_keyword_input" filterKeywordPartialInput .data.filter "Adwords" "checkbox" "form-keyword-filter__checkbox-input" "filter[is_adword_advertiser]" "" }}
     </div>
     <button class="form-keyword-filter__button" type="submit">Search</button>
   </form>

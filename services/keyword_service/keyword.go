@@ -32,7 +32,7 @@ type KeywordService struct {
 
 func (k *KeywordService) GetKeywords(conditions []models.Condition) ([]models.Keyword, error) {
 	conditions = append(conditions, models.Condition{
-		ConditionName: "user_id",
+		ConditionName: models.UserIDCondition,
 		Value:         fmt.Sprint(k.CurrentUserID),
 	})
 

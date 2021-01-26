@@ -8,6 +8,12 @@ import (
 
 const (
 	couldNotJoinConditionError = "could not join conditions"
+
+	// Condition name
+	KeywordCondition            = "keyword"
+	UserIDCondition             = "user_id"
+	URLCondition                = "url"
+	IsAdwordAdvertiserCondition = "is_adword_advertiser"
 )
 
 type Condition struct {
@@ -17,9 +23,10 @@ type Condition struct {
 
 // Map query string filter to where statement
 var ConditionMapper = map[string]string{
-	"keyword": "LOWER(keyword) LIKE LOWER('%%%s%%')",
-	"url":     "(LOWER(non_adword_links::text) LIKE '%%%[1]s%%' OR LOWER(top_position_adword_links::text) LIKE '%%%[1]s%%')",
-	"user_id": "user_id = '%s'",
+	KeywordCondition:            "LOWER(keyword) LIKE LOWER('%%%s%%')",
+	UserIDCondition:             "user_id = '%s'",
+	URLCondition:                "(LOWER(non_adword_links::text) LIKE '%%%[1]s%%' OR LOWER(top_position_adword_links::text) LIKE '%%%[1]s%%')",
+	IsAdwordAdvertiserCondition: "total_adwords_count > 0",
 }
 
 func GetJoinedConditions(conditions []Condition) (string, error) {
@@ -31,7 +38,12 @@ func GetJoinedConditions(conditions []Condition) (string, error) {
 		whereStatement := ConditionMapper[conditionName]
 
 		if conditionValue != "" && whereStatement != "" {
-			formattedConditions = append(formattedConditions, fmt.Sprintf(whereStatement, conditionValue))
+			switch conditionName {
+			case IsAdwordAdvertiserCondition:
+				formattedConditions = append(formattedConditions, whereStatement)
+			default:
+				formattedConditions = append(formattedConditions, fmt.Sprintf(whereStatement, conditionValue))
+			}
 		} else {
 			return "", errors.New(couldNotJoinConditionError)
 		}

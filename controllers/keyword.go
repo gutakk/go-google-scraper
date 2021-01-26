@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"mime/multipart"
 	"net/http"
 
@@ -26,12 +27,16 @@ const (
 
 var FilterList = []map[string]string{
 	{
-		"queryString":    "filter[keyword]",
-		"modelCondition": "keyword",
+		"queryString":    fmt.Sprintf("filter[%s]", models.KeywordCondition),
+		"modelCondition": models.KeywordCondition,
 	},
 	{
-		"queryString":    "filter[url]",
-		"modelCondition": "url",
+		"queryString":    fmt.Sprintf("filter[%s]", models.URLCondition),
+		"modelCondition": models.URLCondition,
+	},
+	{
+		"queryString":    fmt.Sprintf("filter[%s]", models.IsAdwordAdvertiserCondition),
+		"modelCondition": models.IsAdwordAdvertiserCondition,
 	},
 }
 
