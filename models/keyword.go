@@ -35,7 +35,7 @@ type Keyword struct {
 	*gorm.Model             `json:"model,omitempty"`
 	Keyword                 string         `gorm:"notNull;index" json:"keyword,omitempty"`
 	Status                  KeywordStatus  `gorm:"default:pending;type:keyword_status" json:"status,omitempty"`
-	LinksCount              int            `json:"links_count"`
+	LinksCount              int            `json:"links_count,omitempty"`
 	NonAdwordsCount         int            `json:"non_adwords_count,omitempty"`
 	NonAdwordLinks          datatypes.JSON `json:"non_adword_links,omitempty"`
 	TopPositionAdwordsCount int            `json:"top_position_adwords_count,omitempty"`
