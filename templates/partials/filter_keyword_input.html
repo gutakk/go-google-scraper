@@ -2,7 +2,7 @@
 
 <div class="space-y-2">
   <label>{{ .filterLabel }}</label>
-  
+
   {{ if eq .inputType "text" }}
     <input 
       class={{ .className }}
@@ -18,7 +18,7 @@
       name={{ .filterName }}
       type="checkbox"
       value="true"
-      {{ if index .query .filterName }} checked {{ end }}>
+      {{ if .filter }} checked {{ end }}>
   {{ end }}
 </div>
 
