@@ -24,6 +24,7 @@ import (
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/go-oauth2/oauth2/v4/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -34,18 +35,30 @@ import (
 func init() {
 	gin.SetMode(gin.TestMode)
 
-	if err := os.Chdir(path_test.GetRoot()); err != nil {
-		panic(err)
+	err := os.Chdir(path_test.GetRoot())
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	config.LoadEnv()
-	_ = oauth.SetupOAuthServer()
-	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	err = oauth.SetupOAuthServer()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	db.GetDB = func() *gorm.DB {
 		return database
 	}
 
-	_ = db.GetDB().AutoMigrate(&models.User{})
+	err = db.GetDB().AutoMigrate(&models.User{})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 type LoginAPIControllerDbTestSuite struct {
@@ -63,7 +76,11 @@ func (s *LoginAPIControllerDbTestSuite) SetupTest() {
 	s.headers = http.Header{}
 	s.headers.Set("Content-Type", "application/x-www-form-urlencoded")
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
+	if err != nil {
+		log.Error(err)
+	}
+
 	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
 	db.GetDB().Create(&user)
 	s.user = user
@@ -73,7 +90,10 @@ func (s *LoginAPIControllerDbTestSuite) SetupTest() {
 		Secret: "client-secret",
 		Domain: "http://localhost:8080",
 	}
-	data, _ := json.Marshal(s.oauthClient)
+	data, err := json.Marshal(s.oauthClient)
+	if err != nil {
+		log.Error(err)
+	}
 	s.oauthClient.Data = data
 
 	db.GetDB().Exec("INSERT INTO oauth2_clients VALUES(?, ?, ?, ?)",
@@ -103,16 +123,28 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithValidParams() {
 	formData.Set("client_secret", s.oauthClient.Secret)
 
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
-	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	respBodyData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error(err)
+	}
 	var parsedRespBody map[string]string
-	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+	err = json.Unmarshal(respBodyData, &parsedRespBody)
+	if err != nil {
+		log.Error(err)
+	}
 
 	var data []byte
 	row := db.GetDB().Table("oauth2_tokens").Select("data").Row()
-	_ = row.Scan(&data)
+	err = row.Scan(&data)
+	if err != nil {
+		log.Error(err)
+	}
 
 	var dataVal map[string]interface{}
-	_ = json.Unmarshal(data, &dataVal)
+	err = json.Unmarshal(data, &dataVal)
+	if err != nil {
+		log.Error(err)
+	}
 
 	assert.Equal(s.T(), http.StatusOK, resp.Code)
 	assert.Equal(s.T(), parsedRespBody["access_token"], dataVal["Access"])
@@ -129,9 +161,16 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithInvalidGrantType() 
 	formData.Set("client_secret", s.oauthClient.Secret)
 
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
-	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	respBodyData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error(err)
+	}
+
 	var parsedRespBody map[string]string
-	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+	err = json.Unmarshal(respBodyData, &parsedRespBody)
+	if err != nil {
+		log.Error(err)
+	}
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrUnsupportedGrantType.Error(), parsedRespBody["error"])
@@ -146,9 +185,16 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithInvalidClientID() {
 	formData.Set("client_secret", s.oauthClient.Secret)
 
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
-	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	respBodyData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error(err)
+	}
+
 	var parsedRespBody map[string]string
-	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+	err = json.Unmarshal(respBodyData, &parsedRespBody)
+	if err != nil {
+		log.Error(err)
+	}
 
 	assert.Equal(s.T(), http.StatusInternalServerError, resp.Code)
 	assert.Equal(s.T(), errors.ErrServerError.Error(), parsedRespBody["error"])
@@ -163,9 +209,16 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithInvalidClientSecret
 	formData.Set("client_secret", "invalid")
 
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
-	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	respBodyData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error(err)
+	}
+
 	var parsedRespBody map[string]string
-	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+	err = json.Unmarshal(respBodyData, &parsedRespBody)
+	if err != nil {
+		log.Error(err)
+	}
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidClient.Error(), parsedRespBody["error"])
