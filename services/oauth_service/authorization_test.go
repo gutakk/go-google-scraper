@@ -17,6 +17,7 @@ import (
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/go-oauth2/oauth2/v4/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -27,18 +28,30 @@ import (
 func init() {
 	gin.SetMode(gin.TestMode)
 
-	if err := os.Chdir(path_test.GetRoot()); err != nil {
-		panic(err)
+	err := os.Chdir(path_test.GetRoot())
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	config.LoadEnv()
-	_ = oauth.SetupOAuthServer()
-	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	err = oauth.SetupOAuthServer()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	db.GetDB = func() *gorm.DB {
 		return database
 	}
 
-	_ = db.GetDB().AutoMigrate(&models.User{})
+	err = db.GetDB().AutoMigrate(&models.User{})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 type LoginAPIServiceDbTestSuite struct {
@@ -48,7 +61,11 @@ type LoginAPIServiceDbTestSuite struct {
 }
 
 func (s *LoginAPIServiceDbTestSuite) SetupTest() {
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
+	if err != nil {
+		log.Error(err)
+	}
+
 	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
 	db.GetDB().Create(&user)
 

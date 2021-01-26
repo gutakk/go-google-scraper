@@ -9,12 +9,13 @@ import (
 )
 
 func PasswordAuthorizationHandler(username string, password string) (userID string, err error) {
-	user, findUserByErr := models.FindUserBy(&models.User{Email: username})
-	if findUserByErr != nil {
+	user, err := models.FindUserBy(&models.User{Email: username})
+	if err != nil {
 		return "", errors.ErrInvalidClient
 	}
 
-	if err := models.ValidatePassword(user.Password, password); err != nil {
+	err = models.ValidatePassword(user.Password, password)
+	if err != nil {
 		return "", errors.ErrInvalidClient
 	}
 
