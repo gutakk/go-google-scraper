@@ -23,6 +23,7 @@ import (
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 	"github.com/gutakk/go-google-scraper/tests/oauth_test"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
@@ -37,20 +38,31 @@ import (
 func init() {
 	gin.SetMode(gin.TestMode)
 
-	if err := os.Chdir(path_test.GetRoot()); err != nil {
-		panic(err)
+	err := os.Chdir(path_test.GetRoot())
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	config.LoadEnv()
-	_ = oauth.SetupOAuthServer()
+	err = oauth.SetupOAuthServer()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	db.GetDB = func() *gorm.DB {
 		return database
 	}
 
 	testDB.InitKeywordStatusEnum(db.GetDB())
-	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
+	err = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 type KeywordAPIControllerDbTestSuite struct {
@@ -65,7 +77,11 @@ func (s *KeywordAPIControllerDbTestSuite) SetupTest() {
 	s.engine = testConfig.GetRouter(false)
 	new(api_v1.KeywordAPIController).ApplyRoutes(controllers.PrivateAPIGroup(s.engine.Group("/api/v1")))
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
+	if err != nil {
+		log.Error(err)
+	}
+
 	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
 	db.GetDB().Create(&user)
 	s.user = user
@@ -78,10 +94,13 @@ func (s *KeywordAPIControllerDbTestSuite) SetupTest() {
 		Refresh:   "test-refresh",
 	}
 
-	data, _ := json.Marshal(&oauth_test.TokenData{
+	data, err := json.Marshal(&oauth_test.TokenData{
 		Access: tokenItem.Access,
 		UserID: fmt.Sprint(s.user.ID),
 	})
+	if err != nil {
+		log.Error(err)
+	}
 	tokenItem.Data = data
 
 	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
@@ -98,7 +117,10 @@ func (s *KeywordAPIControllerDbTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM keywords")
 	db.GetDB().Exec("DELETE FROM users")
 	db.GetDB().Exec("DELETE FROM oauth2_tokens")
-	_, _ = db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
+	_, err := db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func TestKeywordAPIControllerDbTestSuite(t *testing.T) {
@@ -116,9 +138,16 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithValidParams() 
 
 func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithoutAuthorizationHeader() {
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", nil, nil)
-	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	respBodyData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error(err)
+	}
+
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+	err = json.Unmarshal(respBodyData, &parsedRespBody)
+	if err != nil {
+		log.Error(err)
+	}
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -129,9 +158,16 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithInvalidAccessT
 	headers.Set("Authorization", "invalid_token")
 
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", headers, nil)
-	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	respBodyData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error(err)
+	}
+
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+	err = json.Unmarshal(respBodyData, &parsedRespBody)
+	if err != nil {
+		log.Error(err)
+	}
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -148,10 +184,13 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithExpiredAccessT
 		Refresh:   "test-refresh",
 	}
 
-	data, _ := json.Marshal(&oauth_test.TokenData{
+	data, err := json.Marshal(&oauth_test.TokenData{
 		AccessExpiresIn: 1,
 		Access:          tokenItem.Access,
 	})
+	if err != nil {
+		log.Error(err)
+	}
 	tokenItem.Data = data
 
 	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
@@ -167,9 +206,16 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithExpiredAccessT
 	headers.Set("Authorization", "Bearer test-access")
 
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", headers, nil)
-	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	respBodyData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error(err)
+	}
+
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+	err = json.Unmarshal(respBodyData, &parsedRespBody)
+	if err != nil {
+		log.Error(err)
+	}
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrExpiredAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -180,9 +226,16 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithAccessTokenBut
 	headers.Set("Authorization", "Bearer test-access")
 
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", headers, nil)
-	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	respBodyData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error(err)
+	}
+
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+	err = json.Unmarshal(respBodyData, &parsedRespBody)
+	if err != nil {
+		log.Error(err)
+	}
 
 	assert.Equal(s.T(), http.StatusBadRequest, resp.Code)
 	assert.Equal(s.T(), "invalid file", parsedRespBody["errors"][0].Detail)
@@ -193,9 +246,16 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithAccessTokenBut
 	headers.Set("Authorization", "Bearer test-access")
 
 	resp := testHttp.PerformFileUploadRequest(s.engine, "POST", "/api/v1/keywords", headers, &bytes.Buffer{})
-	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	respBodyData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error(err)
+	}
+
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+	err = json.Unmarshal(respBodyData, &parsedRespBody)
+	if err != nil {
+		log.Error(err)
+	}
 
 	assert.Equal(s.T(), http.StatusBadRequest, resp.Code)
 	assert.Equal(s.T(), "invalid file", parsedRespBody["errors"][0].Detail)

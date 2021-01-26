@@ -22,8 +22,8 @@ func (kapi *KeywordAPIController) ApplyRoutes(engine *gin.RouterGroup) {
 }
 
 func (kapi *KeywordAPIController) uploadKeyword(c *gin.Context) {
-	file, fileErr := c.FormFile("file")
-	if fileErr != nil {
+	file, err := c.FormFile("file")
+	if err != nil {
 		errorResponse := &api_helper.ErrorResponseObject{
 			Detail: errors.New(invalidFileErr).Error(),
 			Status: http.StatusBadRequest,
@@ -35,10 +35,10 @@ func (kapi *KeywordAPIController) uploadKeyword(c *gin.Context) {
 	currentUserID := helpers.GetCurrentUserID(c)
 	keywordService := keyword_service.KeywordService{CurrentUserID: currentUserID}
 
-	validateTypeErr := keywordService.ValidateFileType(file.Header["Content-Type"][0])
-	if validateTypeErr != nil {
+	err = keywordService.ValidateFileType(file.Header["Content-Type"][0])
+	if err != nil {
 		errorResponse := &api_helper.ErrorResponseObject{
-			Detail: validateTypeErr.Error(),
+			Detail: err.Error(),
 			Status: http.StatusBadRequest,
 		}
 		c.JSON(errorResponse.Status, errorResponse.NewErrorResponse())
@@ -47,10 +47,10 @@ func (kapi *KeywordAPIController) uploadKeyword(c *gin.Context) {
 
 	filename := keywordService.UploadFile(c, file)
 
-	parsedKeywordList, readFileErr := keywordService.ReadFile(filename)
-	if readFileErr != nil {
+	parsedKeywordList, err := keywordService.ReadFile(filename)
+	if err != nil {
 		errorResponse := &api_helper.ErrorResponseObject{
-			Detail: readFileErr.Error(),
+			Detail: err.Error(),
 			Status: http.StatusUnprocessableEntity,
 		}
 		c.JSON(errorResponse.Status, errorResponse.NewErrorResponse())
@@ -58,10 +58,10 @@ func (kapi *KeywordAPIController) uploadKeyword(c *gin.Context) {
 	}
 
 	// Validate if CSV has row between 1 and 1,000
-	validateLengthErr := keywordService.ValidateCSVLength(len(parsedKeywordList))
-	if validateLengthErr != nil {
+	err = keywordService.ValidateCSVLength(len(parsedKeywordList))
+	if err != nil {
 		errorResponse := &api_helper.ErrorResponseObject{
-			Detail: validateLengthErr.Error(),
+			Detail: err.Error(),
 			Status: http.StatusBadRequest,
 		}
 		c.JSON(errorResponse.Status, errorResponse.NewErrorResponse())
@@ -69,10 +69,10 @@ func (kapi *KeywordAPIController) uploadKeyword(c *gin.Context) {
 	}
 
 	// Save keywords to database
-	saveKeywordsErr := keywordService.Save(parsedKeywordList)
-	if saveKeywordsErr != nil {
+	err = keywordService.Save(parsedKeywordList)
+	if err != nil {
 		errorResponse := &api_helper.ErrorResponseObject{
-			Detail: saveKeywordsErr.Error(),
+			Detail: err.Error(),
 			Status: http.StatusBadRequest,
 		}
 		c.JSON(errorResponse.Status, errorResponse.NewErrorResponse())
