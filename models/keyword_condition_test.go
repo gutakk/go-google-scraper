@@ -15,6 +15,10 @@ func TestGetJoinedConditionsWithValidConditionsMap(t *testing.T) {
 			Value:         "testKeyword",
 		},
 		{
+			ConditionName: "is_adword_advertiser",
+			Value:         "testAdvertiser",
+		},
+		{
 			ConditionName: "url",
 			Value:         "testURL",
 		},
@@ -27,6 +31,7 @@ func TestGetJoinedConditionsWithValidConditionsMap(t *testing.T) {
 	result, err := models.GetJoinedConditions(conditions)
 
 	expected := "LOWER(keyword) LIKE LOWER('%testKeyword%') AND " +
+		"total_adwords_count > 0 AND " +
 		"(LOWER(non_adword_links::text) LIKE '%testURL%' OR LOWER(top_position_adword_links::text) LIKE '%testURL%') AND " +
 		"user_id = 'testUserID'"
 
