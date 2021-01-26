@@ -29,6 +29,10 @@ var FilterList = []map[string]string{
 		"queryString":    "filter[keyword]",
 		"modelCondition": "keyword",
 	},
+	{
+		"queryString":    "filter[url]",
+		"modelCondition": "url",
+	},
 }
 
 type KeywordController struct{}
