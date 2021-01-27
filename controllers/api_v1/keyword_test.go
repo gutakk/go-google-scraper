@@ -170,7 +170,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNoK
 	}
 
 	assert.Equal(s.T(), http.StatusOK, resp.Code)
-	assert.Equal(s.T(), []api_helper.DataResponseObject{}, parsedRespBody["data"])
+	assert.Equal(s.T(), 0, len(parsedRespBody["data"]))
 }
 
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNotTheResourceOwner() {
@@ -219,7 +219,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNot
 	}
 
 	assert.Equal(s.T(), http.StatusOK, resp.Code)
-	assert.Equal(s.T(), []api_helper.DataResponseObject{}, parsedRespBody["data"])
+	assert.Equal(s.T(), 0, len(parsedRespBody["data"]))
 }
 
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithoutAuthorizationHeader() {
