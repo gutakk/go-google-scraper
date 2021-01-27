@@ -34,7 +34,10 @@ func GenerateClient() (OAuthClient, error) {
 }
 
 func GenerateToken(c *gin.Context) {
-	err := oauth.GetOAuthServer().HandleTokenRequest(c.Writer, c.Request)
+	server := oauth.GetOAuthServer()
+	server.SetPasswordAuthorizationHandler(PasswordAuthorizationHandler)
+
+	err := server.HandleTokenRequest(c.Writer, c.Request)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, nil)
 	}

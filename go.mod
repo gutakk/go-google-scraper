@@ -26,6 +26,7 @@ require (
 	github.com/mattn/goreman v0.3.7 // indirect
 	github.com/pelletier/go-toml v1.8.1 // indirect
 	github.com/robfig/cron v1.2.0 // indirect
+	github.com/sirupsen/logrus v1.4.2
 	github.com/soveran/redisurl v0.0.0-20180322091936-eb325bc7a4b8
 	github.com/stretchr/testify v1.6.1
 	github.com/tidwall/btree v0.3.0 // indirect
