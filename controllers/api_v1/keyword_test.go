@@ -128,7 +128,7 @@ func TestKeywordAPIControllerDbTestSuite(t *testing.T) {
 }
 
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParams() {
-	keyword := models.Keyword{UserID: s.user.ID, Keyword: faker.Name()}
+	keyword := models.Keyword{UserID: s.user.ID, Keyword: "testKeyword"}
 	db.GetDB().Create(&keyword)
 
 	headers := http.Header{}
@@ -146,8 +146,11 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParams() {
 		log.Error(err)
 	}
 
+	respValue, _ := parsedRespBody["data"][0].Attributes.(map[string]interface{})
+
 	assert.Equal(s.T(), http.StatusOK, resp.Code)
 	assert.Equal(s.T(), 1, len(parsedRespBody["data"]))
+	assert.Equal(s.T(), "testKeyword", respValue["keyword"])
 }
 
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNoKeywords() {
