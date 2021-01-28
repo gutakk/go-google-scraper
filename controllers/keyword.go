@@ -136,7 +136,7 @@ func getKeywordResultData(keywordService keyword_service.KeywordService, keyword
 }
 
 func getKeywordsData(keywordService keyword_service.KeywordService, queryString map[string][]string) map[string]interface{} {
-	conditions := validateValidConditions(queryString)
+	conditions := filterValidConditions(queryString)
 	keywords, _ := keywordService.GetKeywords(conditions)
 	var keywordPresenters []presenters.KeywordPresenter
 
@@ -151,7 +151,7 @@ func getKeywordsData(keywordService keyword_service.KeywordService, queryString 
 	return data
 }
 
-func validateValidConditions(queryString map[string][]string) []models.Condition {
+func filterValidConditions(queryString map[string][]string) []models.Condition {
 	var validConditions []models.Condition
 
 	for _, f := range FilterList {

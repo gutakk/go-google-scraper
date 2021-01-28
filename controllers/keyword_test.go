@@ -249,12 +249,12 @@ func TestUploadKeywordWithGuestUser(t *testing.T) {
 	assert.Equal(t, "/login", response.Header().Get("Location"))
 }
 
-func TestValidateValidConditionsWithValidQueryString(t *testing.T) {
+func TestFilterValidConditionsWithValidQueryString(t *testing.T) {
 	queryString := map[string][]string{
 		"filter[keyword]": {"test"},
 	}
 
-	result := validateValidConditions(queryString)
+	result := filterValidConditions(queryString)
 
 	expected := []models.Condition{
 		{
@@ -266,32 +266,32 @@ func TestValidateValidConditionsWithValidQueryString(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
-func TestValidateValidConditionsWithoutQueryString(t *testing.T) {
-	result := validateValidConditions(nil)
+func TestFilterValidConditionsWithoutQueryString(t *testing.T) {
+	result := filterValidConditions(nil)
 
 	var expected []models.Condition
 
 	assert.Equal(t, expected, result)
 }
 
-func TestValidateValidConditionsWithInvalidQueryString(t *testing.T) {
+func TestFilterValidConditionsWithInvalidQueryString(t *testing.T) {
 	queryString := map[string][]string{
 		"filter[invalid]": {"test"},
 	}
 
-	result := validateValidConditions(queryString)
+	result := filterValidConditions(queryString)
 
 	var expected []models.Condition
 
 	assert.Equal(t, expected, result)
 }
 
-func TestValidateValidConditionsWithBlankQueryStringValue(t *testing.T) {
+func TestFilterValidConditionsWithBlankQueryStringValue(t *testing.T) {
 	queryString := map[string][]string{
 		"filter[keyword]": {""},
 	}
 
-	result := validateValidConditions(queryString)
+	result := filterValidConditions(queryString)
 
 	var expected []models.Condition
 
