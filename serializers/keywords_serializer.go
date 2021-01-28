@@ -43,7 +43,7 @@ func (k *KeywordsSerializer) JSONAPIFormat() api_helper.DataResponseList {
 			FailedReason:            value.FailedReason,
 		}
 
-		relationships := api_helper.DataResponseObject{
+		relationships := api_helper.RelationshipsObject{
 			ID:   fmt.Sprint(value.UserID),
 			Type: models.UserType,
 		}
@@ -52,7 +52,7 @@ func (k *KeywordsSerializer) JSONAPIFormat() api_helper.DataResponseList {
 			ID:            fmt.Sprint(value.ID),
 			Type:          models.KeywordType,
 			Attributes:    keywordResp,
-			Relationships: relationships.GetRelationships(),
+			Relationships: relationships.JSONAPIFormat(),
 		}
 
 		formattedKeywords.Data = append(formattedKeywords.Data, dataResponseObject)

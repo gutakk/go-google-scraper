@@ -20,10 +20,10 @@ func (e *ErrorResponseObject) NewErrorResponse() gin.H {
 }
 
 type DataResponseObject struct {
-	ID            string      `json:"id"`
-	Type          string      `json:"type"`
-	Attributes    interface{} `json:"attributes"`
-	Relationships interface{} `json:"relationships"`
+	ID            string                           `json:"id"`
+	Type          string                           `json:"type"`
+	Attributes    interface{}                      `json:"attributes"`
+	Relationships map[string]RelationshipsResponse `json:"relationships"`
 }
 
 type DataResponse struct {
@@ -32,13 +32,4 @@ type DataResponse struct {
 
 type DataResponseList struct {
 	Data []DataResponseObject `json:"data"`
-}
-
-func (d *DataResponseObject) GetRelationships() map[string]DataResponse {
-	relationships := make(map[string]DataResponse)
-	relationships[d.Type] = DataResponse{
-		Data: *d,
-	}
-
-	return relationships
 }

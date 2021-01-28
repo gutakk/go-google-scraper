@@ -48,9 +48,9 @@ func TestJSONAPIFormatWithValidKeywords(t *testing.T) {
 
 	result := keywordsSerializer.JSONAPIFormat()
 
-	relationships := make(map[string]api_helper.DataResponse)
-	relationships["user"] = api_helper.DataResponse{
-		Data: api_helper.DataResponseObject{
+	relationships := make(map[string]api_helper.RelationshipsResponse)
+	relationships["user"] = api_helper.RelationshipsResponse{
+		Data: api_helper.RelationshipsObject{
 			ID:   "1",
 			Type: "user",
 		},

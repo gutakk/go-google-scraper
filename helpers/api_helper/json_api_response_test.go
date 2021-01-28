@@ -39,24 +39,3 @@ func TestNewErrorResponseWithMissingSomeFieldOnErrorResponseObject(t *testing.T)
 
 	assert.Equal(t, expectedResult, errorResponse)
 }
-
-func TestGetRelationshipsWithValidDataResponseObject(t *testing.T) {
-	dataResponseObject := api_helper.DataResponseObject{
-		ID:   "1",
-		Type: "test",
-	}
-
-	result := dataResponseObject.GetRelationships()
-
-	expected := make(map[string]api_helper.DataResponse)
-	expected["test"] = api_helper.DataResponse{
-		Data: api_helper.DataResponseObject{
-			ID:            "1",
-			Type:          "test",
-			Attributes:    nil,
-			Relationships: nil,
-		},
-	}
-
-	assert.Equal(t, expected, result)
-}
