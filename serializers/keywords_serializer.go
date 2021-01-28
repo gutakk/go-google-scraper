@@ -25,8 +25,8 @@ type KeywordsJSONResponse struct {
 	FailedReason            string               `json:"failed_reason"`
 }
 
-func (k *KeywordsSerializer) JSONAPIFormat() api_helper.DataResponseArray {
-	formattedKeywords := api_helper.DataResponseArray{}
+func (k *KeywordsSerializer) JSONAPIFormat() api_helper.DataResponseList {
+	formattedKeywords := api_helper.DataResponseList{}
 	formattedKeywords.Data = []api_helper.DataResponseObject{}
 
 	for _, value := range k.Keywords {

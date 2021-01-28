@@ -56,7 +56,7 @@ func TestJSONAPIFormatWithValidKeywords(t *testing.T) {
 		},
 	}
 
-	expected := api_helper.DataResponseArray{
+	expected := api_helper.DataResponseList{
 		Data: []api_helper.DataResponseObject{
 			{
 				ID:   "1",
@@ -102,5 +102,5 @@ func TestJSONAPIFormatWithBlankKeywords(t *testing.T) {
 	keywordsSerializer := serializers.KeywordsSerializer{}
 	result := keywordsSerializer.JSONAPIFormat()
 
-	assert.Equal(t, api_helper.DataResponseArray{Data: []api_helper.DataResponseObject{}}, result)
+	assert.Equal(t, api_helper.DataResponseList{Data: []api_helper.DataResponseObject{}}, result)
 }

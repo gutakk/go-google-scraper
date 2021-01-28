@@ -30,7 +30,7 @@ type DataResponse struct {
 	Data DataResponseObject `json:"data"`
 }
 
-type DataResponseArray struct {
+type DataResponseList struct {
 	Data []DataResponseObject `json:"data"`
 }
 
