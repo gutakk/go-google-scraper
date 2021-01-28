@@ -6,7 +6,7 @@ import (
 
 	"github.com/gutakk/go-google-scraper/helpers/api_helper"
 	helpers "github.com/gutakk/go-google-scraper/helpers/user"
-	"github.com/gutakk/go-google-scraper/services/keyword_api_service"
+	"github.com/gutakk/go-google-scraper/serializers"
 	"github.com/gutakk/go-google-scraper/services/keyword_service"
 
 	"github.com/gin-gonic/gin"
@@ -37,9 +37,9 @@ func (kapi *KeywordAPIController) fetchKeywords(c *gin.Context) {
 		return
 	}
 
-	keywordsResponse := keyword_api_service.KeywordsResponse{Keywords: keywords}
+	keywordsSerializer := serializers.KeywordsSerializer{Keywords: keywords}
 
-	c.JSON(http.StatusOK, keywordsResponse.JSONAPIFormatKeywordsResponse())
+	c.JSON(http.StatusOK, keywordsSerializer.JSONAPIFormat())
 }
 
 func (kapi *KeywordAPIController) uploadKeyword(c *gin.Context) {
