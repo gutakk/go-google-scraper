@@ -11,9 +11,9 @@ const (
 
 	// Condition name
 	KeywordCondition            = "keyword"
-	UserIDCondition             = "user_id"
+	UserIDCondition             = "userID"
 	URLCondition                = "url"
-	IsAdwordAdvertiserCondition = "is_adword_advertiser"
+	IsAdwordAdvertiserCondition = "isAdwordAdvertiser"
 )
 
 type Condition struct {

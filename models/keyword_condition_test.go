@@ -15,7 +15,7 @@ func TestGetJoinedConditionsWithValidConditionsMap(t *testing.T) {
 			Value:         "testKeyword",
 		},
 		{
-			ConditionName: "is_adword_advertiser",
+			ConditionName: "isAdwordAdvertiser",
 			Value:         "testAdvertiser",
 		},
 		{
@@ -23,7 +23,7 @@ func TestGetJoinedConditionsWithValidConditionsMap(t *testing.T) {
 			Value:         "testURL",
 		},
 		{
-			ConditionName: "user_id",
+			ConditionName: "userID",
 			Value:         "testUserID",
 		},
 	}
