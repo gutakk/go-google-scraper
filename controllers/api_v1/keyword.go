@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gutakk/go-google-scraper/helpers/api_helper"
+	"github.com/gutakk/go-google-scraper/helpers/filter_helper"
 	helpers "github.com/gutakk/go-google-scraper/helpers/user"
 	"github.com/gutakk/go-google-scraper/serializers"
 	"github.com/gutakk/go-google-scraper/services/keyword_service"
@@ -26,7 +27,8 @@ func (kapi *KeywordAPIController) ApplyRoutes(engine *gin.RouterGroup) {
 func (kapi *KeywordAPIController) fetchKeywords(c *gin.Context) {
 	currentUserID := helpers.GetCurrentUserID(c)
 	keywordService := keyword_service.KeywordService{CurrentUserID: currentUserID}
-	keywords, err := keywordService.GetKeywords(nil)
+	conditions := filter_helper.FilterValidConditions(c.Request.URL.Query())
+	keywords, err := keywordService.GetKeywords(conditions)
 
 	if err != nil {
 		errorResponse := api_helper.ErrorResponseObject{
