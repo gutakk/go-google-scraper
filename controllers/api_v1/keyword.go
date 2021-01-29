@@ -26,7 +26,7 @@ func (kapi *KeywordAPIController) ApplyRoutes(engine *gin.RouterGroup) {
 func (kapi *KeywordAPIController) fetchKeywords(c *gin.Context) {
 	currentUserID := helpers.GetCurrentUserID(c)
 	keywordService := keyword_service.KeywordService{CurrentUserID: currentUserID}
-	keywords, err := keywordService.GetAll()
+	keywords, err := keywordService.GetKeywords(nil)
 
 	if err != nil {
 		errorResponse := api_helper.ErrorResponseObject{
