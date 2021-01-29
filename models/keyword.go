@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql/driver"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/gutakk/go-google-scraper/db"
@@ -23,6 +24,11 @@ const (
 
 	InvalidKeywordStatusErr = "invalid keyword status"
 )
+
+var Condition = map[string]string{
+	Equal: "%s = '%s'",
+	Like:  "LOWER(%s) LIKE LOWER('%%%s%%')",
+}
 
 func (k KeywordStatus) Value() (driver.Value, error) {
 	switch k {
@@ -59,8 +65,14 @@ func GetKeywordBy(condition map[string]interface{}) (Keyword, error) {
 	return keyword, nil
 }
 
-func GetKeywordsBy(conditions []string) ([]Keyword, error) {
-	joinedConditions := strings.Join(conditions, " AND ")
+func GetKeywordsBy(conditions []map[string]string) ([]Keyword, error) {
+	var formattedConditions []string
+
+	for _, c := range conditions {
+		formattedConditions = append(formattedConditions, fmt.Sprintf(Condition[c["type"]], c["column"], c["value"]))
+	}
+
+	joinedConditions := strings.Join(formattedConditions, " AND ")
 	var keywords []Keyword
 
 	err := db.GetDB().Where(joinedConditions).Order("keyword").Find(&keywords).Error

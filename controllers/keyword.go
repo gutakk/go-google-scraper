@@ -4,14 +4,16 @@ import (
 	"mime/multipart"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	html "github.com/gutakk/go-google-scraper/helpers/html"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	helpers "github.com/gutakk/go-google-scraper/helpers/user"
+	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/presenters"
 	"github.com/gutakk/go-google-scraper/services/keyword_service"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 const (
@@ -21,6 +23,14 @@ const (
 
 	uploadSuccessFlash = "CSV uploaded successfully"
 )
+
+var FilterMapper = []map[string]string{
+	{
+		"queryString":    "filter[keyword]",
+		"dbColumn":       "keyword",
+		"constraintType": models.Like,
+	},
+}
 
 type KeywordController struct{}
 
@@ -127,7 +137,7 @@ func getKeywordResultData(keywordService keyword_service.KeywordService, keyword
 }
 
 func getKeywordsData(keywordService keyword_service.KeywordService, queryString map[string][]string) map[string]interface{} {
-	conditions := keyword_service.GetKeywordConditionsFromQueryStrings(queryString)
+	conditions := validateValidConditions(queryString)
 	keywords, _ := keywordService.GetKeywords(conditions)
 	var keywordPresenters []presenters.KeywordPresenter
 
@@ -140,6 +150,23 @@ func getKeywordsData(keywordService keyword_service.KeywordService, queryString 
 	data["filter"] = queryString
 
 	return data
+}
+
+func validateValidConditions(queryString map[string][]string) []map[string]string {
+	var validConditions []map[string]string
+
+	for _, f := range FilterMapper {
+		queryStringValue := queryString[f["queryString"]]
+		if queryStringValue != nil && queryStringValue[0] != "" {
+			validConditions = append(validConditions, map[string]string{
+				"column": f["dbColumn"],
+				"value":  queryStringValue[0],
+				"type":   f["constraintType"],
+			})
+		}
+	}
+
+	return validConditions
 }
 
 func getCurrentUser(keywordService keyword_service.KeywordService) map[string]interface{} {

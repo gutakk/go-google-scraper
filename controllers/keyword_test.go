@@ -248,3 +248,12 @@ func TestUploadKeywordWithGuestUser(t *testing.T) {
 	assert.Equal(t, http.StatusFound, response.Code)
 	assert.Equal(t, "/login", response.Header().Get("Location"))
 }
+
+func TestValidateValidConditionsWithValidQueryString(t *testing.T) {
+	queryString := map[string][]string{
+		"filter[keyword]": []string{"test"},
+	}
+	result := validateValidConditions(queryString)
+
+	assert.Equal(t,  ,result)
+}

@@ -2,7 +2,6 @@ package models
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/bxcodec/faker/v3"
@@ -194,7 +193,13 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByValidKeywordStringCondition() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	conditions := []string{fmt.Sprintf("keyword = '%s'", keyword.Keyword)}
+	conditions := []map[string]string{
+		{
+			"column": "keyword",
+			"value":  keyword.Keyword,
+			"type":   Equal,
+		},
+	}
 
 	result, err := GetKeywordsBy(conditions)
 
@@ -207,9 +212,15 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidKeywordCondition() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	condition := []string{"keyword = 'invalid'"}
+	conditions := []map[string]string{
+		{
+			"column": "keyword",
+			"value":  "invalid",
+			"type":   Equal,
+		},
+	}
 
-	result, err := GetKeywordsBy(condition)
+	result, err := GetKeywordsBy(conditions)
 
 	assert.Equal(s.T(), 0, len(result))
 	assert.Equal(s.T(), nil, err)
@@ -230,7 +241,13 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidColumnCondition() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	conditions := []string{fmt.Sprintf("unknown_column = '%s'", keyword.Keyword)}
+	conditions := []map[string]string{
+		{
+			"column": "unknown_column",
+			"value":  keyword.Keyword,
+			"type":   Equal,
+		},
+	}
 
 	result, err := GetKeywordsBy(conditions)
 	_, isPgError := err.(*pgconn.PgError)
