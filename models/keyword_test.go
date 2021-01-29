@@ -189,28 +189,36 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByWithMoreThanOneRows() {
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordDBTestSuite) TestGetKeywordsByValidKeyword() {
+func (s *KeywordDBTestSuite) TestGetKeywordsByValidKeywordStringCondition() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	condition := make(map[string]interface{})
-	condition["keyword"] = keyword.Keyword
+	conditions := []Condition{
+		{
+			ConditionName: "keyword",
+			Value:         keyword.Keyword,
+		},
+	}
 
-	result, err := GetKeywordsBy(condition)
+	result, err := GetKeywordsBy(conditions)
 
 	assert.Equal(s.T(), 1, len(result))
 	assert.Equal(s.T(), keyword.Keyword, result[0].Keyword)
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidKeyword() {
+func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidKeywordCondition() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	condition := make(map[string]interface{})
-	condition["keyword"] = "invalid"
+	conditions := []Condition{
+		{
+			ConditionName: "keyword",
+			Value:         "invalid",
+		},
+	}
 
-	result, err := GetKeywordsBy(condition)
+	result, err := GetKeywordsBy(conditions)
 
 	assert.Equal(s.T(), 0, len(result))
 	assert.Equal(s.T(), nil, err)
@@ -227,18 +235,20 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByWithoutKeyword() {
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidColumn() {
+func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidColumnCondition() {
 	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	condition := make(map[string]interface{})
-	condition["unknown_column"] = keyword.Keyword
+	conditions := []Condition{
+		{
+			ConditionName: "unknown_column",
+			Value:         keyword.Keyword,
+		},
+	}
 
-	result, err := GetKeywordsBy(condition)
-	_, isPgError := err.(*pgconn.PgError)
+	result, err := GetKeywordsBy(conditions)
 
-	assert.Equal(s.T(), "ERROR: column \"unknown_column\" does not exist (SQLSTATE 42703)", err.Error())
-	assert.Equal(s.T(), true, isPgError)
+	assert.Equal(s.T(), "could not join conditions", err.Error())
 	assert.Equal(s.T(), nil, result)
 }
 

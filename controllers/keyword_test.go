@@ -67,7 +67,7 @@ func TestKeywordDbTestSuite(t *testing.T) {
 	suite.Run(t, new(KeywordDbTestSuite))
 }
 
-func TestDisplayKeywordWithAuthenticatedUser(t *testing.T) {
+func TestDisplayKeywordWithAuthenticatedUserWithoutFilter(t *testing.T) {
 	engine := testConfig.GetRouter(true)
 	new(KeywordController).applyRoutes(EnsureAuthenticatedUserGroup(engine))
 
@@ -77,6 +77,23 @@ func TestDisplayKeywordWithAuthenticatedUser(t *testing.T) {
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
 	response := testHttp.PerformRequest(engine, "GET", "/keyword", headers, nil)
+	p, err := ioutil.ReadAll(response.Body)
+	isKeywordPage := err == nil && strings.Index(string(p), "<title>Keyword</title>") > 0
+
+	assert.Equal(t, http.StatusOK, response.Code)
+	assert.Equal(t, true, isKeywordPage)
+}
+
+func TestDisplayKeywordWithAuthenticatedUserWithFilter(t *testing.T) {
+	engine := testConfig.GetRouter(true)
+	new(KeywordController).applyRoutes(EnsureAuthenticatedUserGroup(engine))
+
+	// Cookie from login API Set-Cookie header
+	headers := http.Header{}
+	cookie := fixture.GenerateCookie("user_id", "test-user")
+	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
+
+	response := testHttp.PerformRequest(engine, "GET", "/keyword?filter[keyword]=Test", headers, nil)
 	p, err := ioutil.ReadAll(response.Body)
 	isKeywordPage := err == nil && strings.Index(string(p), "<title>Keyword</title>") > 0
 
@@ -230,4 +247,53 @@ func TestUploadKeywordWithGuestUser(t *testing.T) {
 
 	assert.Equal(t, http.StatusFound, response.Code)
 	assert.Equal(t, "/login", response.Header().Get("Location"))
+}
+
+func TestFilterValidConditionsWithValidQueryString(t *testing.T) {
+	queryString := map[string][]string{
+		"filter[keyword]": {"test"},
+	}
+
+	result := filterValidConditions(queryString)
+
+	expected := []models.Condition{
+		{
+			ConditionName: "keyword",
+			Value:         "test",
+		},
+	}
+
+	assert.Equal(t, expected, result)
+}
+
+func TestFilterValidConditionsWithoutQueryString(t *testing.T) {
+	result := filterValidConditions(nil)
+
+	var expected []models.Condition
+
+	assert.Equal(t, expected, result)
+}
+
+func TestFilterValidConditionsWithInvalidQueryString(t *testing.T) {
+	queryString := map[string][]string{
+		"filter[invalid]": {"test"},
+	}
+
+	result := filterValidConditions(queryString)
+
+	var expected []models.Condition
+
+	assert.Equal(t, expected, result)
+}
+
+func TestFilterValidConditionsWithBlankQueryStringValue(t *testing.T) {
+	queryString := map[string][]string{
+		"filter[keyword]": {""},
+	}
+
+	result := filterValidConditions(queryString)
+
+	var expected []models.Condition
+
+	assert.Equal(t, expected, result)
 }

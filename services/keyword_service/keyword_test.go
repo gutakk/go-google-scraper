@@ -65,23 +65,56 @@ func TestKeywordServiceDbTestSuite(t *testing.T) {
 	suite.Run(t, new(KeywordServiceDbTestSuite))
 }
 
-func (s *KeywordServiceDbTestSuite) TestGetAllWithValidUser() {
+func (s *KeywordServiceDbTestSuite) TestGetKeywordsWithValidUser() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	result, err := s.keywordService.GetAll()
+	result, err := s.keywordService.GetKeywords(nil)
 
 	assert.Equal(s.T(), 1, len(result))
 	assert.Equal(s.T(), keyword.Keyword, result[0].Keyword)
 	assert.Equal(s.T(), nil, err)
 }
 
-func (s *KeywordServiceDbTestSuite) TestGetAllWithInvalidUser() {
+func (s *KeywordServiceDbTestSuite) TestGetKeywordsWithValidUserAndAdditionalConditions() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: "test"}
+	db.GetDB().Create(&keyword)
+
+	additionalCondition := []models.Condition{
+		{
+			ConditionName: "keyword",
+			Value:         "test",
+		},
+	}
+	result, err := s.keywordService.GetKeywords(additionalCondition)
+
+	assert.Equal(s.T(), 1, len(result))
+	assert.Equal(s.T(), keyword.Keyword, result[0].Keyword)
+	assert.Equal(s.T(), nil, err)
+}
+
+func (s *KeywordServiceDbTestSuite) TestGetKeywordsWithValidUserButInvalidAdditionalConditions() {
+	keyword := models.Keyword{UserID: s.userID, Keyword: "test"}
+	db.GetDB().Create(&keyword)
+
+	additionalCondition := []models.Condition{
+		{
+			ConditionName: "keyword",
+			Value:         "invalid",
+		},
+	}
+	result, err := s.keywordService.GetKeywords(additionalCondition)
+
+	assert.Equal(s.T(), 0, len(result))
+	assert.Equal(s.T(), nil, err)
+}
+
+func (s *KeywordServiceDbTestSuite) TestGetKeywordsWithInvalidUser() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
 	keywordService := KeywordService{}
-	result, err := keywordService.GetAll()
+	result, err := keywordService.GetKeywords(nil)
 
 	assert.Equal(s.T(), 0, len(result))
 	assert.Equal(s.T(), nil, err)

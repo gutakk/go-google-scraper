@@ -1,7 +1,14 @@
 body.keyword {
-  .form-keyword-upload {
+  .form-keyword-upload,
+  .form-keyword-filter {
     @apply border rounded-md p-6;
     width: fit-content;
+  }
+  
+  .form-keyword-filter {
+    &__input-container {
+      @apply flex;
+    }
   }
   
   .list-keyword {

@@ -3,6 +3,7 @@ package keyword_service
 import (
 	"encoding/csv"
 	"errors"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"os"
@@ -29,11 +30,13 @@ type KeywordService struct {
 	CurrentUserID uint
 }
 
-func (k *KeywordService) GetAll() ([]models.Keyword, error) {
-	condition := make(map[string]interface{})
-	condition["user_id"] = k.CurrentUserID
+func (k *KeywordService) GetKeywords(conditions []models.Condition) ([]models.Keyword, error) {
+	conditions = append(conditions, models.Condition{
+		ConditionName: "user_id",
+		Value:         fmt.Sprint(k.CurrentUserID),
+	})
 
-	keywords, err := models.GetKeywordsBy(condition)
+	keywords, err := models.GetKeywordsBy(conditions)
 	if err != nil {
 		return nil, errorHandler.DatabaseErrorMessage(err)
 	}

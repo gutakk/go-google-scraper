@@ -58,10 +58,15 @@ func GetKeywordBy(condition map[string]interface{}) (Keyword, error) {
 	return keyword, nil
 }
 
-func GetKeywordsBy(condition map[string]interface{}) ([]Keyword, error) {
+func GetKeywordsBy(conditions []Condition) ([]Keyword, error) {
 	var keywords []Keyword
 
-	err := db.GetDB().Where(condition).Order("keyword").Find(&keywords).Error
+	joinedConditions, err := GetJoinedConditions(conditions)
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.GetDB().Where(joinedConditions).Order("keyword").Find(&keywords).Error
 	if err != nil {
 		return nil, err
 	}

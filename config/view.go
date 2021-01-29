@@ -3,8 +3,9 @@ package config
 import (
 	"html/template"
 
-	"github.com/foolin/goview"
 	"github.com/gutakk/go-google-scraper/helpers/view"
+
+	"github.com/foolin/goview"
 )
 
 func AppGoviewConfig() goview.Config {
@@ -16,9 +17,11 @@ func AppGoviewConfig() goview.Config {
 		Partials: []string{
 			"partials/search_result",
 			"partials/list_search_result",
+			"partials/filter_keyword_input",
 		},
 		Funcs: template.FuncMap{
-			"searchResultPartial": view.SearchResultPartial,
+			"searchResultPartial":       view.SearchResultPartial,
+			"filterKeywordPartialInput": view.FilterKeywordPartialInput,
 		},
 	}
 }
