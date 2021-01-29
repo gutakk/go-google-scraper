@@ -5,10 +5,10 @@ import (
 	"net/http"
 
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	"github.com/gutakk/go-google-scraper/helpers/filter_helper"
 	html "github.com/gutakk/go-google-scraper/helpers/html"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	helpers "github.com/gutakk/go-google-scraper/helpers/user"
-	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/presenters"
 	"github.com/gutakk/go-google-scraper/services/keyword_service"
 
@@ -144,7 +144,7 @@ func getKeywordResultData(keywordService keyword_service.KeywordService, keyword
 }
 
 func getKeywordsData(keywordService keyword_service.KeywordService, queryString map[string][]string) map[string]interface{} {
-	conditions := filterValidConditions(queryString)
+	conditions := filter_helper.FilterValidConditions(queryString)
 	keywords, _ := keywordService.GetKeywords(conditions)
 	var keywordPresenters []presenters.KeywordPresenter
 
@@ -157,22 +157,6 @@ func getKeywordsData(keywordService keyword_service.KeywordService, queryString 
 	data["filter"] = queryString
 
 	return data
-}
-
-func filterValidConditions(queryString map[string][]string) []models.Condition {
-	var validConditions []models.Condition
-
-	for _, f := range FilterList {
-		queryStringValue := queryString[f["queryString"]]
-		if queryStringValue != nil && queryStringValue[0] != "" {
-			validConditions = append(validConditions, models.Condition{
-				ConditionName: f["modelCondition"],
-				Value:         queryStringValue[0],
-			})
-		}
-	}
-
-	return validConditions
 }
 
 func getCurrentUser(keywordService keyword_service.KeywordService) map[string]interface{} {
