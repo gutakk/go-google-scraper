@@ -1,6 +1,8 @@
 package api_helper
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 type ErrorResponseObject struct {
 	Detail string `json:"detail"`
@@ -18,13 +20,16 @@ func (e *ErrorResponseObject) NewErrorResponse() gin.H {
 }
 
 type DataResponseObject struct {
-	ID         string      `json:"id"`
-	Type       string      `json:"type"`
-	Attributes interface{} `json:"attributes"`
+	ID            string                           `json:"id"`
+	Type          string                           `json:"type"`
+	Attributes    interface{}                      `json:"attributes"`
+	Relationships map[string]RelationshipsResponse `json:"relationships"`
 }
 
-func (d *DataResponseObject) ConstructDataResponse() gin.H {
-	return gin.H{
-		"data": d,
-	}
+type DataResponse struct {
+	Data DataResponseObject `json:"data"`
+}
+
+type DataResponseList struct {
+	Data []DataResponseObject `json:"data"`
 }

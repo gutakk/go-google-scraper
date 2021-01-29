@@ -15,7 +15,7 @@ func TestFormattedCreatedAtWithValidTime(t *testing.T) {
 	time := time.Date(2020, 12, 16, 12, 0, 0, 0, time.UTC)
 	keywordPresenter := KeywordPresenter{
 		Keyword: models.Keyword{
-			Model: gorm.Model{CreatedAt: time},
+			Model: &gorm.Model{CreatedAt: time},
 		},
 	}
 

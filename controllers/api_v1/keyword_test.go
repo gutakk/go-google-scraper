@@ -127,6 +127,186 @@ func TestKeywordAPIControllerDbTestSuite(t *testing.T) {
 	suite.Run(t, new(KeywordAPIControllerDbTestSuite))
 }
 
+func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParams() {
+	keyword := models.Keyword{UserID: s.user.ID, Keyword: "testKeyword"}
+	db.GetDB().Create(&keyword)
+
+	headers := http.Header{}
+	headers.Set("Authorization", "Bearer test-access")
+
+	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
+	respBodyData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error(err)
+	}
+
+	var parsedRespBody map[string][]api_helper.DataResponseObject
+	err = json.Unmarshal(respBodyData, &parsedRespBody)
+	if err != nil {
+		log.Error(err)
+	}
+
+	respValue, _ := parsedRespBody["data"][0].Attributes.(map[string]interface{})
+
+	assert.Equal(s.T(), http.StatusOK, resp.Code)
+	assert.Equal(s.T(), 1, len(parsedRespBody["data"]))
+	assert.Equal(s.T(), "testKeyword", respValue["keyword"])
+}
+
+func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNoKeywords() {
+	headers := http.Header{}
+	headers.Set("Authorization", "Bearer test-access")
+
+	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
+	respBodyData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error(err)
+	}
+
+	var parsedRespBody map[string][]api_helper.DataResponseObject
+	err = json.Unmarshal(respBodyData, &parsedRespBody)
+	if err != nil {
+		log.Error(err)
+	}
+
+	assert.Equal(s.T(), http.StatusOK, resp.Code)
+	assert.Equal(s.T(), 0, len(parsedRespBody["data"]))
+}
+
+func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNotTheResourceOwner() {
+	tokenItem := &oauth_test.TokenStoreItem{
+		CreatedAt: time.Now(),
+		ExpiresAt: time.Now(),
+		Code:      "test-code",
+		Access:    "test-not-resource-owner",
+		Refresh:   "test-refresh",
+	}
+
+	data, err := json.Marshal(&oauth_test.TokenData{
+		Access: tokenItem.Access,
+		UserID: "invalidUserID",
+	})
+	if err != nil {
+		log.Error(err)
+	}
+	tokenItem.Data = data
+
+	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
+		tokenItem.CreatedAt,
+		tokenItem.ExpiresAt,
+		tokenItem.Code,
+		tokenItem.Access,
+		tokenItem.Refresh,
+		tokenItem.Data,
+	)
+
+	keyword := models.Keyword{UserID: s.user.ID, Keyword: faker.Name()}
+	db.GetDB().Create(&keyword)
+
+	headers := http.Header{}
+	headers.Set("Authorization", "Bearer test-not-resource-owner")
+
+	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
+	respBodyData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error(err)
+	}
+
+	var parsedRespBody map[string][]api_helper.DataResponseObject
+	err = json.Unmarshal(respBodyData, &parsedRespBody)
+	if err != nil {
+		log.Error(err)
+	}
+
+	assert.Equal(s.T(), http.StatusOK, resp.Code)
+	assert.Equal(s.T(), 0, len(parsedRespBody["data"]))
+}
+
+func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithoutAuthorizationHeader() {
+	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", nil, nil)
+	respBodyData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error(err)
+	}
+
+	var parsedRespBody map[string][]api_helper.ErrorResponseObject
+	err = json.Unmarshal(respBodyData, &parsedRespBody)
+	if err != nil {
+		log.Error(err)
+	}
+
+	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
+	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
+}
+
+func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithInvalidAccessToken() {
+	headers := http.Header{}
+	headers.Set("Authorization", "invalid_token")
+
+	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
+	respBodyData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error(err)
+	}
+
+	var parsedRespBody map[string][]api_helper.ErrorResponseObject
+	err = json.Unmarshal(respBodyData, &parsedRespBody)
+	if err != nil {
+		log.Error(err)
+	}
+
+	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
+	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
+}
+
+func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithExpiredAccessToken() {
+	db.GetDB().Exec("DELETE FROM oauth2_tokens")
+
+	tokenItem := &oauth_test.TokenStoreItem{
+		CreatedAt: time.Now(),
+		ExpiresAt: time.Now(),
+		Code:      "test-code",
+		Access:    "test-access",
+		Refresh:   "test-refresh",
+	}
+
+	data, err := json.Marshal(&oauth_test.TokenData{
+		AccessExpiresIn: 1,
+		Access:          tokenItem.Access,
+	})
+	if err != nil {
+		log.Error(err)
+	}
+	tokenItem.Data = data
+
+	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
+		tokenItem.CreatedAt,
+		tokenItem.ExpiresAt,
+		tokenItem.Code,
+		tokenItem.Access,
+		tokenItem.Refresh,
+		tokenItem.Data,
+	)
+
+	headers := http.Header{}
+	headers.Set("Authorization", "Bearer test-access")
+
+	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
+	respBodyData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error(err)
+	}
+
+	var parsedRespBody map[string][]api_helper.ErrorResponseObject
+	err = json.Unmarshal(respBodyData, &parsedRespBody)
+	if err != nil {
+		log.Error(err)
+	}
+
+	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
+	assert.Equal(s.T(), errors.ErrExpiredAccessToken.Error(), parsedRespBody["errors"][0].Detail)
+}
+
 func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithValidParams() {
 	headers, payload := testFile.CreateMultipartPayload("tests/fixture/adword_keywords.csv")
 	headers.Set("Authorization", "Bearer test-access")

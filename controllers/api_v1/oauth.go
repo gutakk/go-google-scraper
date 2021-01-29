@@ -24,11 +24,13 @@ func (oa *OAuthController) generateClient(c *gin.Context) {
 		}
 		c.JSON(errorResponse.Status, errorResponse.NewErrorResponse())
 	} else {
-		dataResponse := &api_helper.DataResponseObject{
-			ID:         oauthClient.ClientID,
-			Type:       "client",
-			Attributes: oauthClient,
+		dataResponse := &api_helper.DataResponse{
+			Data: api_helper.DataResponseObject{
+				ID:         oauthClient.ClientID,
+				Type:       "client",
+				Attributes: oauthClient,
+			},
 		}
-		c.JSON(http.StatusCreated, dataResponse.ConstructDataResponse())
+		c.JSON(http.StatusCreated, dataResponse)
 	}
 }

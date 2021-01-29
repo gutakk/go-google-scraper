@@ -13,10 +13,12 @@ import (
 type KeywordStatus string
 
 const (
-	Pending    KeywordStatus = "pending"
-	Processing KeywordStatus = "processing"
-	Processed  KeywordStatus = "processed"
+	KeywordType = "keyword"
+
 	Failed     KeywordStatus = "failed"
+	Pending    KeywordStatus = "pending"
+	Processed  KeywordStatus = "processed"
+	Processing KeywordStatus = "processing"
 
 	InvalidKeywordStatusErr = "invalid keyword status"
 )
@@ -30,7 +32,7 @@ func (k KeywordStatus) Value() (driver.Value, error) {
 }
 
 type Keyword struct {
-	gorm.Model
+	*gorm.Model
 	Keyword                 string        `gorm:"notNull;index"`
 	Status                  KeywordStatus `gorm:"default:pending;type:keyword_status"`
 	LinksCount              int
@@ -42,7 +44,7 @@ type Keyword struct {
 	UserID                  uint
 	HtmlCode                string
 	FailedReason            string
-	User                    User
+	User                    *User
 }
 
 func GetKeywordBy(condition map[string]interface{}) (Keyword, error) {

@@ -12,6 +12,7 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/go-playground/assert.v1"
+	"gorm.io/gorm"
 )
 
 type JobEnqueuerTestSuite struct {
@@ -32,6 +33,7 @@ func TestJobEnqueuerTestSuite(t *testing.T) {
 
 func (s *JobEnqueuerTestSuite) TestEnqueueSearchJobWithValidSavedKeyword() {
 	savedKeyword := models.Keyword{
+		Model:   &gorm.Model{},
 		Keyword: "Hazard",
 	}
 
