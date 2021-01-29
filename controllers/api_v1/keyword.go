@@ -47,7 +47,9 @@ func (kapi *KeywordAPIController) fetchKeyword(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, keyword_api_service.JSONAPIFormatKeywordResponse(keyword))
+	keywordSerializer := serializers.KeywordSerializer{Keyword: keyword}
+
+	c.JSON(http.StatusOK, keywordSerializer.JSONAPIFormat())
 }
 
 func (kapi *KeywordAPIController) fetchKeywords(c *gin.Context) {

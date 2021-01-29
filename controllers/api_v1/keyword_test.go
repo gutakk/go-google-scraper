@@ -160,9 +160,12 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParams() {
 		`"status":"pending",` +
 		`"links_count":1,` +
 		`"non_adwords_count":1,` +
+		`"non_adword_links":null,` +
 		`"top_position_adwords_count":1,` +
+		`"top_position_adword_links":null,` +
 		`"total_adwords_count":1,` +
-		`"html_code":"testHTML"` +
+		`"html_code":"testHTML",` +
+		`"failed_reason":""` +
 		`},` +
 		`"relationships":{` +
 		`"user":{` +
