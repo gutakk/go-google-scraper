@@ -4,24 +4,24 @@
 @import 'node_modules/tailwindcss/utilities';
 
 // Base
-@import 'base/button';
-@import 'base/form';
-@import 'base/nav';
-@import 'base/table';
-@import 'base/typography';
+@import 'base/_button';
+@import 'base/_form';
+@import 'base/_nav';
+@import 'base/_table';
+@import 'base/_typography';
 
 // Components
-@import 'components/alert';
-@import 'components/list-search-result';
-@import 'components/navigation';
-@import 'components/search-result';
+@import 'components/_alert';
+@import 'components/_list-search-result';
+@import 'components/_navigation';
+@import 'components/_search-result';
 
 // Layouts
-@import 'layouts/application';
-@import 'layouts/authentication';
+@import 'layouts/_application';
+@import 'layouts/_authentication';
 
 // Screens
-@import 'screens/home';
-@import 'screens/keyword-result';
-@import 'screens/keyword';
-@import 'screens/not-found';
+@import 'screens/_home';
+@import 'screens/_keyword-result';
+@import 'screens/_keyword';
+@import 'screens/_not-found';
