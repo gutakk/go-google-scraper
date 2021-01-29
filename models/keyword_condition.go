@@ -38,10 +38,9 @@ func GetJoinedConditions(conditions []Condition) (string, error) {
 		whereStatement := ConditionMapper[conditionName]
 
 		if conditionValue != "" && whereStatement != "" {
-			switch conditionName {
-			case IsAdwordAdvertiserCondition:
+			if conditionName == IsAdwordAdvertiserCondition {
 				formattedConditions = append(formattedConditions, whereStatement)
-			default:
+			} else {
 				formattedConditions = append(formattedConditions, fmt.Sprintf(whereStatement, conditionValue))
 			}
 		} else {
