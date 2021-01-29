@@ -84,7 +84,6 @@ func (s *KeywordServiceDbTestSuite) TestGetKeywordsWithValidUserAndAdditionalCon
 		{
 			ConditionName: "keyword",
 			Value:         "test",
-			Type:          models.Equal,
 		},
 	}
 	result, err := s.keywordService.GetKeywords(additionalCondition)
@@ -102,7 +101,6 @@ func (s *KeywordServiceDbTestSuite) TestGetKeywordsWithValidUserButInvalidAdditi
 		{
 			ConditionName: "keyword",
 			Value:         "invalid",
-			Type:          models.Equal,
 		},
 	}
 	result, err := s.keywordService.GetKeywords(additionalCondition)

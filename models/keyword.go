@@ -26,15 +26,15 @@ const (
 	couldNotJoinConditionError = "could not join conditions"
 )
 
-var WhereStatement = map[string]string{
-	Equal: "%s = '%s'",
-	Like:  "LOWER(%s) LIKE LOWER('%%%s%%')",
+type Condition struct {
+	ConditionName string
+	Value         string
 }
 
-// Map query string filter to db column
+// Map query string filter to where statement
 var ConditionMapper = map[string]string{
-	"keyword": "keyword",
-	"user_id": "user_id",
+	"keyword": "LOWER(keyword) LIKE LOWER('%%%s%%')",
+	"user_id": "user_id = '%s'",
 }
 
 func (k KeywordStatus) Value() (driver.Value, error) {
@@ -43,12 +43,6 @@ func (k KeywordStatus) Value() (driver.Value, error) {
 		return string(k), nil
 	}
 	return nil, errors.New(InvalidKeywordStatusErr)
-}
-
-type Condition struct {
-	ConditionName string
-	Value         string
-	Type          string
 }
 
 type Keyword struct {
@@ -125,12 +119,10 @@ func getJoinedConditions(conditions []Condition) (string, error) {
 	for _, c := range conditions {
 		conditionName := c.ConditionName
 		conditionValue := c.Value
-		whereType := c.Type
-		dbColumn := ConditionMapper[conditionName]
-		whereStatement := WhereStatement[whereType]
+		whereStatement := ConditionMapper[conditionName]
 
-		if conditionValue != "" && dbColumn != "" && whereStatement != "" {
-			formattedConditions = append(formattedConditions, fmt.Sprintf(whereStatement, dbColumn, conditionValue))
+		if conditionValue != "" && whereStatement != "" {
+			formattedConditions = append(formattedConditions, fmt.Sprintf(whereStatement, conditionValue))
 		} else {
 			return "", errors.New(couldNotJoinConditionError)
 		}

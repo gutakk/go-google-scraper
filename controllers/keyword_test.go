@@ -260,7 +260,6 @@ func TestValidateValidConditionsWithValidQueryString(t *testing.T) {
 		{
 			ConditionName: "keyword",
 			Value:         "test",
-			Type:          "like",
 		},
 	}
 

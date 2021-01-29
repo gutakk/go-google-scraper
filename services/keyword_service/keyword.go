@@ -34,7 +34,6 @@ func (k *KeywordService) GetKeywords(conditions []models.Condition) ([]models.Ke
 	conditions = append(conditions, models.Condition{
 		ConditionName: "user_id",
 		Value:         fmt.Sprint(k.CurrentUserID),
-		Type:          models.Equal,
 	})
 
 	keywords, err := models.GetKeywordsBy(conditions)

@@ -197,7 +197,6 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByValidKeywordStringCondition() {
 		{
 			ConditionName: "keyword",
 			Value:         keyword.Keyword,
-			Type:          Equal,
 		},
 	}
 
@@ -216,7 +215,6 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidKeywordCondition() {
 		{
 			ConditionName: "keyword",
 			Value:         "invalid",
-			Type:          Equal,
 		},
 	}
 
@@ -245,7 +243,6 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidColumnCondition() {
 		{
 			ConditionName: "unknown_column",
 			Value:         keyword.Keyword,
-			Type:          Equal,
 		},
 	}
 
@@ -321,12 +318,10 @@ func TestGetJoinedConditionsWithValidConditionsMap(t *testing.T) {
 		{
 			ConditionName: "keyword",
 			Value:         "testKeyword",
-			Type:          Like,
 		},
 		{
 			ConditionName: "user_id",
 			Value:         "testUserID",
-			Type:          Equal,
 		},
 	}
 
@@ -343,12 +338,10 @@ func TestGetJoinedConditionsWithInvalidFilter(t *testing.T) {
 		{
 			ConditionName: "invalid",
 			Value:         "testKeyword",
-			Type:          Like,
 		},
 		{
 			ConditionName: "invalid",
 			Value:         "testUserID",
-			Type:          Equal,
 		},
 	}
 
@@ -363,32 +356,10 @@ func TestGetJoinedConditionsWithBlankValue(t *testing.T) {
 		{
 			ConditionName: "keyword",
 			Value:         "",
-			Type:          Like,
 		},
 		{
 			ConditionName: "user_id",
 			Value:         "",
-			Type:          Equal,
-		},
-	}
-
-	result, err := getJoinedConditions(conditions)
-
-	assert.Equal(t, "", result)
-	assert.Equal(t, "could not join conditions", err.Error())
-}
-
-func TestGetJoinedConditionsWithInvalidType(t *testing.T) {
-	conditions := []Condition{
-		{
-			ConditionName: "keyword",
-			Value:         "testKeyword",
-			Type:          "invalid",
-		},
-		{
-			ConditionName: "user_id",
-			Value:         "testUserID",
-			Type:          "invalid",
 		},
 	}
 

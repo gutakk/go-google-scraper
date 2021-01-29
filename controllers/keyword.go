@@ -28,7 +28,6 @@ var FilterList = []map[string]string{
 	{
 		"queryString": "filter[keyword]",
 		"filter":      "keyword",
-		"type":        models.Like,
 	},
 }
 
@@ -161,7 +160,6 @@ func validateValidConditions(queryString map[string][]string) []models.Condition
 			validConditions = append(validConditions, models.Condition{
 				ConditionName: f["filter"],
 				Value:         queryStringValue[0],
-				Type:          f["type"],
 			})
 		}
 	}
