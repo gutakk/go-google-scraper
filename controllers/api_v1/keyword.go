@@ -19,8 +19,27 @@ const (
 type KeywordAPIController struct{}
 
 func (kapi *KeywordAPIController) ApplyRoutes(engine *gin.RouterGroup) {
+	engine.GET("/keywords/:keyword_id", kapi.fetchKeyword)
 	engine.GET("/keywords", kapi.fetchKeywords)
 	engine.POST("/keywords", kapi.uploadKeyword)
+}
+
+func (kapi *KeywordAPIController) fetchKeyword(c *gin.Context) {
+	currentUserID := helpers.GetCurrentUserID(c)
+	keywordService := keyword_service.KeywordService{CurrentUserID: currentUserID}
+	keywordID := c.Param("keyword_id")
+
+	keyword, err := keywordService.GetKeywordResult(keywordID)
+	if err != nil {
+		errorResponse := api_helper.ErrorResponseObject{
+			Detail: err.Error(),
+			Status: http.StatusBadRequest,
+		}
+		c.JSON(errorResponse.Status, errorResponse.NewErrorResponse())
+		return
+	}
+
+	c.JSON(http.StatusOK, keyword_api_service.JSONAPIFormatKeywordResponse(keyword))
 }
 
 func (kapi *KeywordAPIController) fetchKeywords(c *gin.Context) {
