@@ -93,7 +93,10 @@ func TestDisplayKeywordWithAuthenticatedUserWithFilter(t *testing.T) {
 	cookie := fixture.GenerateCookie("user_id", "test-user")
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
-	response := testHttp.PerformRequest(engine, "GET", "/keyword?filter[keyword]=Test", headers, nil)
+	url := "/keyword?" +
+		"filter[keyword]=Test&" +
+		"filter[url]=Test"
+	response := testHttp.PerformRequest(engine, "GET", url, headers, nil)
 	p, err := ioutil.ReadAll(response.Body)
 	isKeywordPage := err == nil && strings.Index(string(p), "<title>Keyword</title>") > 0
 

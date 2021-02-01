@@ -18,6 +18,7 @@ type Condition struct {
 // Map query string filter to where statement
 var ConditionMapper = map[string]string{
 	"keyword": "LOWER(keyword) LIKE LOWER('%%%s%%')",
+	"url":     "(LOWER(non_adword_links::text) LIKE '%%%[1]s%%' OR LOWER(top_position_adword_links::text) LIKE '%%%[1]s%%')",
 	"user_id": "user_id = '%s'",
 }
 

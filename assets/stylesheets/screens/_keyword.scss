@@ -9,6 +9,10 @@ body.keyword {
     &__input-container {
       @apply flex;
     }
+
+    &__button {
+      @apply w-24;
+    }
   }
   
   .list-keyword {
