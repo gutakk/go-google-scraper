@@ -140,3 +140,14 @@ func TestDisplayRegister(t *testing.T) {
 	assert.Equal(t, http.StatusOK, response.Code)
 	assert.Equal(t, true, pageOK)
 }
+
+func (s *RegisterDbTestSuite) TestDisplayRegisterWithUserIDCookieButNoUser() {
+	cookie := fixture.GenerateCookie("user_id", "test-user")
+	headers := http.Header{}
+	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
+
+	response := testHttp.PerformRequest(s.engine, "GET", "/register", headers, nil)
+
+	assert.Equal(s.T(), http.StatusFound, response.Code)
+	assert.Equal(s.T(), "/register", response.Header().Get("Location"))
+}

@@ -115,6 +115,17 @@ func TestDisplayKeywordWithGuestUser(t *testing.T) {
 	assert.Equal(t, "/login", response.Header().Get("Location"))
 }
 
+func (s *KeywordDbTestSuite) TestDisplayKeywordWithUserIDCookieButNoUser() {
+	cookie := fixture.GenerateCookie("user_id", "test-user")
+	headers := http.Header{}
+	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
+
+	response := testHttp.PerformRequest(s.engine, "GET", "/keyword", headers, nil)
+
+	assert.Equal(s.T(), http.StatusFound, response.Code)
+	assert.Equal(s.T(), "/login", response.Header().Get("Location"))
+}
+
 func (s *KeywordDbTestSuite) TestDisplayKeywordResultWithAuthenticatedUserAndValidKeyword() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)

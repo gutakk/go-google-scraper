@@ -155,3 +155,14 @@ func TestDisplayLogin(t *testing.T) {
 	assert.Equal(t, http.StatusOK, response.Code)
 	assert.Equal(t, true, pageOK)
 }
+
+func (s *LoginDbTestSuite) TestDisplayLoginWithUserIDCookieButNoUser() {
+	cookie := fixture.GenerateCookie("user_id", "test-user")
+	headers := http.Header{}
+	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
+
+	response := testHttp.PerformRequest(s.engine, "GET", "/login", headers, nil)
+
+	assert.Equal(s.T(), http.StatusFound, response.Code)
+	assert.Equal(s.T(), "/login", response.Header().Get("Location"))
+}
