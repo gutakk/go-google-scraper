@@ -161,5 +161,5 @@ func (s *RegisterDbTestSuite) TestDisplayRegisterWithUserIDCookieButNoUser() {
 	pageOK := err == nil && strings.Index(string(p), "<title>Register</title>") > 0
 
 	assert.Equal(s.T(), http.StatusOK, response.Code)
-	assert.Equal(s.T(), true, pageOK)
+	assert.Equal(s.T(), true, pageOK) // TODO: Check the controller in other task
 }
