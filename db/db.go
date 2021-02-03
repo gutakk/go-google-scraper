@@ -47,6 +47,10 @@ func constructDsn() string {
 }
 
 func GetDatabaseURL() string {
+	if gin.Mode() == gin.ReleaseMode {
+		return os.Getenv("DATABASE_URL")
+	}
+
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
