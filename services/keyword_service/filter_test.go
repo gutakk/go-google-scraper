@@ -1,10 +1,10 @@
-package filter_helper_test
+package keyword_service_test
 
 import (
 	"testing"
 
-	"github.com/gutakk/go-google-scraper/helpers/filter_helper"
 	"github.com/gutakk/go-google-scraper/models"
+	"github.com/gutakk/go-google-scraper/services/keyword_service"
 
 	"gopkg.in/go-playground/assert.v1"
 )
@@ -14,7 +14,8 @@ func TestFilterValidConditionsWithValidQueryString(t *testing.T) {
 		"filter[keyword]": {"test"},
 	}
 
-	result := filter_helper.FilterValidConditions(queryString)
+	keywordService := keyword_service.KeywordService{QueryString: queryString}
+	result := keywordService.FilterValidConditions()
 
 	expected := []models.Condition{
 		{
@@ -27,7 +28,8 @@ func TestFilterValidConditionsWithValidQueryString(t *testing.T) {
 }
 
 func TestFilterValidConditionsWithoutQueryString(t *testing.T) {
-	result := filter_helper.FilterValidConditions(nil)
+	keywordService := keyword_service.KeywordService{}
+	result := keywordService.FilterValidConditions()
 
 	var expected []models.Condition
 
@@ -39,7 +41,8 @@ func TestFilterValidConditionsWithInvalidQueryString(t *testing.T) {
 		"filter[invalid]": {"test"},
 	}
 
-	result := filter_helper.FilterValidConditions(queryString)
+	keywordService := keyword_service.KeywordService{QueryString: queryString}
+	result := keywordService.FilterValidConditions()
 
 	var expected []models.Condition
 
@@ -51,7 +54,8 @@ func TestFilterValidConditionsWithBlankQueryStringValue(t *testing.T) {
 		"filter[keyword]": {""},
 	}
 
-	result := filter_helper.FilterValidConditions(queryString)
+	keywordService := keyword_service.KeywordService{QueryString: queryString}
+	result := keywordService.FilterValidConditions()
 
 	var expected []models.Condition
 

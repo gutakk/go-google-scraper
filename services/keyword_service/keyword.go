@@ -26,10 +26,6 @@ const (
 	invalidDataError    = "invalid data"
 )
 
-type KeywordService struct {
-	CurrentUserID uint
-}
-
 func (k *KeywordService) GetKeywords(conditions []models.Condition) ([]models.Keyword, error) {
 	conditions = append(conditions, models.Condition{
 		ConditionName: models.UserIDCondition,

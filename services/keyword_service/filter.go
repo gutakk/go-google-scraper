@@ -1,4 +1,4 @@
-package filter_helper
+package keyword_service
 
 import (
 	"fmt"
@@ -21,11 +21,11 @@ var FilterList = []map[string]string{
 	},
 }
 
-func FilterValidConditions(queryString map[string][]string) []models.Condition {
+func (k *KeywordService) FilterValidConditions() []models.Condition {
 	var validConditions []models.Condition
 
 	for _, f := range FilterList {
-		queryStringValue := queryString[f["queryString"]]
+		queryStringValue := k.QueryString[f["queryString"]]
 		if queryStringValue != nil && queryStringValue[0] != "" {
 			validConditions = append(validConditions, models.Condition{
 				ConditionName: f["modelCondition"],

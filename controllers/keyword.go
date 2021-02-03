@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
-	"github.com/gutakk/go-google-scraper/helpers/filter_helper"
 	html "github.com/gutakk/go-google-scraper/helpers/html"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	helpers "github.com/gutakk/go-google-scraper/helpers/user"
@@ -54,7 +53,7 @@ func (k *KeywordController) applyRoutes(engine *gin.RouterGroup) {
 
 func (k *KeywordController) displayKeyword(c *gin.Context) {
 	keywordService := initKeywordService(c)
-	data := getKeywordsData(keywordService, c.Request.URL.Query())
+	data := getKeywordsData(keywordService)
 
 	html.RenderWithFlash(c, http.StatusOK, keywordView, keywordTitle, data)
 }
@@ -87,7 +86,7 @@ func (k *KeywordController) displayKeywordHTML(c *gin.Context) {
 
 func (k *KeywordController) uploadKeyword(c *gin.Context) {
 	keywordService := initKeywordService(c)
-	data := getKeywordsData(keywordService, nil)
+	data := getKeywordsData(keywordService)
 
 	form := &UploadFileForm{}
 	if err := c.ShouldBind(form); err != nil {
@@ -143,8 +142,8 @@ func getKeywordResultData(keywordService keyword_service.KeywordService, keyword
 	return data, nil
 }
 
-func getKeywordsData(keywordService keyword_service.KeywordService, queryString map[string][]string) map[string]interface{} {
-	conditions := filter_helper.FilterValidConditions(queryString)
+func getKeywordsData(keywordService keyword_service.KeywordService) map[string]interface{} {
+	conditions := keywordService.FilterValidConditions()
 	keywords, _ := keywordService.GetKeywords(conditions)
 	var keywordPresenters []presenters.KeywordPresenter
 
@@ -154,7 +153,7 @@ func getKeywordsData(keywordService keyword_service.KeywordService, queryString 
 
 	data := getCurrentUser(keywordService)
 	data["keywordPresenters"] = keywordPresenters
-	data["filter"] = queryString
+	data["filter"] = keywordService.QueryString
 
 	return data
 }
@@ -167,5 +166,8 @@ func getCurrentUser(keywordService keyword_service.KeywordService) map[string]in
 
 func initKeywordService(c *gin.Context) keyword_service.KeywordService {
 	currentUser := helpers.GetCurrentUser(c)
-	return keyword_service.KeywordService{CurrentUserID: currentUser.ID}
+	return keyword_service.KeywordService{
+		CurrentUserID: currentUser.ID,
+		QueryString:   c.Request.URL.Query(),
+	}
 }
