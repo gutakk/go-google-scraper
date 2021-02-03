@@ -30,6 +30,7 @@ func main() {
 	r := config.SetupRouter()
 	controllers.CombineRoutes(r)
 
+	log.Printf("================ %v", os.Getenv("PORT"))
 	if error := r.Run(fmt.Sprint(":", os.Getenv("PORT"))); error != nil {
 		log.Fatal(fmt.Sprintf(startServerFailureError, error))
 	}
