@@ -23,7 +23,6 @@ func main() {
 
 	db.SetupRedisPool()
 	oauthServerErr := oauth.SetupOAuthServer()
-	log.Printf("================ %v", oauthServerErr)
 	if oauthServerErr != nil {
 		log.Fatal(fmt.Sprintf("Failed to start oauth server: %v", oauthServerErr))
 	}
@@ -31,7 +30,6 @@ func main() {
 	r := config.SetupRouter()
 	controllers.CombineRoutes(r)
 
-	log.Printf("================ %v", os.Getenv("PORT"))
 	if error := r.Run(fmt.Sprint(":", os.Getenv("PORT"))); error != nil {
 		log.Fatal(fmt.Sprintf(startServerFailureError, error))
 	}
