@@ -157,7 +157,9 @@ func (s *RegisterDbTestSuite) TestDisplayRegisterWithUserIDCookieButNoUser() {
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
 	response := testHttp.PerformRequest(s.engine, "GET", "/register", headers, nil)
+	p, err := ioutil.ReadAll(response.Body)
+	pageOK := err == nil && strings.Index(string(p), "<title>Register</title>") > 0
 
-	assert.Equal(s.T(), http.StatusFound, response.Code)
-	assert.Equal(s.T(), "/register", response.Header().Get("Location"))
+	assert.Equal(s.T(), http.StatusOK, response.Code)
+	assert.Equal(s.T(), true, pageOK)
 }

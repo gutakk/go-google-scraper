@@ -166,7 +166,9 @@ func (s *LoginDbTestSuite) TestDisplayLoginWithUserIDCookieButNoUser() {
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
 	response := testHttp.PerformRequest(s.engine, "GET", "/login", headers, nil)
+	p, err := ioutil.ReadAll(response.Body)
+	pageOK := err == nil && strings.Index(string(p), "<title>Login</title>") > 0
 
-	assert.Equal(s.T(), http.StatusFound, response.Code)
-	assert.Equal(s.T(), "/login", response.Header().Get("Location"))
+	assert.Equal(s.T(), http.StatusOK, response.Code)
+	assert.Equal(s.T(), true, pageOK)
 }
