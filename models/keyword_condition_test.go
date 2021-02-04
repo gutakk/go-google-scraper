@@ -39,6 +39,36 @@ func TestGetJoinedConditionsWithValidConditionsMap(t *testing.T) {
 	assert.Equal(t, nil, err)
 }
 
+func TestGetJoinedConditionsWithInvalidAdvertiserConditionValue(t *testing.T) {
+	conditions := []models.Condition{
+		{
+			ConditionName: "keyword",
+			Value:         "testKeyword",
+		},
+		{
+			ConditionName: "is_adword_advertiser",
+			Value:         "invalid",
+		},
+		{
+			ConditionName: "url",
+			Value:         "testURL",
+		},
+		{
+			ConditionName: "user_id",
+			Value:         "testUserID",
+		},
+	}
+
+	result, err := models.GetJoinedConditions(conditions)
+
+	expected := "LOWER(keyword) LIKE LOWER('%testKeyword%') AND " +
+		"(LOWER(non_adword_links::text) LIKE '%testURL%' OR LOWER(top_position_adword_links::text) LIKE '%testURL%') AND " +
+		"user_id = 'testUserID'"
+
+	assert.Equal(t, expected, result)
+	assert.Equal(t, nil, err)
+}
+
 func TestGetJoinedConditionsWithInvalidFilter(t *testing.T) {
 	conditions := []models.Condition{
 		{
