@@ -23,21 +23,6 @@ const (
 	uploadSuccessFlash = "CSV uploaded successfully"
 )
 
-var FilterList = []map[string]string{
-	{
-		"queryString":    "filter[keyword]",
-		"modelCondition": models.KeywordCondition,
-	},
-	{
-		"queryString":    "filter[url]",
-		"modelCondition": models.URLCondition,
-	},
-	{
-		"queryString":    "filter[is_adword_advertiser]",
-		"modelCondition": models.IsAdwordAdvertiserCondition,
-	},
-}
-
 type KeywordController struct{}
 
 type UploadFileForm struct {
