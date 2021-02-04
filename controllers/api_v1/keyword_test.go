@@ -150,32 +150,31 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParams() {
 	if err != nil {
 		log.Error(err)
 	}
+	var parsedRespBody map[string]api_helper.DataResponseObject
+	err = json.Unmarshal(respBodyData, &parsedRespBody)
+	if err != nil {
+		log.Error(err)
+	}
 
-	expectedResp := `{` +
-		`"data":{` +
-		`"id":"1",` +
-		`"type":"keyword",` +
-		`"attributes":{` +
-		`"keyword":"testKeyword",` +
-		`"status":"pending",` +
-		`"links_count":1,` +
-		`"non_adwords_count":1,` +
-		`"non_adword_links":null,` +
-		`"top_position_adwords_count":1,` +
-		`"top_position_adword_links":null,` +
-		`"total_adwords_count":1,` +
-		`"html_code":"testHTML",` +
-		`"failed_reason":""` +
-		`},` +
-		`"relationships":{` +
-		`"user":{` +
-		`"data":{` +
-		fmt.Sprintf(`"id":"%v",`, fmt.Sprint(s.user.ID)) +
-		`"type":"user"` +
-		`}}}}}`
+	data := parsedRespBody["data"]
+	attributes, _ := parsedRespBody["data"].Attributes.(map[string]interface{})
+	relationships := parsedRespBody["data"].Relationships
 
 	assert.Equal(s.T(), http.StatusOK, resp.Code)
-	assert.Equal(s.T(), expectedResp, string(respBodyData))
+	assert.Equal(s.T(), data.ID, "1")
+	assert.Equal(s.T(), data.Type, "keyword")
+	assert.Equal(s.T(), attributes["keyword"], "testKeyword")
+	assert.Equal(s.T(), attributes["status"], "pending")
+	assert.Equal(s.T(), attributes["links_count"], float64(1))
+	assert.Equal(s.T(), attributes["non_adwords_count"], float64(1))
+	assert.Equal(s.T(), attributes["non_adword_links"], nil)
+	assert.Equal(s.T(), attributes["top_position_adwords_count"], float64(1))
+	assert.Equal(s.T(), attributes["top_position_adword_links"], nil)
+	assert.Equal(s.T(), attributes["total_adwords_count"], float64(1))
+	assert.Equal(s.T(), attributes["html_code"], "testHTML")
+	assert.Equal(s.T(), attributes["failed_reason"], "")
+	assert.Equal(s.T(), relationships["user"].Data.Type, "user")
+	assert.Equal(s.T(), relationships["user"].Data.ID, fmt.Sprint(s.user.ID))
 }
 
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithInvalidKeywordID() {
