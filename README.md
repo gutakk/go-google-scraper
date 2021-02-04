@@ -31,6 +31,8 @@ make build-dependencies
   ```
 To visit app locally: `localhost:8080`
 
+Check [Postman collection](https://documenter.getpostman.com/view/14248300/TVzXCvaL) for API endpoints detail.
+
 ### Build assets
 ```sh
 npm run build
