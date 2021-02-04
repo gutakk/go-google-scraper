@@ -7,11 +7,7 @@ func FilterKeywordPartialInput(filter map[string][]string, label string, inputTy
 		case "text":
 			filterValue = filter[name][0]
 		case "checkbox":
-			if len(filter[name]) > 0 && filter[name][0] == "true" {
-				filterValue = true
-			} else {
-				filterValue = false
-			}
+			filterValue = filter[name]
 		}
 	}
 
