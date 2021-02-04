@@ -2,20 +2,23 @@ package controllers
 
 import (
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
 
-	"github.com/bxcodec/faker/v3"
-	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/fixture"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
+
+	"github.com/bxcodec/faker/v3"
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
+	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -120,7 +123,14 @@ func (s *RegisterDbTestSuite) TestRegisterWithTooShortPasswordValidation() {
 }
 
 func (s *RegisterDbTestSuite) TestDisplayRegisterWithAuthenticatedUser() {
-	cookie := fixture.GenerateCookie("user_id", "test-user")
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(s.password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Fatalf("Cannot hash password: %s", err)
+	}
+	user := models.User{Email: s.email, Password: string(hashedPassword)}
+	db.GetDB().Create(&user)
+
+	cookie := fixture.GenerateCookie("user_id", user.ID)
 	s.headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
 	response := testHttp.PerformRequest(s.engine, "GET", "/register", s.headers, nil)

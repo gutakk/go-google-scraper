@@ -8,8 +8,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/bxcodec/faker/v3"
-	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
@@ -18,6 +16,9 @@ import (
 	testFile "github.com/gutakk/go-google-scraper/tests/file"
 	"github.com/gutakk/go-google-scraper/tests/fixture"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
+
+	"github.com/bxcodec/faker/v3"
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -67,42 +68,36 @@ func TestKeywordDbTestSuite(t *testing.T) {
 	suite.Run(t, new(KeywordDbTestSuite))
 }
 
-func TestDisplayKeywordWithAuthenticatedUserWithoutFilter(t *testing.T) {
-	engine := testConfig.GetRouter(true)
-	new(KeywordController).applyRoutes(EnsureAuthenticatedUserGroup(engine))
-
+func (s *KeywordDbTestSuite) TestDisplayKeywordWithAuthenticatedUserWithoutFilter() {
 	// Cookie from login API Set-Cookie header
 	headers := http.Header{}
-	cookie := fixture.GenerateCookie("user_id", "test-user")
+	cookie := fixture.GenerateCookie("user_id", s.userID)
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
-	response := testHttp.PerformRequest(engine, "GET", "/keyword", headers, nil)
+	response := testHttp.PerformRequest(s.engine, "GET", "/keyword", headers, nil)
 	p, err := ioutil.ReadAll(response.Body)
 	isKeywordPage := err == nil && strings.Index(string(p), "<title>Keyword</title>") > 0
 
-	assert.Equal(t, http.StatusOK, response.Code)
-	assert.Equal(t, true, isKeywordPage)
+	assert.Equal(s.T(), http.StatusOK, response.Code)
+	assert.Equal(s.T(), true, isKeywordPage)
 }
 
-func TestDisplayKeywordWithAuthenticatedUserWithFilter(t *testing.T) {
-	engine := testConfig.GetRouter(true)
-	new(KeywordController).applyRoutes(EnsureAuthenticatedUserGroup(engine))
-
+func (s *KeywordDbTestSuite) TestDisplayKeywordWithAuthenticatedUserWithFilter() {
 	// Cookie from login API Set-Cookie header
 	headers := http.Header{}
-	cookie := fixture.GenerateCookie("user_id", "test-user")
+	cookie := fixture.GenerateCookie("user_id", s.userID)
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
 	url := "/keyword?" +
 		"filter[keyword]=Test&" +
 		"filter[url]=Test" +
 		"filter[is_adword_advertiser]=Test"
-	response := testHttp.PerformRequest(engine, "GET", url, headers, nil)
+	response := testHttp.PerformRequest(s.engine, "GET", url, headers, nil)
 	p, err := ioutil.ReadAll(response.Body)
 	isKeywordPage := err == nil && strings.Index(string(p), "<title>Keyword</title>") > 0
 
-	assert.Equal(t, http.StatusOK, response.Code)
-	assert.Equal(t, true, isKeywordPage)
+	assert.Equal(s.T(), http.StatusOK, response.Code)
+	assert.Equal(s.T(), true, isKeywordPage)
 }
 
 func TestDisplayKeywordWithGuestUser(t *testing.T) {
