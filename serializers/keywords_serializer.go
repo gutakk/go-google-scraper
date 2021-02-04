@@ -5,6 +5,7 @@ import (
 
 	"github.com/gutakk/go-google-scraper/helpers/api_helper"
 	"github.com/gutakk/go-google-scraper/models"
+
 	"gorm.io/datatypes"
 )
 
