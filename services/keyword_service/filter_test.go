@@ -9,9 +9,11 @@ import (
 	"gopkg.in/go-playground/assert.v1"
 )
 
-func TestFilterValidConditionsWithValidQueryString(t *testing.T) {
+func TestFilterValidConditionsWithValidQueryStrings(t *testing.T) {
 	queryString := map[string][]string{
-		"filter[keyword]": {"test"},
+		"filter[keyword]":              {"testKeyword"},
+		"filter[url]":                  {"testURL"},
+		"filter[is_adword_advertiser]": {"testAdword"},
 	}
 
 	keywordService := keyword_service.KeywordService{QueryString: queryString}
@@ -20,7 +22,15 @@ func TestFilterValidConditionsWithValidQueryString(t *testing.T) {
 	expected := []models.Condition{
 		{
 			ConditionName: "keyword",
-			Value:         "test",
+			Value:         "testKeyword",
+		},
+		{
+			ConditionName: "url",
+			Value:         "testURL",
+		},
+		{
+			ConditionName: "isAdwordAdvertiser",
+			Value:         "testAdword",
 		},
 	}
 
