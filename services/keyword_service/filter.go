@@ -1,22 +1,20 @@
 package keyword_service
 
 import (
-	"fmt"
-
 	"github.com/gutakk/go-google-scraper/models"
 )
 
 var FilterList = []map[string]string{
 	{
-		"queryString":    fmt.Sprintf("filter[%s]", models.KeywordCondition),
+		"queryString":    "filter[keyword]",
 		"modelCondition": models.KeywordCondition,
 	},
 	{
-		"queryString":    fmt.Sprintf("filter[%s]", models.URLCondition),
+		"queryString":    "filter[url]",
 		"modelCondition": models.URLCondition,
 	},
 	{
-		"queryString":    fmt.Sprintf("filter[%s]", models.IsAdwordAdvertiserCondition),
+		"queryString":    "filter[is_adword_advertiser]",
 		"modelCondition": models.IsAdwordAdvertiserCondition,
 	},
 }
