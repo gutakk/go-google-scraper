@@ -27,11 +27,15 @@ const (
 var FilterList = []map[string]string{
 	{
 		"queryString":    "filter[keyword]",
-		"modelCondition": "keyword",
+		"modelCondition": models.KeywordCondition,
 	},
 	{
 		"queryString":    "filter[url]",
-		"modelCondition": "url",
+		"modelCondition": models.URLCondition,
+	},
+	{
+		"queryString":    "filter[is_adword_advertiser]",
+		"modelCondition": models.IsAdwordAdvertiserCondition,
 	},
 }
 

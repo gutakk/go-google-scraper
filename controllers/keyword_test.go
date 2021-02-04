@@ -95,7 +95,8 @@ func TestDisplayKeywordWithAuthenticatedUserWithFilter(t *testing.T) {
 
 	url := "/keyword?" +
 		"filter[keyword]=Test&" +
-		"filter[url]=Test"
+		"filter[url]=Test" +
+		"filter[is_adword_advertiser]=Test"
 	response := testHttp.PerformRequest(engine, "GET", url, headers, nil)
 	p, err := ioutil.ReadAll(response.Body)
 	isKeywordPage := err == nil && strings.Index(string(p), "<title>Keyword</title>") > 0

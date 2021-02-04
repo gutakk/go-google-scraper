@@ -13,6 +13,11 @@ body.keyword {
     &__button {
       @apply w-24;
     }
+
+    &__checkbox-input {
+      @apply block;
+      margin-top: 0.19rem;
+    }
   }
   
   .list-keyword {

@@ -11,3 +11,7 @@ form {
     @apply outline-none border-indigo-500 z-10;
   }
 }
+
+[type="checkbox"] {
+  cursor: pointer;
+}
