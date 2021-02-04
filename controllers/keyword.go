@@ -8,7 +8,6 @@ import (
 	html "github.com/gutakk/go-google-scraper/helpers/html"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	helpers "github.com/gutakk/go-google-scraper/helpers/user"
-	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/presenters"
 	"github.com/gutakk/go-google-scraper/services/keyword_service"
 
@@ -23,21 +22,6 @@ const (
 
 	uploadSuccessFlash = "CSV uploaded successfully"
 )
-
-var FilterList = []map[string]string{
-	{
-		"queryString":    "filter[keyword]",
-		"modelCondition": models.KeywordCondition,
-	},
-	{
-		"queryString":    "filter[url]",
-		"modelCondition": models.URLCondition,
-	},
-	{
-		"queryString":    "filter[is_adword_advertiser]",
-		"modelCondition": models.IsAdwordAdvertiserCondition,
-	},
-}
 
 type KeywordController struct{}
 
@@ -54,7 +38,7 @@ func (k *KeywordController) applyRoutes(engine *gin.RouterGroup) {
 
 func (k *KeywordController) displayKeyword(c *gin.Context) {
 	keywordService := initKeywordService(c)
-	data := getKeywordsData(keywordService, c.Request.URL.Query())
+	data := getKeywordsData(keywordService)
 
 	html.RenderWithFlash(c, http.StatusOK, keywordView, keywordTitle, data)
 }
@@ -87,7 +71,7 @@ func (k *KeywordController) displayKeywordHTML(c *gin.Context) {
 
 func (k *KeywordController) uploadKeyword(c *gin.Context) {
 	keywordService := initKeywordService(c)
-	data := getKeywordsData(keywordService, nil)
+	data := getKeywordsData(keywordService)
 
 	form := &UploadFileForm{}
 	if err := c.ShouldBind(form); err != nil {
@@ -143,8 +127,8 @@ func getKeywordResultData(keywordService keyword_service.KeywordService, keyword
 	return data, nil
 }
 
-func getKeywordsData(keywordService keyword_service.KeywordService, queryString map[string][]string) map[string]interface{} {
-	conditions := filterValidConditions(queryString)
+func getKeywordsData(keywordService keyword_service.KeywordService) map[string]interface{} {
+	conditions := keywordService.FilterValidConditions()
 	keywords, _ := keywordService.GetKeywords(conditions)
 	var keywordPresenters []presenters.KeywordPresenter
 
@@ -154,25 +138,9 @@ func getKeywordsData(keywordService keyword_service.KeywordService, queryString 
 
 	data := getCurrentUser(keywordService)
 	data["keywordPresenters"] = keywordPresenters
-	data["filter"] = queryString
+	data["filter"] = keywordService.QueryString
 
 	return data
-}
-
-func filterValidConditions(queryString map[string][]string) []models.Condition {
-	var validConditions []models.Condition
-
-	for _, f := range FilterList {
-		queryStringValue := queryString[f["queryString"]]
-		if queryStringValue != nil && queryStringValue[0] != "" {
-			validConditions = append(validConditions, models.Condition{
-				ConditionName: f["modelCondition"],
-				Value:         queryStringValue[0],
-			})
-		}
-	}
-
-	return validConditions
 }
 
 func getCurrentUser(keywordService keyword_service.KeywordService) map[string]interface{} {
@@ -183,5 +151,8 @@ func getCurrentUser(keywordService keyword_service.KeywordService) map[string]in
 
 func initKeywordService(c *gin.Context) keyword_service.KeywordService {
 	currentUser := helpers.GetCurrentUser(c)
-	return keyword_service.KeywordService{CurrentUserID: currentUser.ID}
+	return keyword_service.KeywordService{
+		CurrentUserID: currentUser.ID,
+		QueryString:   c.Request.URL.Query(),
+	}
 }
