@@ -3,17 +3,30 @@ package config
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	log "github.com/sirupsen/logrus"
 )
 
 func LoadEnv() {
 	switch gin.Mode() {
 	case gin.ReleaseMode:
-		_ = godotenv.Load(".env." + gin.ReleaseMode)
+		err := godotenv.Load(".env." + gin.ReleaseMode)
+		if err != nil {
+			log.Error("Failed to load release env: ", err)
+		}
 	case gin.TestMode:
-		_ = godotenv.Load(".env." + gin.TestMode)
+		err := godotenv.Load(".env." + gin.TestMode)
+		if err != nil {
+			log.Error("Failed to load test env: ", err)
+		}
 	default:
-		_ = godotenv.Load(".env." + gin.DebugMode)
+		err := godotenv.Load(".env." + gin.DebugMode)
+		if err != nil {
+			log.Error("Failed to load debug env: ", err)
+		}
 	}
 
-	_ = godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		log.Error("Failed to load env: ", err)
+	}
 }
