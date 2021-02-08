@@ -1,17 +1,18 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 	"testing"
 
 	"github.com/gutakk/go-google-scraper/db"
+	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	"github.com/gutakk/go-google-scraper/tests/fixture"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -34,7 +35,7 @@ func TestLogoutTestSuit(t *testing.T) {
 func (s *LogoutTestSuite) TestLogoutWithAuthenticatedUser() {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("testPassword"), bcrypt.DefaultCost)
 	if err != nil {
-		log.Fatalf("Cannot hash password: %s", err)
+		log.Error(errorHelper.HashPasswordFailure, err)
 	}
 	user := models.User{Email: "test@email.com", Password: string(hashedPassword)}
 	db.GetDB().Create(&user)

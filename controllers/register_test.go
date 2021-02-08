@@ -2,13 +2,13 @@ package controllers
 
 import (
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
 
 	"github.com/gutakk/go-google-scraper/db"
+	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
@@ -17,6 +17,7 @@ import (
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -34,12 +35,19 @@ type RegisterDbTestSuite struct {
 }
 
 func (s *RegisterDbTestSuite) SetupTest() {
-	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	if err != nil {
+		log.Fatal(errorHelper.ConnectToDatabaseFailure, err)
+	}
+
 	db.GetDB = func() *gorm.DB {
 		return database
 	}
 
-	_ = db.GetDB().AutoMigrate(&models.User{})
+	err = db.GetDB().AutoMigrate(&models.User{})
+	if err != nil {
+		log.Fatal(errorHelper.MigrateDatabaseFailure, err)
+	}
 
 	s.engine = testConfig.GetRouter(true)
 	new(RegisterController).applyRoutes(EnsureGuestUserGroup(s.engine))
@@ -125,7 +133,7 @@ func (s *RegisterDbTestSuite) TestRegisterWithTooShortPasswordValidation() {
 func (s *RegisterDbTestSuite) TestDisplayRegisterWithAuthenticatedUser() {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(s.password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Fatalf("Cannot hash password: %s", err)
+		log.Error(errorHelper.HashPasswordFailure, err)
 	}
 	user := models.User{Email: s.email, Password: string(hashedPassword)}
 	db.GetDB().Create(&user)

@@ -65,7 +65,10 @@ func (k *KeywordController) displayKeywordHTML(c *gin.Context) {
 		html.RenderErrorPage(c, http.StatusNotFound, NotFoundView, NotFoundTitle)
 	} else {
 		c.Writer.WriteHeader(http.StatusOK)
-		_, _ = c.Writer.Write([]byte(keyword.HtmlCode))
+		_, err := c.Writer.Write([]byte(keyword.HtmlCode))
+		if err != nil {
+			html.RenderErrorPage(c, http.StatusNotFound, NotFoundView, NotFoundTitle)
+		}
 	}
 }
 
@@ -74,7 +77,8 @@ func (k *KeywordController) uploadKeyword(c *gin.Context) {
 	data := getKeywordsData(keywordService)
 
 	form := &UploadFileForm{}
-	if err := c.ShouldBind(form); err != nil {
+	err := c.ShouldBind(form)
+	if err != nil {
 		for _, fieldErr := range err.(validator.ValidationErrors) {
 			html.RenderWithError(c, http.StatusBadRequest, keywordView, keywordTitle, errorHandler.ValidationErrorMessage(fieldErr), data)
 			return

@@ -10,6 +10,7 @@ import (
 
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/db"
+	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
@@ -19,6 +20,7 @@ import (
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -35,7 +37,11 @@ type KeywordDbTestSuite struct {
 func (s *KeywordDbTestSuite) SetupTest() {
 	config.LoadEnv()
 
-	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	if err != nil {
+		log.Fatal(errorHelper.ConnectToDatabaseFailure, err)
+	}
+
 	db.GetDB = func() *gorm.DB {
 		return database
 	}
@@ -43,7 +49,10 @@ func (s *KeywordDbTestSuite) SetupTest() {
 	db.SetupRedisPool()
 
 	testDB.InitKeywordStatusEnum(db.GetDB())
-	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
+	err = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
+	if err != nil {
+		log.Fatal(errorHelper.MigrateDatabaseFailure, err)
+	}
 
 	s.engine = testConfig.GetRouter(true)
 	new(LoginController).applyRoutes(EnsureGuestUserGroup(s.engine))
@@ -52,7 +61,11 @@ func (s *KeywordDbTestSuite) SetupTest() {
 	email := faker.Email()
 	password := faker.Password()
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Error(errorHelper.HashPasswordFailure, err)
+	}
+
 	user := models.User{Email: email, Password: string(hashedPassword)}
 	db.GetDB().Create(&user)
 	s.userID = user.ID
@@ -61,7 +74,10 @@ func (s *KeywordDbTestSuite) SetupTest() {
 func (s *KeywordDbTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM keywords")
 	db.GetDB().Exec("DELETE FROM users")
-	_, _ = db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
+	_, err := db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
+	if err != nil {
+		log.Fatal(errorHelper.DeleteRedisJobFailure, err)
+	}
 }
 
 func TestKeywordDbTestSuite(t *testing.T) {
