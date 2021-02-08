@@ -13,7 +13,8 @@ import (
 )
 
 const (
-	startServerFailureError = "Failed to start the server %v"
+	startOAuthServerFailureError = "Failed to start oauth server: %v"
+	startServerFailureError      = "Failed to start the server: %v"
 )
 
 func main() {
@@ -24,7 +25,7 @@ func main() {
 	db.SetupRedisPool()
 	oauthServerErr := oauth.SetupOAuthServer()
 	if oauthServerErr != nil {
-		log.Fatal(fmt.Sprintf(startServerFailureError, oauthServerErr))
+		log.Fatal(fmt.Sprintf(startOAuthServerFailureError, oauthServerErr))
 	}
 
 	r := config.SetupRouter()
