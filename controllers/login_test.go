@@ -7,14 +7,15 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/bxcodec/faker/v3"
-	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/fixture"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
+
+	"github.com/bxcodec/faker/v3"
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -72,7 +73,10 @@ func (s *LoginDbTestSuite) TestLoginWithValidParameters() {
 }
 
 func (s *LoginDbTestSuite) TestDisplayLoginWithAuthenticatedUser() {
-	cookie := fixture.GenerateCookie("user_id", "test-user")
+	user := models.User{}
+	_ = db.GetDB().First(&user)
+
+	cookie := fixture.GenerateCookie("user_id", user.ID)
 	s.headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
 	response := testHttp.PerformRequest(s.engine, "GET", "/login", s.headers, nil)
@@ -154,4 +158,17 @@ func TestDisplayLogin(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, response.Code)
 	assert.Equal(t, true, pageOK)
+}
+
+func (s *LoginDbTestSuite) TestDisplayLoginWithUserIDCookieButNoUser() {
+	cookie := fixture.GenerateCookie("user_id", "test-user")
+	headers := http.Header{}
+	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
+
+	response := testHttp.PerformRequest(s.engine, "GET", "/login", headers, nil)
+	p, err := ioutil.ReadAll(response.Body)
+	pageOK := err == nil && strings.Index(string(p), "<title>Login</title>") > 0
+
+	assert.Equal(s.T(), http.StatusOK, response.Code)
+	assert.Equal(s.T(), true, pageOK) // TODO: Check the controller in other task
 }
