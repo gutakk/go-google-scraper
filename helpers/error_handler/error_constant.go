@@ -9,5 +9,6 @@ const (
 	JSONUnmarshalFailure     = "Failed to unmarshal json: "
 	MigrateDatabaseFailure   = "Failed to migrate database: "
 	ReadResponseBodyFailure  = "Failed to read response body: "
+	ScanRowFailure           = "Failed to scan row: "
 	StartOAuthServerFailute  = "Failed to setup oauth server: "
 )

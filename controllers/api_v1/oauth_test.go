@@ -12,6 +12,7 @@ import (
 	"github.com/gutakk/go-google-scraper/controllers/api_v1"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/helpers/api_helper"
+	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/oauth"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
@@ -19,6 +20,7 @@ import (
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/go-playground/assert.v1"
 	"gorm.io/driver/postgres"
@@ -28,13 +30,23 @@ import (
 func init() {
 	gin.SetMode(gin.TestMode)
 
-	if err := os.Chdir(path_test.GetRoot()); err != nil {
-		panic(err)
+	err := os.Chdir(path_test.GetRoot())
+	if err != nil {
+		log.Fatal(errorHelper.ChangeToRootDirFailure, err)
 	}
 
 	config.LoadEnv()
-	_ = oauth.SetupOAuthServer()
-	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+
+	err = oauth.SetupOAuthServer()
+	if err != nil {
+		log.Fatal(errorHelper.StartOAuthServerFailute, err)
+	}
+
+	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	if err != nil {
+		log.Fatal(errorHelper.ConnectToDatabaseFailure, err)
+	}
+
 	db.GetDB = func() *gorm.DB {
 		return database
 	}
@@ -64,17 +76,31 @@ func (s *OAuthControllerDbTestSuite) TestGenerateClientWithValidBasicAuth() {
 	headers.Set("Authorization", "Basic YWRtaW46cGFzc3dvcmQ=")
 
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/client", headers, nil)
-	respBodyData, _ := ioutil.ReadAll(resp.Body)
+	respBodyData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error(errorHelper.ReadResponseBodyFailure, err)
+	}
+
 	var parsedRespBody map[string]api_helper.DataResponseObject
-	_ = json.Unmarshal(respBodyData, &parsedRespBody)
+	err = json.Unmarshal(respBodyData, &parsedRespBody)
+	if err != nil {
+		log.Error(errorHelper.JSONUnmarshalFailure, err)
+	}
+
 	v, _ := parsedRespBody["data"].Attributes.(map[string]interface{})
 
 	var data []byte
 	row := db.GetDB().Table("oauth2_clients").Select("data").Row()
-	_ = row.Scan(&data)
+	err = row.Scan(&data)
+	if err != nil {
+		log.Error(errorHelper.ScanRowFailure, err)
+	}
 
 	var dataVal map[string]interface{}
-	_ = json.Unmarshal(data, &dataVal)
+	err = json.Unmarshal(data, &dataVal)
+	if err != nil {
+		log.Error(errorHelper.JSONUnmarshalFailure, err)
+	}
 
 	assert.Equal(s.T(), http.StatusCreated, resp.Code)
 	assert.Equal(s.T(), v["client_id"], dataVal["ID"])
