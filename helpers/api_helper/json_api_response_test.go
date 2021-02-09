@@ -3,9 +3,9 @@ package api_helper_test
 import (
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/gutakk/go-google-scraper/helpers/api_helper"
 
+	"github.com/gin-gonic/gin"
 	"gopkg.in/go-playground/assert.v1"
 )
 

@@ -3,22 +3,31 @@ package helpers
 import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
 	sessionTimeoutInSec = 60 * 60 * 24 // 24 hours
+
+	saveSessionFailure = "Failed to save session: "
 )
 
 func AddFlash(c *gin.Context, value interface{}, key string) {
 	session := sessions.Default(c)
 	session.AddFlash(value, key)
-	_ = session.Save()
+	err := session.Save()
+	if err != nil {
+		log.Error(saveSessionFailure, err)
+	}
 }
 
 func Flashes(c *gin.Context, key string) []interface{} {
 	session := sessions.Default(c)
 	flashes := session.Flashes(key)
-	_ = session.Save()
+	err := session.Save()
+	if err != nil {
+		log.Error(saveSessionFailure, err)
+	}
 
 	return flashes
 }
@@ -35,11 +44,17 @@ func Set(c *gin.Context, key string, value interface{}) {
 	})
 
 	session.Set(key, value)
-	_ = session.Save()
+	err := session.Save()
+	if err != nil {
+		log.Error(saveSessionFailure, err)
+	}
 }
 
 func Delete(c *gin.Context, key string) {
 	session := sessions.Default(c)
 	session.Delete(key)
-	_ = session.Save()
+	err := session.Save()
+	if err != nil {
+		log.Error(saveSessionFailure, err)
+	}
 }
