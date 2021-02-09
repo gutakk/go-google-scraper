@@ -2,12 +2,12 @@ package google_search_service
 
 import (
 	"errors"
-	"log"
 
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/models"
 
 	"github.com/gocraft/work"
+	log "github.com/sirupsen/logrus"
 )
 
 const (

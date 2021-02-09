@@ -5,11 +5,13 @@ import (
 	"testing"
 
 	"github.com/gutakk/go-google-scraper/db"
+	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/models"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 
 	"github.com/gocraft/work"
 	"github.com/gomodule/redigo/redis"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/go-playground/assert.v1"
 	"gorm.io/gorm"
@@ -24,7 +26,10 @@ func (s *JobEnqueuerTestSuite) SetupTest() {
 }
 
 func (s *JobEnqueuerTestSuite) TearDownTest() {
-	_, _ = db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
+	_, err := db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
+	if err != nil {
+		log.Fatal(errorHelper.DeleteRedisJobFailure, err)
+	}
 }
 
 func TestJobEnqueuerTestSuite(t *testing.T) {
@@ -37,22 +42,25 @@ func (s *JobEnqueuerTestSuite) TestEnqueueSearchJobWithValidSavedKeyword() {
 		Keyword: "Hazard",
 	}
 
-	err := EnqueueSearchJob(savedKeyword)
+	enqueueJobErr := EnqueueSearchJob(savedKeyword)
 
 	conn := db.GetRedisPool().Get()
 	defer conn.Close()
 
 	redisKey := testDB.RedisKeyJobs("go-google-scraper", "search")
 
-	rawJSON, redisErr := redis.Bytes(conn.Do("RPOP", redisKey))
-	if redisErr != nil {
-		panic("could not RPOP from job queue: " + redisErr.Error())
+	rawJSON, err := redis.Bytes(conn.Do("RPOP", redisKey))
+	if err != nil {
+		log.Error("Failed to RPOP from job queue: ", err)
 	}
 
 	var job work.Job
-	_ = json.Unmarshal(rawJSON, &job)
+	err = json.Unmarshal(rawJSON, &job)
+	if err != nil {
+		log.Error(errorHelper.JSONUnmarshalFailure, err)
+	}
 
-	assert.Equal(s.T(), nil, err)
+	assert.Equal(s.T(), nil, enqueueJobErr)
 	assert.Equal(s.T(), "search", job.Name)
 	assert.Equal(s.T(), "Hazard", job.ArgString("keyword"))
 }
@@ -60,7 +68,7 @@ func (s *JobEnqueuerTestSuite) TestEnqueueSearchJobWithValidSavedKeyword() {
 func (s *JobEnqueuerTestSuite) TestEnqueueSearchJobWithBlankSavedKeyword() {
 	savedKeyword := models.Keyword{}
 
-	err := EnqueueSearchJob(savedKeyword)
+	enqueueJobErr := EnqueueSearchJob(savedKeyword)
 
 	conn := db.GetRedisPool().Get()
 	defer conn.Close()
@@ -69,6 +77,6 @@ func (s *JobEnqueuerTestSuite) TestEnqueueSearchJobWithBlankSavedKeyword() {
 
 	_, redisErr := redis.Bytes(conn.Do("RPOP", redisKey))
 
-	assert.Equal(s.T(), "invalid keyword", err.Error())
+	assert.Equal(s.T(), "invalid keyword", enqueueJobErr.Error())
 	assert.Equal(s.T(), "redigo: nil returned", redisErr.Error())
 }

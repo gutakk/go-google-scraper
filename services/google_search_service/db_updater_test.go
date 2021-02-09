@@ -5,10 +5,12 @@ import (
 	"testing"
 
 	"github.com/gutakk/go-google-scraper/db"
+	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/models"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 
 	"github.com/bxcodec/faker/v3"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -22,15 +24,26 @@ type DBUpdaterDBTestSuite struct {
 }
 
 func (s *DBUpdaterDBTestSuite) SetupTest() {
-	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	if err != nil {
+		log.Fatal(errorHelper.ConnectToDatabaseFailure, err)
+	}
+
 	db.GetDB = func() *gorm.DB {
 		return database
 	}
 
 	testDB.InitKeywordStatusEnum(db.GetDB())
-	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
+	err = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
+	if err != nil {
+		log.Fatal(errorHelper.MigrateDatabaseFailure, err)
+	}
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
+	if err != nil {
+		log.Error(errorHelper.HashPasswordFailure, err)
+	}
+
 	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
 	db.GetDB().Create(&user)
 	s.userID = user.ID
