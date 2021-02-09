@@ -9,6 +9,8 @@ import (
 	"net/textproto"
 	"os"
 	"path/filepath"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func createFormFile(w *multipart.Writer, fieldname, filename string) (io.Writer, error) {
@@ -20,13 +22,23 @@ func createFormFile(w *multipart.Writer, fieldname, filename string) (io.Writer,
 
 func CreateMultipartPayload(filename string) (http.Header, *bytes.Buffer) {
 	path := filename
-	file, _ := os.Open(path)
+	file, err := os.Open(path)
+	if err != nil {
+		log.Error("Failed to open file: ", err)
+	}
 	defer file.Close()
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	part, _ := createFormFile(writer, "file", filepath.Base(path))
-	_, _ = io.Copy(part, file)
+	part, err := createFormFile(writer, "file", filepath.Base(path))
+	if err != nil {
+		log.Error("Failed to create part from file: ", err)
+	}
+
+	_, err = io.Copy(part, file)
+	if err != nil {
+		log.Error("Failed to copy file: ", err)
+	}
 	writer.Close()
 
 	headers := http.Header{}
