@@ -56,8 +56,8 @@ func (kapi *KeywordAPIController) fetchKeywords(c *gin.Context) {
 	currentUserID := helpers.GetCurrentUserID(c)
 	keywordService := keyword_service.KeywordService{CurrentUserID: currentUserID, QueryString: c.Request.URL.Query()}
 	conditions := keywordService.FilterValidConditions()
-
 	keywords, err := keywordService.GetKeywords(conditions)
+
 	if err != nil {
 		errorResponse := api_helper.ErrorResponseObject{
 			Detail: err.Error(),
