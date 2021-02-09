@@ -8,6 +8,7 @@ import (
 
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/db"
+	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/services/google_search_service"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
@@ -16,6 +17,7 @@ import (
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/gocraft/work"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -26,8 +28,9 @@ import (
 func init() {
 	gin.SetMode(gin.TestMode)
 
-	if err := os.Chdir(path_test.GetRoot()); err != nil {
-		panic(err)
+	err := os.Chdir(path_test.GetRoot())
+	if err != nil {
+		log.Fatal(errorHelper.ChangeToRootDirFailure, err)
 	}
 
 	config.LoadEnv()
@@ -50,7 +53,11 @@ func setupMocks() {
 }
 
 func (s *KeywordScraperDBTestSuite) SetupTest() {
-	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	if err != nil {
+		log.Fatal(errorHelper.ConnectToDatabaseFailure, err)
+	}
+
 	db.GetDB = func() *gorm.DB {
 		return database
 	}
@@ -58,11 +65,18 @@ func (s *KeywordScraperDBTestSuite) SetupTest() {
 	db.SetupRedisPool()
 
 	testDB.InitKeywordStatusEnum(db.GetDB())
-	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
+	err = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
+	if err != nil {
+		log.Fatal(errorHelper.MigrateDatabaseFailure, err)
+	}
 
 	setupMocks()
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
+	if err != nil {
+		log.Error(errorHelper.HashPasswordFailure, err)
+	}
+
 	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
 	db.GetDB().Create(&user)
 	s.userID = user.ID
@@ -73,7 +87,10 @@ func (s *KeywordScraperDBTestSuite) SetupTest() {
 func (s *KeywordScraperDBTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM keywords")
 	db.GetDB().Exec("DELETE FROM users")
-	_, _ = db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("test-job", "search"))
+	_, err := db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("test-job", "search"))
+	if err != nil {
+		log.Fatal(errorHelper.DeleteRedisJobFailure, err)
+	}
 }
 
 func TestKeywordScraperDBTestSuite(t *testing.T) {
@@ -84,21 +101,24 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithValidJob() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job, _ := s.enqueuer.Enqueue(
+	job, err := s.enqueuer.Enqueue(
 		"search",
 		work.Q{
 			"keywordID": keyword.ID,
 			"keyword":   keyword.Keyword,
 		},
 	)
+	if err != nil {
+		log.Error(errorHelper.EnqueueJobFailure, err)
+	}
 
 	ctx := Context{}
-	err := ctx.PerformSearchJob(job)
+	performSearchJobErr := ctx.PerformSearchJob(job)
 
 	var result models.Keyword
 	db.GetDB().First(&result, keyword.ID)
 
-	assert.Equal(s.T(), nil, err)
+	assert.Equal(s.T(), nil, performSearchJobErr)
 	assert.Equal(s.T(), models.Processed, result.Status)
 }
 
@@ -106,38 +126,44 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithoutKeywordID() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job, _ := s.enqueuer.Enqueue(
+	job, err := s.enqueuer.Enqueue(
 		"search",
 		work.Q{
 			"keyword": keyword.Keyword,
 		},
 	)
+	if err != nil {
+		log.Error(errorHelper.EnqueueJobFailure, err)
+	}
 
 	ctx := Context{}
-	err := ctx.PerformSearchJob(job)
+	performSearchJobErr := ctx.PerformSearchJob(job)
 
-	assert.Equal(s.T(), "invalid keyword id", err.Error())
+	assert.Equal(s.T(), "invalid keyword id", performSearchJobErr.Error())
 }
 
 func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithoutKeywordAndReachMaxFails() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job, _ := s.enqueuer.Enqueue(
+	job, err := s.enqueuer.Enqueue(
 		"search",
 		work.Q{
 			"keywordID": keyword.ID,
 		},
 	)
+	if err != nil {
+		log.Error(errorHelper.EnqueueJobFailure, err)
+	}
 
 	job.Fails = MaxFails
 	ctx := Context{}
-	err := ctx.PerformSearchJob(job)
+	performSearchJobErr := ctx.PerformSearchJob(job)
 
 	var result models.Keyword
 	db.GetDB().First(&result, keyword.ID)
 
-	assert.Equal(s.T(), "invalid keyword", err.Error())
+	assert.Equal(s.T(), "invalid keyword", performSearchJobErr.Error())
 	assert.Equal(s.T(), "invalid keyword", result.FailedReason)
 	assert.Equal(s.T(), models.Failed, result.Status)
 }
@@ -150,22 +176,25 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithRequestErrorAndReach
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job, _ := s.enqueuer.Enqueue(
+	job, err := s.enqueuer.Enqueue(
 		"search",
 		work.Q{
 			"keywordID": keyword.ID,
 			"keyword":   keyword.Keyword,
 		},
 	)
+	if err != nil {
+		log.Error(errorHelper.EnqueueJobFailure, err)
+	}
 
 	job.Fails = MaxFails
 	ctx := Context{}
-	err := ctx.PerformSearchJob(job)
+	performSearchJobErr := ctx.PerformSearchJob(job)
 
 	var result models.Keyword
 	db.GetDB().First(&result, keyword.ID)
 
-	assert.Equal(s.T(), "mock request error", err.Error())
+	assert.Equal(s.T(), "mock request error", performSearchJobErr.Error())
 	assert.Equal(s.T(), "mock request error", result.FailedReason)
 	assert.Equal(s.T(), models.Failed, result.Status)
 }
@@ -178,22 +207,25 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithParsingErrorAndReach
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job, _ := s.enqueuer.Enqueue(
+	job, err := s.enqueuer.Enqueue(
 		"search",
 		work.Q{
 			"keywordID": keyword.ID,
 			"keyword":   keyword.Keyword,
 		},
 	)
+	if err != nil {
+		log.Error(errorHelper.EnqueueJobFailure, err)
+	}
 
 	job.Fails = MaxFails
 	ctx := Context{}
-	err := ctx.PerformSearchJob(job)
+	performSearchJobErr := ctx.PerformSearchJob(job)
 
 	var result models.Keyword
 	db.GetDB().First(&result, keyword.ID)
 
-	assert.Equal(s.T(), "mock parsing error", err.Error())
+	assert.Equal(s.T(), "mock parsing error", performSearchJobErr.Error())
 	assert.Equal(s.T(), "mock parsing error", result.FailedReason)
 	assert.Equal(s.T(), models.Failed, result.Status)
 }
