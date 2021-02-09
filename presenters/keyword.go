@@ -3,7 +3,10 @@ package presenters
 import (
 	"encoding/json"
 
+	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/models"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type KeywordPresenter struct {
@@ -21,10 +24,16 @@ func (kp *KeywordPresenter) FormattedCreatedAt() string {
 
 func (kp *KeywordPresenter) KeywordLinks() KeywordLinks {
 	var nonAdwordLinks []string
-	_ = json.Unmarshal(kp.Keyword.NonAdwordLinks, &nonAdwordLinks)
+	err := json.Unmarshal(kp.Keyword.NonAdwordLinks, &nonAdwordLinks)
+	if err != nil {
+		log.Error(errorHelper.JSONUnmarshalFailure, err)
+	}
 
 	var topPositionAdwordLinks []string
-	_ = json.Unmarshal(kp.Keyword.TopPositionAdwordLinks, &topPositionAdwordLinks)
+	err = json.Unmarshal(kp.Keyword.TopPositionAdwordLinks, &topPositionAdwordLinks)
+	if err != nil {
+		log.Error(errorHelper.JSONUnmarshalFailure, err)
+	}
 
 	return KeywordLinks{
 		NonAdwordLinks:         nonAdwordLinks,
