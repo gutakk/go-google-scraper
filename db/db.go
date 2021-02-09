@@ -2,10 +2,12 @@ package db
 
 import (
 	"fmt"
-	"log"
 	"os"
 
+	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
+
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -16,7 +18,7 @@ func ConnectDB() (db *gorm.DB) {
 	db, err := gorm.Open(postgres.Open(constructDsn()), &gorm.Config{})
 
 	if err != nil {
-		log.Fatal(fmt.Sprintf("Failed to connect to database %v", err))
+		log.Fatal(errorHelper.ConnectToDatabaseFailure, err)
 	} else {
 		log.Print("Connect to database successfully")
 	}
