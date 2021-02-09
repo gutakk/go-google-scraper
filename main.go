@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/gutakk/go-google-scraper/config"
@@ -10,6 +9,8 @@ import (
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/migration"
 	"github.com/gutakk/go-google-scraper/oauth"
+
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -23,15 +24,16 @@ func main() {
 	migration.Migrate(database)
 
 	db.SetupRedisPool()
-	oauthServerErr := oauth.SetupOAuthServer()
-	if oauthServerErr != nil {
-		log.Fatal(fmt.Sprintf(startOAuthServerFailureError, oauthServerErr))
+	err := oauth.SetupOAuthServer()
+	if err != nil {
+		log.Fatal(fmt.Sprintf(startOAuthServerFailureError, err))
 	}
 
 	r := config.SetupRouter()
 	controllers.CombineRoutes(r)
 
-	if error := r.Run(fmt.Sprint(":", os.Getenv("PORT"))); error != nil {
-		log.Fatal(fmt.Sprintf(startServerFailureError, error))
+	err = r.Run(fmt.Sprint(":", os.Getenv("PORT")))
+	if err != nil {
+		log.Fatal(fmt.Sprintf(startServerFailureError, err))
 	}
 }
