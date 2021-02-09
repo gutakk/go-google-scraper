@@ -36,7 +36,8 @@ func SaveUser(email string, password string) error {
 		log.Error(errorHelper.HashPasswordFailure, err)
 	}
 
-	if result := db.GetDB().Create(&User{Email: email, Password: string(hashedPassword)}); result.Error != nil {
+	result := db.GetDB().Create(&User{Email: email, Password: string(hashedPassword)})
+	if result.Error != nil {
 		return result.Error
 	}
 	return nil
