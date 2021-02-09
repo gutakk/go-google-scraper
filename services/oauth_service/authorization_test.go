@@ -7,6 +7,7 @@ import (
 
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/db"
+	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/oauth"
 	"github.com/gutakk/go-google-scraper/services/oauth_service"
@@ -30,18 +31,18 @@ func init() {
 
 	err := os.Chdir(path_test.GetRoot())
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(errorHelper.ChangeToRootDirFailure, err)
 	}
 
 	config.LoadEnv()
 	err = oauth.SetupOAuthServer()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(errorHelper.StartOAuthServerFailute, err)
 	}
 
 	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(errorHelper.ConnectToDatabaseFailure, err)
 	}
 
 	db.GetDB = func() *gorm.DB {
@@ -50,7 +51,7 @@ func init() {
 
 	err = db.GetDB().AutoMigrate(&models.User{})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(errorHelper.MigrateDatabaseFailure, err)
 	}
 }
 
@@ -63,7 +64,7 @@ type LoginAPIServiceDbTestSuite struct {
 func (s *LoginAPIServiceDbTestSuite) SetupTest() {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
 	if err != nil {
-		log.Error(err)
+		log.Error(errorHelper.HashPasswordFailure, err)
 	}
 
 	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
