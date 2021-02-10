@@ -69,12 +69,7 @@ func (k *KeywordService) Save(parsedKeywordList []string) error {
 				return errorHandler.DatabaseErrorMessage(err)
 			}
 
-			err = google_search_service.EnqueueSearchJob(savedKeyword)
-			if err != nil {
-				return err
-			}
-
-			return nil
+			return google_search_service.EnqueueSearchJob(savedKeyword)
 		})
 
 		if err != nil {
