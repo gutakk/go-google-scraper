@@ -6,12 +6,12 @@ import (
 
 	"github.com/gutakk/go-google-scraper/db"
 	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 
 	"github.com/gocraft/work"
 	"github.com/gomodule/redigo/redis"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/go-playground/assert.v1"
 	"gorm.io/gorm"

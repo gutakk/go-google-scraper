@@ -6,10 +6,10 @@ import (
 
 	"github.com/gutakk/go-google-scraper/config"
 	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 )
 
 func TestMain(m *testing.M) {

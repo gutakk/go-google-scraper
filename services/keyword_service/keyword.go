@@ -11,11 +11,11 @@ import (
 
 	"github.com/gutakk/go-google-scraper/db"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/services/google_search_service"
 
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -110,7 +110,7 @@ func (k *KeywordService) UploadFile(c *gin.Context, file *multipart.FileHeader) 
 	path := "dist/"
 	err := os.Mkdir(path, 0755)
 	if err != nil {
-		log.Warn("Failed to create directory: ", err)
+		log.Error("Failed to create directory: ", err)
 	}
 
 	filename := filepath.Join(path, filepath.Base(file.Filename))

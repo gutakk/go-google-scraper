@@ -5,9 +5,9 @@ import (
 	"os"
 
 	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -20,7 +20,7 @@ func ConnectDB() (db *gorm.DB) {
 	if err != nil {
 		log.Fatal(errorHelper.ConnectToDatabaseFailure, err)
 	} else {
-		log.Print("Connect to database successfully")
+		log.Println("Connect to database successfully")
 	}
 
 	DB = db

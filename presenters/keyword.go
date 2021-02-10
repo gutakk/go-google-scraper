@@ -4,9 +4,8 @@ import (
 	"encoding/json"
 
 	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
-
-	log "github.com/sirupsen/logrus"
 )
 
 type KeywordPresenter struct {

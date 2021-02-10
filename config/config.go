@@ -1,9 +1,10 @@
 package config
 
 import (
+	"github.com/gutakk/go-google-scraper/helpers/log"
+
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	log "github.com/sirupsen/logrus"
 )
 
 func LoadEnv() {

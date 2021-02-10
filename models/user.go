@@ -5,8 +5,8 @@ import (
 
 	"github.com/gutakk/go-google-scraper/db"
 	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 
-	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )

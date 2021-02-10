@@ -3,8 +3,9 @@ package fixture
 import (
 	"net/http"
 
+	"github.com/gutakk/go-google-scraper/helpers/log"
+
 	"github.com/gorilla/securecookie"
-	log "github.com/sirupsen/logrus"
 )
 
 func GenerateCookie(key interface{}, value interface{}) *http.Cookie {

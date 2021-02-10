@@ -8,8 +8,7 @@ import (
 	"strings"
 
 	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
-
-	log "github.com/sirupsen/logrus"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 )
 
 func PerformRequest(r http.Handler, method, path string, headers http.Header, payload url.Values) *httptest.ResponseRecorder {

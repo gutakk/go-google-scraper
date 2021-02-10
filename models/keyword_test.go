@@ -6,11 +6,11 @@ import (
 
 	"github.com/gutakk/go-google-scraper/db"
 	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/jackc/pgconn"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"

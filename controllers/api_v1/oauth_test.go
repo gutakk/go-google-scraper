@@ -13,6 +13,7 @@ import (
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/helpers/api_helper"
 	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/oauth"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
@@ -20,7 +21,6 @@ import (
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/go-playground/assert.v1"
 	"gorm.io/driver/postgres"

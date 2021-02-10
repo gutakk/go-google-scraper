@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 
 	"github.com/dnaeon/go-vcr/recorder"
-	log "github.com/sirupsen/logrus"
 	"gopkg.in/go-playground/assert.v1"
 )
 

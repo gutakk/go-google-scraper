@@ -8,13 +8,13 @@ import (
 
 	"github.com/gutakk/go-google-scraper/db"
 	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/fixture"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 
-	log "github.com/sirupsen/logrus"
 	"gopkg.in/go-playground/assert.v1"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

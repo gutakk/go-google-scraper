@@ -1,9 +1,10 @@
 package helpers
 
 import (
+	"github.com/gutakk/go-google-scraper/helpers/log"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 )
 
 const (

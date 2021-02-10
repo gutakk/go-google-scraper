@@ -7,10 +7,9 @@ import (
 	"github.com/gutakk/go-google-scraper/config"
 	"github.com/gutakk/go-google-scraper/controllers"
 	"github.com/gutakk/go-google-scraper/db"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/migration"
 	"github.com/gutakk/go-google-scraper/oauth"
-
-	log "github.com/sirupsen/logrus"
 )
 
 const (

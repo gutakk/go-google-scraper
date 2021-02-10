@@ -2,9 +2,9 @@ package migration
 
 import (
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 
-	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -13,7 +13,7 @@ func Migrate(db *gorm.DB) {
 	if err != nil {
 		log.Fatal(errorHandler.MigrateDatabaseFailure, err)
 	} else {
-		log.Print("Migrate user schema successfully")
+		log.Println("Migrate user schema successfully")
 	}
 
 	InitKeywordStatusEnum(db)
@@ -22,7 +22,7 @@ func Migrate(db *gorm.DB) {
 	if err != nil {
 		log.Fatal(errorHandler.MigrateDatabaseFailure, err)
 	} else {
-		log.Print("Migrate keyword schema successfully")
+		log.Println("Migrate keyword schema successfully")
 	}
 }
 

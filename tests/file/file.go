@@ -10,7 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 )
 
 func createFormFile(w *multipart.Writer, fieldname, filename string) (io.Writer, error) {
