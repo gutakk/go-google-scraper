@@ -1,7 +1,7 @@
 package migration
 
 import (
-	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 
@@ -11,7 +11,7 @@ import (
 func Migrate(db *gorm.DB) {
 	err := db.AutoMigrate(&models.User{})
 	if err != nil {
-		log.Fatal(errorHandler.MigrateDatabaseFailure, err)
+		log.Fatal(errorconf.MigrateDatabaseFailure, err)
 	} else {
 		log.Println("Migrate user schema successfully")
 	}
@@ -20,7 +20,7 @@ func Migrate(db *gorm.DB) {
 
 	err = db.AutoMigrate(&models.Keyword{})
 	if err != nil {
-		log.Fatal(errorHandler.MigrateDatabaseFailure, err)
+		log.Fatal(errorconf.MigrateDatabaseFailure, err)
 	} else {
 		log.Println("Migrate keyword schema successfully")
 	}

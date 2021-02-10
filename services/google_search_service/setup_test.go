@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/gutakk/go-google-scraper/config"
-	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
@@ -17,7 +17,7 @@ func TestMain(m *testing.M) {
 
 	err := os.Chdir(path_test.GetRoot())
 	if err != nil {
-		log.Fatal(errorHelper.ChangeToRootDirFailure, err)
+		log.Fatal(errorconf.ChangeToRootDirFailure, err)
 	}
 
 	config.LoadEnv()

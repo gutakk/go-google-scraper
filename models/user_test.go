@@ -3,8 +3,8 @@ package models
 import (
 	"testing"
 
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
-	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/helpers/log"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 
@@ -26,7 +26,7 @@ type UserDBTestSuite struct {
 func (s *UserDBTestSuite) SetupTest() {
 	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	if err != nil {
-		log.Fatal(errorHelper.ConnectToDatabaseFailure, err)
+		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
 	}
 
 	db.GetDB = func() *gorm.DB {
@@ -35,7 +35,7 @@ func (s *UserDBTestSuite) SetupTest() {
 
 	err = db.GetDB().AutoMigrate(&User{})
 	if err != nil {
-		log.Fatal(errorHelper.MigrateDatabaseFailure, err)
+		log.Fatal(errorconf.MigrateDatabaseFailure, err)
 	}
 
 	s.email = faker.Email()
@@ -123,7 +123,7 @@ func (s *UserDBTestSuite) TestFindUserByIDWithInvalidID() {
 func TestHashPassword(t *testing.T) {
 	hashedPassword, err := hashPassword("password")
 	if err != nil {
-		log.Error(errorHelper.HashPasswordFailure, err)
+		log.Error(errorconf.HashPasswordFailure, err)
 	}
 	result := bcrypt.CompareHashAndPassword(hashedPassword, []byte("password"))
 
@@ -133,7 +133,7 @@ func TestHashPassword(t *testing.T) {
 func TestValidatePasswordWithValidPassword(t *testing.T) {
 	hashedPassword, err := hashPassword("password")
 	if err != nil {
-		log.Error(errorHelper.HashPasswordFailure, err)
+		log.Error(errorconf.HashPasswordFailure, err)
 	}
 	result := ValidatePassword(string(hashedPassword), "password")
 
@@ -143,7 +143,7 @@ func TestValidatePasswordWithValidPassword(t *testing.T) {
 func TestValidatePasswordWithInvalidPassword(t *testing.T) {
 	hashedPassword, err := hashPassword("password")
 	if err != nil {
-		log.Error(errorHelper.HashPasswordFailure, err)
+		log.Error(errorconf.HashPasswordFailure, err)
 	}
 	result := ValidatePassword(string(hashedPassword), "drowssap")
 

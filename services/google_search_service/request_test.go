@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/helpers/log"
 
 	"github.com/dnaeon/go-vcr/recorder"
@@ -15,14 +15,14 @@ import (
 func TestRequestWithValidKeyword(t *testing.T) {
 	r, err := recorder.New("tests/fixture/vcr/valid_keyword")
 	if err != nil {
-		log.Error(errorHelper.RecordInitializeFailure, err)
+		log.Error(errorconf.RecordInitializeFailure, err)
 	}
 
 	resp, requestErr := Request("AWS", r)
 
 	err = r.Stop()
 	if err != nil {
-		log.Error(errorHelper.RecordStopFailure, err)
+		log.Error(errorconf.RecordStopFailure, err)
 	}
 
 	p, err := ioutil.ReadAll(resp.Body)
@@ -35,14 +35,14 @@ func TestRequestWithValidKeyword(t *testing.T) {
 func TestRequestWithBlankSpaceKeyword(t *testing.T) {
 	r, err := recorder.New("tests/fixture/vcr/blank_space_keyword")
 	if err != nil {
-		log.Error(errorHelper.RecordInitializeFailure, err)
+		log.Error(errorconf.RecordInitializeFailure, err)
 	}
 
 	resp, requestErr := Request("A W S", r)
 
 	err = r.Stop()
 	if err != nil {
-		log.Error(errorHelper.RecordStopFailure, err)
+		log.Error(errorconf.RecordStopFailure, err)
 	}
 
 	p, err := ioutil.ReadAll(resp.Body)
@@ -55,14 +55,14 @@ func TestRequestWithBlankSpaceKeyword(t *testing.T) {
 func TestRequestWithThaiKeyword(t *testing.T) {
 	r, err := recorder.New("tests/fixture/vcr/thai_keyword")
 	if err != nil {
-		log.Error(errorHelper.RecordInitializeFailure, err)
+		log.Error(errorconf.RecordInitializeFailure, err)
 	}
 
 	resp, requestErr := Request("สวัสดี", r)
 
 	err = r.Stop()
 	if err != nil {
-		log.Error(errorHelper.RecordStopFailure, err)
+		log.Error(errorconf.RecordStopFailure, err)
 	}
 
 	p, err := ioutil.ReadAll(resp.Body)

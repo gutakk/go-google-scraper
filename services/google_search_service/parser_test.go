@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/helpers/log"
 
 	"github.com/dnaeon/go-vcr/recorder"
@@ -14,24 +14,24 @@ import (
 func TestParserWithValidGoogleResponse(t *testing.T) {
 	r, err := recorder.New("tests/fixture/vcr/valid_keyword")
 	if err != nil {
-		log.Error(errorHelper.RecordInitializeFailure, err)
+		log.Error(errorconf.RecordInitializeFailure, err)
 	}
 
 	url := "https://www.google.com/search?q=AWS"
 	client := &http.Client{Transport: r}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		log.Error(errorHelper.RequestInitializeFailure, err)
+		log.Error(errorconf.RequestInitializeFailure, err)
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Error(errorHelper.RequestFailure, err)
+		log.Error(errorconf.RequestFailure, err)
 	}
 
 	err = r.Stop()
 	if err != nil {
-		log.Error(errorHelper.RecordStopFailure, err)
+		log.Error(errorconf.RecordStopFailure, err)
 	}
 
 	parsingResult, parsingError := ParseGoogleResponse(resp)
@@ -49,24 +49,24 @@ func TestParserWithValidGoogleResponse(t *testing.T) {
 func TestParserWithNotGoogleSearchPage(t *testing.T) {
 	r, err := recorder.New("tests/fixture/vcr/invalid_site")
 	if err != nil {
-		log.Error(errorHelper.RecordInitializeFailure, err)
+		log.Error(errorconf.RecordInitializeFailure, err)
 	}
 
 	url := "https://www.golang.org"
 	client := &http.Client{Transport: r}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		log.Error(errorHelper.RequestInitializeFailure, err)
+		log.Error(errorconf.RequestInitializeFailure, err)
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Error(errorHelper.RequestFailure, err)
+		log.Error(errorconf.RequestFailure, err)
 	}
 
 	err = r.Stop()
 	if err != nil {
-		log.Error(errorHelper.RecordStopFailure, err)
+		log.Error(errorconf.RecordStopFailure, err)
 	}
 
 	parsingResult, parsingErr := ParseGoogleResponse(resp)

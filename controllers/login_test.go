@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
-	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
@@ -37,7 +37,7 @@ type LoginDbTestSuite struct {
 func (s *LoginDbTestSuite) SetupTest() {
 	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	if err != nil {
-		log.Fatal(errorHelper.ConnectToDatabaseFailure, err)
+		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
 	}
 
 	db.GetDB = func() *gorm.DB {
@@ -46,7 +46,7 @@ func (s *LoginDbTestSuite) SetupTest() {
 
 	err = db.GetDB().AutoMigrate(&models.User{})
 	if err != nil {
-		log.Fatal(errorHelper.MigrateDatabaseFailure, err)
+		log.Fatal(errorconf.MigrateDatabaseFailure, err)
 	}
 
 	s.engine = testConfig.GetRouter(true)
@@ -64,7 +64,7 @@ func (s *LoginDbTestSuite) SetupTest() {
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(s.password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Error(errorHelper.HashPasswordFailure, err)
+		log.Error(errorconf.HashPasswordFailure, err)
 	}
 
 	db.GetDB().Create(&models.User{Email: s.email, Password: string(hashedPassword)})

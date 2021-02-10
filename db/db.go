@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/helpers/log"
 
 	"github.com/gin-gonic/gin"
@@ -18,7 +18,7 @@ func ConnectDB() (db *gorm.DB) {
 	db, err := gorm.Open(postgres.Open(constructDsn()), &gorm.Config{})
 
 	if err != nil {
-		log.Fatal(errorHelper.ConnectToDatabaseFailure, err)
+		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
 	} else {
 		log.Println("Connect to database successfully")
 	}

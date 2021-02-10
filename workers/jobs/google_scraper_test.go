@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/gutakk/go-google-scraper/config"
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
-	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/services/google_search_service"
@@ -30,7 +30,7 @@ func init() {
 
 	err := os.Chdir(path_test.GetRoot())
 	if err != nil {
-		log.Fatal(errorHelper.ChangeToRootDirFailure, err)
+		log.Fatal(errorconf.ChangeToRootDirFailure, err)
 	}
 
 	config.LoadEnv()
@@ -55,7 +55,7 @@ func setupMocks() {
 func (s *KeywordScraperDBTestSuite) SetupTest() {
 	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	if err != nil {
-		log.Fatal(errorHelper.ConnectToDatabaseFailure, err)
+		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
 	}
 
 	db.GetDB = func() *gorm.DB {
@@ -67,14 +67,14 @@ func (s *KeywordScraperDBTestSuite) SetupTest() {
 	testDB.InitKeywordStatusEnum(db.GetDB())
 	err = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
 	if err != nil {
-		log.Fatal(errorHelper.MigrateDatabaseFailure, err)
+		log.Fatal(errorconf.MigrateDatabaseFailure, err)
 	}
 
 	setupMocks()
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
 	if err != nil {
-		log.Error(errorHelper.HashPasswordFailure, err)
+		log.Error(errorconf.HashPasswordFailure, err)
 	}
 
 	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
@@ -89,7 +89,7 @@ func (s *KeywordScraperDBTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM users")
 	_, err := db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("test-job", "search"))
 	if err != nil {
-		log.Fatal(errorHelper.DeleteRedisJobFailure, err)
+		log.Fatal(errorconf.DeleteRedisJobFailure, err)
 	}
 }
 
@@ -109,7 +109,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithValidJob() {
 		},
 	)
 	if err != nil {
-		log.Error(errorHelper.EnqueueJobFailure, err)
+		log.Error(errorconf.EnqueueJobFailure, err)
 	}
 
 	ctx := Context{}
@@ -133,7 +133,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithoutKeywordID() {
 		},
 	)
 	if err != nil {
-		log.Error(errorHelper.EnqueueJobFailure, err)
+		log.Error(errorconf.EnqueueJobFailure, err)
 	}
 
 	ctx := Context{}
@@ -153,7 +153,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithoutKeywordAndReachMa
 		},
 	)
 	if err != nil {
-		log.Error(errorHelper.EnqueueJobFailure, err)
+		log.Error(errorconf.EnqueueJobFailure, err)
 	}
 
 	job.Fails = MaxFails
@@ -184,7 +184,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithRequestErrorAndReach
 		},
 	)
 	if err != nil {
-		log.Error(errorHelper.EnqueueJobFailure, err)
+		log.Error(errorconf.EnqueueJobFailure, err)
 	}
 
 	job.Fails = MaxFails
@@ -215,7 +215,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithParsingErrorAndReach
 		},
 	)
 	if err != nil {
-		log.Error(errorHelper.EnqueueJobFailure, err)
+		log.Error(errorconf.EnqueueJobFailure, err)
 	}
 
 	job.Fails = MaxFails

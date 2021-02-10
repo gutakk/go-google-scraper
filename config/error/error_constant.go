@@ -1,4 +1,4 @@
-package helpers
+package error
 
 const (
 	ChangeToRootDirFailure   = "Failed to change to root directory: "

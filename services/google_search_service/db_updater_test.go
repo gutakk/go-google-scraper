@@ -4,8 +4,8 @@ import (
 	"errors"
 	"testing"
 
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
-	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
@@ -26,7 +26,7 @@ type DBUpdaterDBTestSuite struct {
 func (s *DBUpdaterDBTestSuite) SetupTest() {
 	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	if err != nil {
-		log.Fatal(errorHelper.ConnectToDatabaseFailure, err)
+		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
 	}
 
 	db.GetDB = func() *gorm.DB {
@@ -36,12 +36,12 @@ func (s *DBUpdaterDBTestSuite) SetupTest() {
 	testDB.InitKeywordStatusEnum(db.GetDB())
 	err = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
 	if err != nil {
-		log.Fatal(errorHelper.MigrateDatabaseFailure, err)
+		log.Fatal(errorconf.MigrateDatabaseFailure, err)
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
 	if err != nil {
-		log.Error(errorHelper.HashPasswordFailure, err)
+		log.Error(errorconf.HashPasswordFailure, err)
 	}
 
 	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}

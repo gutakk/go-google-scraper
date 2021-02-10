@@ -3,7 +3,7 @@ package presenters
 import (
 	"encoding/json"
 
-	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 )
@@ -25,13 +25,13 @@ func (kp *KeywordPresenter) KeywordLinks() KeywordLinks {
 	var nonAdwordLinks []string
 	err := json.Unmarshal(kp.Keyword.NonAdwordLinks, &nonAdwordLinks)
 	if err != nil {
-		log.Error(errorHelper.JSONUnmarshalFailure, err)
+		log.Error(errorconf.JSONUnmarshalFailure, err)
 	}
 
 	var topPositionAdwordLinks []string
 	err = json.Unmarshal(kp.Keyword.TopPositionAdwordLinks, &topPositionAdwordLinks)
 	if err != nil {
-		log.Error(errorHelper.JSONUnmarshalFailure, err)
+		log.Error(errorconf.JSONUnmarshalFailure, err)
 	}
 
 	return KeywordLinks{

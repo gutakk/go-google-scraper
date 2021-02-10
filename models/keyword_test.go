@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"testing"
 
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
-	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/helpers/log"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 
@@ -26,7 +26,7 @@ type KeywordDBTestSuite struct {
 func (s *KeywordDBTestSuite) SetupTest() {
 	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	if err != nil {
-		log.Fatal(errorHelper.ConnectToDatabaseFailure, err)
+		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
 	}
 
 	db.GetDB = func() *gorm.DB {
@@ -36,12 +36,12 @@ func (s *KeywordDBTestSuite) SetupTest() {
 	testDB.InitKeywordStatusEnum(db.GetDB())
 	err = db.GetDB().AutoMigrate(&User{}, &Keyword{})
 	if err != nil {
-		log.Fatal(errorHelper.MigrateDatabaseFailure, err)
+		log.Fatal(errorconf.MigrateDatabaseFailure, err)
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
 	if err != nil {
-		log.Error(errorHelper.HashPasswordFailure, err)
+		log.Error(errorconf.HashPasswordFailure, err)
 	}
 
 	user := User{Email: faker.Email(), Password: string(hashedPassword)}
@@ -61,12 +61,12 @@ func TestKeywordDBTestSuite(t *testing.T) {
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 	nonAdwordLinks, err := json.Marshal([]string{"test-non-ads-link"})
 	if err != nil {
-		log.Error(errorHelper.JSONMarshalFailure, err)
+		log.Error(errorconf.JSONMarshalFailure, err)
 	}
 
 	topPositionAdwordLinks, err := json.Marshal([]string{"test-top-ads-link"})
 	if err != nil {
-		log.Error(errorHelper.JSONMarshalFailure, err)
+		log.Error(errorconf.JSONMarshalFailure, err)
 	}
 
 	keyword := Keyword{
@@ -87,13 +87,13 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 	var nonAdwordLinksVal []string
 	err = json.Unmarshal(result.NonAdwordLinks, &nonAdwordLinksVal)
 	if err != nil {
-		log.Error(errorHelper.JSONUnmarshalFailure, err)
+		log.Error(errorconf.JSONUnmarshalFailure, err)
 	}
 
 	var topPositionAdwordLinksVal []string
 	err = json.Unmarshal(result.TopPositionAdwordLinks, &topPositionAdwordLinksVal)
 	if err != nil {
-		log.Error(errorHelper.JSONUnmarshalFailure, err)
+		log.Error(errorconf.JSONUnmarshalFailure, err)
 	}
 
 	assert.Equal(s.T(), nil, resultError)

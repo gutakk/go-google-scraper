@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"testing"
 
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
-	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
@@ -35,7 +35,7 @@ func TestLogoutTestSuit(t *testing.T) {
 func (s *LogoutTestSuite) TestLogoutWithAuthenticatedUser() {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("testPassword"), bcrypt.DefaultCost)
 	if err != nil {
-		log.Error(errorHelper.HashPasswordFailure, err)
+		log.Error(errorconf.HashPasswordFailure, err)
 	}
 	user := models.User{Email: "test@email.com", Password: string(hashedPassword)}
 	db.GetDB().Create(&user)

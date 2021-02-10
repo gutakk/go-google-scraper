@@ -8,11 +8,11 @@ import (
 	"testing"
 
 	"github.com/gutakk/go-google-scraper/config"
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/controllers"
 	"github.com/gutakk/go-google-scraper/controllers/api_v1"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/helpers/api_helper"
-	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/oauth"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
@@ -32,19 +32,19 @@ func init() {
 
 	err := os.Chdir(path_test.GetRoot())
 	if err != nil {
-		log.Fatal(errorHelper.ChangeToRootDirFailure, err)
+		log.Fatal(errorconf.ChangeToRootDirFailure, err)
 	}
 
 	config.LoadEnv()
 
 	err = oauth.SetupOAuthServer()
 	if err != nil {
-		log.Fatal(errorHelper.StartOAuthServerFailute, err)
+		log.Fatal(errorconf.StartOAuthServerFailute, err)
 	}
 
 	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	if err != nil {
-		log.Fatal(errorHelper.ConnectToDatabaseFailure, err)
+		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
 	}
 
 	db.GetDB = func() *gorm.DB {
@@ -78,13 +78,13 @@ func (s *OAuthControllerDbTestSuite) TestGenerateClientWithValidBasicAuth() {
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/client", headers, nil)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Error(errorHelper.ReadResponseBodyFailure, err)
+		log.Error(errorconf.ReadResponseBodyFailure, err)
 	}
 
 	var parsedRespBody map[string]api_helper.DataResponseObject
 	err = json.Unmarshal(respBodyData, &parsedRespBody)
 	if err != nil {
-		log.Error(errorHelper.JSONUnmarshalFailure, err)
+		log.Error(errorconf.JSONUnmarshalFailure, err)
 	}
 
 	v, _ := parsedRespBody["data"].Attributes.(map[string]interface{})
@@ -93,13 +93,13 @@ func (s *OAuthControllerDbTestSuite) TestGenerateClientWithValidBasicAuth() {
 	row := db.GetDB().Table("oauth2_clients").Select("data").Row()
 	err = row.Scan(&data)
 	if err != nil {
-		log.Error(errorHelper.ScanRowFailure, err)
+		log.Error(errorconf.ScanRowFailure, err)
 	}
 
 	var dataVal map[string]interface{}
 	err = json.Unmarshal(data, &dataVal)
 	if err != nil {
-		log.Error(errorHelper.JSONUnmarshalFailure, err)
+		log.Error(errorconf.JSONUnmarshalFailure, err)
 	}
 
 	assert.Equal(s.T(), http.StatusCreated, resp.Code)

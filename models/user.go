@@ -3,8 +3,8 @@ package models
 import (
 	"errors"
 
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
-	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/helpers/log"
 
 	"golang.org/x/crypto/bcrypt"
@@ -33,7 +33,7 @@ func SaveUser(email string, password string) error {
 
 	hashedPassword, err := hashPassword(password)
 	if err != nil {
-		log.Error(errorHelper.HashPasswordFailure, err)
+		log.Error(errorconf.HashPasswordFailure, err)
 	}
 
 	result := db.GetDB().Create(&User{Email: email, Password: string(hashedPassword)})

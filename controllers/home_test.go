@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
-	errorHelper "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
@@ -35,7 +35,7 @@ func TestDisplayHomeWithGuestUser(t *testing.T) {
 func TestDisplayHomeWithAuthenticatedUser(t *testing.T) {
 	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	if err != nil {
-		log.Fatal(errorHelper.ConnectToDatabaseFailure, err)
+		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
 	}
 
 	db.GetDB = func() *gorm.DB {
@@ -44,7 +44,7 @@ func TestDisplayHomeWithAuthenticatedUser(t *testing.T) {
 
 	err = db.GetDB().AutoMigrate(&models.User{})
 	if err != nil {
-		log.Fatal(errorHelper.MigrateDatabaseFailure, err)
+		log.Fatal(errorconf.MigrateDatabaseFailure, err)
 	}
 
 	engine := testConfig.GetRouter(true)
