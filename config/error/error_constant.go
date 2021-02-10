@@ -15,5 +15,5 @@ const (
 	RequestInitializeFailure = "Failed to init request: "
 	RequestFailure           = "Failed to make a request: "
 	ScanRowFailure           = "Failed to scan row: "
-	StartOAuthServerFailute  = "Failed to setup oauth server: "
+	StartOAuthServerFailure  = "Failed to setup oauth server: "
 )
