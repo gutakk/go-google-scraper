@@ -39,7 +39,7 @@ func init() {
 
 	err = oauth.SetupOAuthServer()
 	if err != nil {
-		log.Fatal(errorconf.StartOAuthServerFailute, err)
+		log.Fatal(errorconf.StartOAuthServerFailure, err)
 	}
 
 	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
