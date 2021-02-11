@@ -1,7 +1,6 @@
 package api_v1_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -101,10 +100,7 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithValidParams() {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
 	}
 	var parsedRespBody map[string]string
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	var data []byte
 	row := db.GetDB().Table("oauth2_tokens").Select("data").Row()
@@ -114,10 +110,7 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithValidParams() {
 	}
 
 	var dataVal map[string]interface{}
-	err = json.Unmarshal(data, &dataVal)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(data, &dataVal)
 
 	assert.Equal(s.T(), http.StatusOK, resp.Code)
 	assert.Equal(s.T(), parsedRespBody["access_token"], dataVal["Access"])
@@ -140,10 +133,7 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithInvalidGrantType() 
 	}
 
 	var parsedRespBody map[string]string
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrUnsupportedGrantType.Error(), parsedRespBody["error"])
@@ -164,10 +154,7 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithInvalidClientID() {
 	}
 
 	var parsedRespBody map[string]string
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	// TODO: This need to be status unauthorized
 	assert.Equal(s.T(), http.StatusInternalServerError, resp.Code)
@@ -189,10 +176,7 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithInvalidClientSecret
 	}
 
 	var parsedRespBody map[string]string
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidClient.Error(), parsedRespBody["error"])

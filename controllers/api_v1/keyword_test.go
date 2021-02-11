@@ -2,7 +2,6 @@ package api_v1_test
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -121,10 +120,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParams() {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
 	}
 	var parsedRespBody map[string]api_helper.DataResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	data := parsedRespBody["data"]
 	attributes, _ := parsedRespBody["data"].Attributes.(map[string]interface{})
@@ -171,10 +167,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithInvalidKeywordID()
 		log.Error(errorconf.ReadResponseBodyFailure, err)
 	}
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusNotFound, resp.Code)
 	assert.Equal(s.T(), "keyword not found", parsedRespBody["errors"][0].Detail)
@@ -227,10 +220,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParamsButNotT
 		log.Error(errorconf.ReadResponseBodyFailure, err)
 	}
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusNotFound, resp.Code)
 	assert.Equal(s.T(), "keyword not found", parsedRespBody["errors"][0].Detail)
@@ -243,10 +233,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithoutAuthorizatio
 		log.Error(errorconf.ReadResponseBodyFailure, err)
 	}
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -262,10 +249,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithInvalidAccessTo
 		log.Error(errorconf.ReadResponseBodyFailure, err)
 	}
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -306,10 +290,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithExpiredAccessTo
 		log.Error(errorconf.ReadResponseBodyFailure, err)
 	}
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrExpiredAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -329,10 +310,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParams() {
 	}
 
 	var parsedRespBody map[string][]api_helper.DataResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	respValue, _ := parsedRespBody["data"][0].Attributes.(map[string]interface{})
 
@@ -352,10 +330,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNoK
 	}
 
 	var parsedRespBody map[string][]api_helper.DataResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusOK, resp.Code)
 	assert.Equal(s.T(), 0, len(parsedRespBody["data"]))
@@ -398,10 +373,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNot
 	}
 
 	var parsedRespBody map[string][]api_helper.DataResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusOK, resp.Code)
 	assert.Equal(s.T(), 0, len(parsedRespBody["data"]))
@@ -415,10 +387,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithoutAuthorizati
 	}
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -435,10 +404,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithInvalidAccessT
 	}
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -480,10 +446,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithExpiredAccessT
 	}
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrExpiredAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -506,10 +469,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithoutAuthorizati
 	}
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -526,10 +486,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithInvalidAccessT
 	}
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -571,10 +528,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithExpiredAccessT
 	}
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrExpiredAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -591,10 +545,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithAccessTokenBut
 	}
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusBadRequest, resp.Code)
 	assert.Equal(s.T(), "invalid file", parsedRespBody["errors"][0].Detail)
@@ -611,10 +562,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithAccessTokenBut
 	}
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusBadRequest, resp.Code)
 	assert.Equal(s.T(), "invalid file", parsedRespBody["errors"][0].Detail)

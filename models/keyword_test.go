@@ -1,12 +1,9 @@
 package models_test
 
 import (
-	"encoding/json"
 	"testing"
 
-	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
-	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/fabricator"
@@ -59,16 +56,10 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 	result, resultError := models.SaveKeyword(keyword, nil)
 
 	var nonAdwordLinksVal []string
-	err := json.Unmarshal(result.NonAdwordLinks, &nonAdwordLinksVal)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(result.NonAdwordLinks, &nonAdwordLinksVal)
 
 	var topPositionAdwordLinksVal []string
-	err = json.Unmarshal(result.TopPositionAdwordLinks, &topPositionAdwordLinksVal)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(result.TopPositionAdwordLinks, &topPositionAdwordLinksVal)
 
 	assert.Equal(s.T(), nil, resultError)
 	assert.Equal(s.T(), "Hazard", result.Keyword)

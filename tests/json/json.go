@@ -15,3 +15,10 @@ func JSONMarshaler(value interface{}) []byte {
 
 	return data
 }
+
+func JSONUnmarshaler(data []byte, v interface{}) {
+	err := json.Unmarshal(data, &v)
+	if err != nil {
+		log.Error(errorconf.JSONUnmarshalFailure, err)
+	}
+}

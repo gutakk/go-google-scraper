@@ -1,7 +1,6 @@
 package api_v1_test
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -15,6 +14,7 @@ import (
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
+	testjson "github.com/gutakk/go-google-scraper/tests/json"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/gin-gonic/gin"
@@ -66,10 +66,7 @@ func (s *OAuthControllerDbTestSuite) TestGenerateClientWithValidBasicAuth() {
 	}
 
 	var parsedRespBody map[string]api_helper.DataResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	v, _ := parsedRespBody["data"].Attributes.(map[string]interface{})
 
@@ -81,10 +78,7 @@ func (s *OAuthControllerDbTestSuite) TestGenerateClientWithValidBasicAuth() {
 	}
 
 	var dataVal map[string]interface{}
-	err = json.Unmarshal(data, &dataVal)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testjson.JSONUnmarshaler(data, &dataVal)
 
 	assert.Equal(s.T(), http.StatusCreated, resp.Code)
 	assert.Equal(s.T(), v["client_id"], dataVal["ID"])
