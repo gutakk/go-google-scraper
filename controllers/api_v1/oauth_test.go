@@ -66,12 +66,7 @@ func (s *OAuthControllerDbTestSuite) TestGenerateClientWithValidBasicAuth() {
 
 	v, _ := parsedRespBody["data"].Attributes.(map[string]interface{})
 
-	var data []byte
-	row := db.GetDB().Table("oauth2_clients").Select("data").Row()
-	err := row.Scan(&data)
-	if err != nil {
-		log.Error(errorconf.ScanRowFailure, err)
-	}
+	data := testDB.Scan("oauth2_clients", "data")
 
 	var dataVal map[string]interface{}
 	testjson.JSONUnmarshaler(data, &dataVal)

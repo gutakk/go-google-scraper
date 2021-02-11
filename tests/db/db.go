@@ -80,3 +80,14 @@ func redisNamespacePrefix(namespace string) string {
 	}
 	return namespace
 }
+
+func Scan(table string, column string) []byte {
+	var data []byte
+	row := db.GetDB().Table(table).Select(column).Row()
+	err := row.Scan(&data)
+	if err != nil {
+		log.Error(errorconf.ScanRowFailure, err)
+	}
+
+	return data
+}

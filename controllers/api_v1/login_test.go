@@ -99,12 +99,7 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithValidParams() {
 	var parsedRespBody map[string]string
 	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
-	var data []byte
-	row := db.GetDB().Table("oauth2_tokens").Select("data").Row()
-	err := row.Scan(&data)
-	if err != nil {
-		log.Error(errorconf.ScanRowFailure, err)
-	}
+	data := testDB.Scan("oauth2_tokens", "data")
 
 	var dataVal map[string]interface{}
 	testjson.JSONUnmarshaler(data, &dataVal)
