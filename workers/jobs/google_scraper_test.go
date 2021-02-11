@@ -3,7 +3,6 @@ package jobs
 import (
 	"errors"
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/gutakk/go-google-scraper/config"
@@ -26,10 +25,7 @@ import (
 func init() {
 	gin.SetMode(gin.TestMode)
 
-	err := os.Chdir(path_test.GetRoot())
-	if err != nil {
-		log.Fatal(errorconf.ChangeToRootDirFailure, err)
-	}
+	path_test.ChangeToRootDir()
 
 	config.LoadEnv()
 }

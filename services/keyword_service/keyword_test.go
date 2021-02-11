@@ -2,7 +2,6 @@ package keyword_service
 
 import (
 	"errors"
-	"os"
 	"testing"
 
 	"github.com/gutakk/go-google-scraper/config"
@@ -22,9 +21,7 @@ import (
 func init() {
 	gin.SetMode(gin.TestMode)
 
-	if err := os.Chdir(path_test.GetRoot()); err != nil {
-		panic(err)
-	}
+	path_test.ChangeToRootDir()
 
 	config.LoadEnv()
 }

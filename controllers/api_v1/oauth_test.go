@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/gutakk/go-google-scraper/config"
@@ -26,14 +25,11 @@ import (
 func init() {
 	gin.SetMode(gin.TestMode)
 
-	err := os.Chdir(path_test.GetRoot())
-	if err != nil {
-		log.Fatal(errorconf.ChangeToRootDirFailure, err)
-	}
+	path_test.ChangeToRootDir()
 
 	config.LoadEnv()
 
-	err = oauth.SetupOAuthServer()
+	err := oauth.SetupOAuthServer()
 	if err != nil {
 		log.Fatal(errorconf.StartOAuthServerFailure, err)
 	}
