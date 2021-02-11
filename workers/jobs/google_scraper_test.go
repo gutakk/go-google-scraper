@@ -11,7 +11,7 @@ import (
 	"github.com/gutakk/go-google-scraper/services/google_search_service"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/fabricator"
-	jobhelper "github.com/gutakk/go-google-scraper/tests/job"
+	testjob "github.com/gutakk/go-google-scraper/tests/job"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/bxcodec/faker/v3"
@@ -70,7 +70,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithValidJob() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job := jobhelper.EnqueueJob(s.enqueuer, work.Q{
+	job := testjob.EnqueueJob(s.enqueuer, work.Q{
 		"keywordID": keyword.ID,
 		"keyword":   keyword.Keyword,
 	})
@@ -89,7 +89,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithoutKeywordID() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job := jobhelper.EnqueueJob(s.enqueuer, work.Q{
+	job := testjob.EnqueueJob(s.enqueuer, work.Q{
 		"keyword": keyword.Keyword,
 	})
 
@@ -103,7 +103,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithoutKeywordAndReachMa
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job := jobhelper.EnqueueJob(s.enqueuer, work.Q{
+	job := testjob.EnqueueJob(s.enqueuer, work.Q{
 		"keywordID": keyword.ID,
 	})
 
@@ -127,7 +127,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithRequestErrorAndReach
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job := jobhelper.EnqueueJob(s.enqueuer, work.Q{
+	job := testjob.EnqueueJob(s.enqueuer, work.Q{
 		"keywordID": keyword.ID,
 		"keyword":   keyword.Keyword,
 	})
@@ -152,7 +152,7 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithParsingErrorAndReach
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job := jobhelper.EnqueueJob(s.enqueuer, work.Q{
+	job := testjob.EnqueueJob(s.enqueuer, work.Q{
 		"keywordID": keyword.ID,
 		"keyword":   keyword.Keyword,
 	})

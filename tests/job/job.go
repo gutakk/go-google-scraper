@@ -1,4 +1,4 @@
-package tests
+package job
 
 import (
 	errorconf "github.com/gutakk/go-google-scraper/config/error"
