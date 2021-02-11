@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/helpers/log"
 
 	"github.com/gin-contrib/sessions"
@@ -9,8 +10,6 @@ import (
 
 const (
 	sessionTimeoutInSec = 60 * 60 * 24 // 24 hours
-
-	saveSessionFailure = "Failed to save session: "
 )
 
 func AddFlash(c *gin.Context, value interface{}, key string) {
@@ -18,7 +17,7 @@ func AddFlash(c *gin.Context, value interface{}, key string) {
 	session.AddFlash(value, key)
 	err := session.Save()
 	if err != nil {
-		log.Error(saveSessionFailure, err)
+		log.Error(errorconf.SaveSessionFailure, err)
 	}
 }
 
@@ -27,7 +26,7 @@ func Flashes(c *gin.Context, key string) []interface{} {
 	flashes := session.Flashes(key)
 	err := session.Save()
 	if err != nil {
-		log.Error(saveSessionFailure, err)
+		log.Error(errorconf.SaveSessionFailure, err)
 	}
 
 	return flashes
@@ -47,7 +46,7 @@ func Set(c *gin.Context, key string, value interface{}) {
 	session.Set(key, value)
 	err := session.Save()
 	if err != nil {
-		log.Error(saveSessionFailure, err)
+		log.Error(errorconf.SaveSessionFailure, err)
 	}
 }
 
@@ -56,6 +55,6 @@ func Delete(c *gin.Context, key string) {
 	session.Delete(key)
 	err := session.Save()
 	if err != nil {
-		log.Error(saveSessionFailure, err)
+		log.Error(errorconf.SaveSessionFailure, err)
 	}
 }
