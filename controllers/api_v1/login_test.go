@@ -7,11 +7,8 @@ import (
 	"testing"
 
 	"github.com/gutakk/go-google-scraper/config"
-	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
-	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
-	"github.com/gutakk/go-google-scraper/oauth"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/fabricator"
@@ -34,10 +31,7 @@ func init() {
 
 	config.LoadEnv()
 
-	err := oauth.SetupOAuthServer()
-	if err != nil {
-		log.Fatal(errorconf.StartOAuthServerFailure, err)
-	}
+	testConfig.SetupTestOAuthServer()
 
 	testDB.SetupTestDatabase()
 }
