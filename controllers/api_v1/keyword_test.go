@@ -18,6 +18,7 @@ import (
 	"github.com/gutakk/go-google-scraper/oauth"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	"github.com/gutakk/go-google-scraper/tests/fabricator"
 	testFile "github.com/gutakk/go-google-scraper/tests/file"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 	"github.com/gutakk/go-google-scraper/tests/oauth_test"
@@ -27,7 +28,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-oauth2/oauth2/v4/errors"
 	"github.com/stretchr/testify/suite"
-	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
 	"gorm.io/gorm"
 )
@@ -58,13 +58,7 @@ func (s *KeywordAPIControllerDbTestSuite) SetupTest() {
 
 	s.engine = testConfig.SetupTestRouter()
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
-	if err != nil {
-		log.Error(errorconf.HashPasswordFailure, err)
-	}
-
-	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
-	db.GetDB().Create(&user)
+	user := fabricator.FabricateUser(faker.Email(), "password")
 	s.user = user
 
 	tokenItem := &oauth_test.TokenStoreItem{

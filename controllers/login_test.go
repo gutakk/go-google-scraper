@@ -5,19 +5,17 @@ import (
 	"net/url"
 	"testing"
 
-	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
-	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	"github.com/gutakk/go-google-scraper/tests/fabricator"
 	"github.com/gutakk/go-google-scraper/tests/fixture"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
-	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
 )
 
@@ -45,12 +43,7 @@ func (s *LoginDbTestSuite) SetupTest() {
 	s.formData.Set("email", s.email)
 	s.formData.Set("password", s.password)
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(s.password), bcrypt.DefaultCost)
-	if err != nil {
-		log.Error(errorconf.HashPasswordFailure, err)
-	}
-
-	db.GetDB().Create(&models.User{Email: s.email, Password: string(hashedPassword)})
+	fabricator.FabricateUser(s.email, s.password)
 }
 
 func (s *LoginDbTestSuite) TearDownTest() {

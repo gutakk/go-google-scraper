@@ -9,11 +9,11 @@ import (
 	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	"github.com/gutakk/go-google-scraper/tests/fabricator"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/jackc/pgconn"
 	"github.com/stretchr/testify/suite"
-	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
 )
 
@@ -25,13 +25,7 @@ type KeywordDBTestSuite struct {
 func (s *KeywordDBTestSuite) SetupTest() {
 	testDB.SetupTestDatabase()
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
-	if err != nil {
-		log.Error(errorconf.HashPasswordFailure, err)
-	}
-
-	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
-	db.GetDB().Create(&user)
+	user := fabricator.FabricateUser(faker.Email(), faker.Password())
 	s.userID = user.ID
 }
 

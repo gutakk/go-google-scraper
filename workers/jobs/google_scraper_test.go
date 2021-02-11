@@ -6,12 +6,11 @@ import (
 	"testing"
 
 	"github.com/gutakk/go-google-scraper/config"
-	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
-	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/services/google_search_service"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	"github.com/gutakk/go-google-scraper/tests/fabricator"
 	jobhelper "github.com/gutakk/go-google-scraper/tests/job"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
@@ -19,7 +18,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gocraft/work"
 	"github.com/stretchr/testify/suite"
-	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
 )
 
@@ -52,13 +50,7 @@ func (s *KeywordScraperDBTestSuite) SetupTest() {
 
 	setupMocks()
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
-	if err != nil {
-		log.Error(errorconf.HashPasswordFailure, err)
-	}
-
-	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
-	db.GetDB().Create(&user)
+	user := fabricator.FabricateUser(faker.Email(), faker.Password())
 	s.userID = user.ID
 
 	s.enqueuer = work.NewEnqueuer("test-job", db.GetRedisPool())

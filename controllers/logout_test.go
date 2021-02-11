@@ -4,17 +4,13 @@ import (
 	"net/http"
 	"testing"
 
-	errorconf "github.com/gutakk/go-google-scraper/config/error"
-	"github.com/gutakk/go-google-scraper/db"
-	"github.com/gutakk/go-google-scraper/helpers/log"
-	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
+	"github.com/gutakk/go-google-scraper/tests/fabricator"
 	"github.com/gutakk/go-google-scraper/tests/fixture"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
-	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
 )
 
@@ -32,12 +28,7 @@ func TestLogoutTestSuit(t *testing.T) {
 }
 
 func (s *LogoutTestSuite) TestLogoutWithAuthenticatedUser() {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("testPassword"), bcrypt.DefaultCost)
-	if err != nil {
-		log.Error(errorconf.HashPasswordFailure, err)
-	}
-	user := models.User{Email: "test@email.com", Password: string(hashedPassword)}
-	db.GetDB().Create(&user)
+	user := fabricator.FabricateUser("test@email.com", "testPassword")
 
 	cookie := fixture.GenerateCookie("user_id", user.ID)
 	headers := http.Header{}
