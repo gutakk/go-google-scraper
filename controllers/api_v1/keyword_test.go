@@ -22,7 +22,7 @@ import (
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	testFile "github.com/gutakk/go-google-scraper/tests/file"
-	testHttp "github.com/gutakk/go-google-scraper/tests/http"
+	testhttp "github.com/gutakk/go-google-scraper/tests/http"
 	"github.com/gutakk/go-google-scraper/tests/oauth_test"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
@@ -147,7 +147,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParams() {
 	headers := http.Header{}
 	headers.Set("Authorization", "Bearer test-access")
 
-	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", headers, nil)
+	resp := testhttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", headers, nil)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -197,7 +197,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithInvalidKeywordID()
 	headers := http.Header{}
 	headers.Set("Authorization", "Bearer test-access")
 
-	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/9999", headers, nil)
+	resp := testhttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/9999", headers, nil)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -256,7 +256,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParamsButNotT
 	headers := http.Header{}
 	headers.Set("Authorization", "Bearer test-not-resource-owner")
 
-	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", headers, nil)
+	resp := testhttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", headers, nil)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -272,7 +272,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParamsButNotT
 }
 
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithoutAuthorizationHeader() {
-	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", nil, nil)
+	resp := testhttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", nil, nil)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -291,7 +291,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithInvalidAccessTo
 	headers := http.Header{}
 	headers.Set("Authorization", "invalid_token")
 
-	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", headers, nil)
+	resp := testhttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", headers, nil)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -338,7 +338,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithExpiredAccessTo
 	headers := http.Header{}
 	headers.Set("Authorization", "Bearer test-access")
 
-	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", headers, nil)
+	resp := testhttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", headers, nil)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -360,7 +360,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParams() {
 	headers := http.Header{}
 	headers.Set("Authorization", "Bearer test-access")
 
-	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
+	resp := testhttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -383,7 +383,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNoK
 	headers := http.Header{}
 	headers.Set("Authorization", "Bearer test-access")
 
-	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
+	resp := testhttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -432,7 +432,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNot
 	headers := http.Header{}
 	headers.Set("Authorization", "Bearer test-not-resource-owner")
 
-	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
+	resp := testhttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -449,7 +449,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNot
 }
 
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithoutAuthorizationHeader() {
-	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", nil, nil)
+	resp := testhttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", nil, nil)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -469,7 +469,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithInvalidAccessT
 	headers := http.Header{}
 	headers.Set("Authorization", "invalid_token")
 
-	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
+	resp := testhttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -517,7 +517,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithExpiredAccessT
 	headers := http.Header{}
 	headers.Set("Authorization", "Bearer test-access")
 
-	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
+	resp := testhttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -537,13 +537,13 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithValidParams() 
 	headers, payload := testFile.CreateMultipartPayload("tests/fixture/adword_keywords.csv")
 	headers.Set("Authorization", "Bearer test-access")
 
-	resp := testHttp.PerformFileUploadRequest(s.engine, "POST", "/api/v1/keywords", headers, payload)
+	resp := testhttp.PerformFileUploadRequest(s.engine, "POST", "/api/v1/keywords", headers, payload)
 
 	assert.Equal(s.T(), http.StatusNoContent, resp.Code)
 }
 
 func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithoutAuthorizationHeader() {
-	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", nil, nil)
+	resp := testhttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", nil, nil)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -563,7 +563,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithInvalidAccessT
 	headers := http.Header{}
 	headers.Set("Authorization", "invalid_token")
 
-	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", headers, nil)
+	resp := testhttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", headers, nil)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -611,7 +611,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithExpiredAccessT
 	headers := http.Header{}
 	headers.Set("Authorization", "Bearer test-access")
 
-	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", headers, nil)
+	resp := testhttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", headers, nil)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -631,7 +631,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithAccessTokenBut
 	headers := http.Header{}
 	headers.Set("Authorization", "Bearer test-access")
 
-	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", headers, nil)
+	resp := testhttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", headers, nil)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -651,7 +651,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithAccessTokenBut
 	headers, _ := testFile.CreateMultipartPayload("")
 	headers.Set("Authorization", "Bearer test-access")
 
-	resp := testHttp.PerformFileUploadRequest(s.engine, "POST", "/api/v1/keywords", headers, &bytes.Buffer{})
+	resp := testhttp.PerformFileUploadRequest(s.engine, "POST", "/api/v1/keywords", headers, &bytes.Buffer{})
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)

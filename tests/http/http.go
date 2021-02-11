@@ -2,6 +2,8 @@ package tests
 
 import (
 	"bytes"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -32,4 +34,27 @@ func perform(req *http.Request, r http.Handler, headers http.Header) *httptest.R
 	response := httptest.NewRecorder()
 	r.ServeHTTP(response, req)
 	return response
+}
+
+func ReadResponseBody(respBody interface{}) []byte {
+	var bodyByte []byte
+	var err error
+	byteBufferBody, isByteBuffer := respBody.(*bytes.Buffer)
+	readCloserBody, isReadCloser := respBody.(io.ReadCloser)
+
+	if isByteBuffer {
+		bodyByte, err = ioutil.ReadAll(byteBufferBody)
+	} else if isReadCloser {
+		bodyByte, err = ioutil.ReadAll(readCloserBody)
+	}
+
+	if err != nil {
+		log.Error("Failed to read response body: ", err)
+	}
+
+	return bodyByte
+}
+
+func ValidateResponseBody(bodyByte []byte, expected string) bool {
+	return strings.Index(string(bodyByte), expected) > 0
 }
