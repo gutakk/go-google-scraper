@@ -1,4 +1,4 @@
-package controllers
+package controllers_test
 
 import (
 	"net/http"
@@ -24,8 +24,7 @@ type LogoutTestSuite struct {
 }
 
 func (s *LogoutTestSuite) SetupTest() {
-	s.engine = testConfig.GetRouter(false)
-	new(LogoutController).applyRoutes(EnsureAuthenticatedUserGroup(s.engine))
+	s.engine = testConfig.SetupTestRouter()
 }
 
 func TestLogoutTestSuit(t *testing.T) {

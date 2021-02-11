@@ -1,4 +1,4 @@
-package controllers
+package controllers_test
 
 import (
 	"net/http"
@@ -13,8 +13,7 @@ import (
 )
 
 func TestDisplayHomeWithGuestUser(t *testing.T) {
-	engine := testConfig.GetRouter(true)
-	new(HomeController).applyRoutes(engine)
+	engine := testConfig.SetupTestRouter()
 
 	response := testHttp.PerformRequest(engine, "GET", "/", nil, nil)
 
@@ -28,8 +27,7 @@ func TestDisplayHomeWithGuestUser(t *testing.T) {
 func TestDisplayHomeWithAuthenticatedUser(t *testing.T) {
 	testdb.SetupTestDatabase()
 
-	engine := testConfig.GetRouter(true)
-	new(HomeController).applyRoutes(engine)
+	engine := testConfig.SetupTestRouter()
 
 	// Cookie from login API Set-Cookie header
 	headers := http.Header{}

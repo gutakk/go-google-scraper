@@ -1,4 +1,4 @@
-package controllers
+package controllers_test
 
 import (
 	"net/http"
@@ -33,8 +33,7 @@ type LoginDbTestSuite struct {
 func (s *LoginDbTestSuite) SetupTest() {
 	testDB.SetupTestDatabase()
 
-	s.engine = testConfig.GetRouter(true)
-	new(LoginController).applyRoutes(EnsureGuestUserGroup(s.engine))
+	s.engine = testConfig.SetupTestRouter()
 
 	s.headers = http.Header{}
 	s.headers.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -151,8 +150,7 @@ func (s *LoginDbTestSuite) TestLoginWithInvalidPassword() {
 }
 
 func TestDisplayLogin(t *testing.T) {
-	engine := testConfig.GetRouter(true)
-	new(LoginController).applyRoutes(EnsureGuestUserGroup(engine))
+	engine := testConfig.SetupTestRouter()
 
 	response := testHttp.PerformRequest(engine, "GET", "/login", nil, nil)
 

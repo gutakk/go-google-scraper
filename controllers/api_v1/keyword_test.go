@@ -12,8 +12,6 @@ import (
 
 	"github.com/gutakk/go-google-scraper/config"
 	errorconf "github.com/gutakk/go-google-scraper/config/error"
-	"github.com/gutakk/go-google-scraper/controllers"
-	"github.com/gutakk/go-google-scraper/controllers/api_v1"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/helpers/api_helper"
 	"github.com/gutakk/go-google-scraper/helpers/log"
@@ -62,8 +60,7 @@ type KeywordAPIControllerDbTestSuite struct {
 func (s *KeywordAPIControllerDbTestSuite) SetupTest() {
 	db.SetupRedisPool()
 
-	s.engine = testConfig.GetRouter(false)
-	new(api_v1.KeywordAPIController).ApplyRoutes(controllers.PrivateAPIGroup(s.engine.Group("/api/v1")))
+	s.engine = testConfig.SetupTestRouter()
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
 	if err != nil {

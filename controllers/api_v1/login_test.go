@@ -11,8 +11,6 @@ import (
 
 	"github.com/gutakk/go-google-scraper/config"
 	errorconf "github.com/gutakk/go-google-scraper/config/error"
-	"github.com/gutakk/go-google-scraper/controllers"
-	"github.com/gutakk/go-google-scraper/controllers/api_v1"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
@@ -58,8 +56,7 @@ type LoginAPIControllerDbTestSuite struct {
 }
 
 func (s *LoginAPIControllerDbTestSuite) SetupTest() {
-	s.engine = testConfig.GetRouter(false)
-	new(api_v1.LoginAPIController).ApplyRoutes(controllers.PublicAPIGroup(s.engine.Group("/api/v1")))
+	s.engine = testConfig.SetupTestRouter()
 
 	s.headers = http.Header{}
 	s.headers.Set("Content-Type", "application/x-www-form-urlencoded")

@@ -1,4 +1,4 @@
-package controllers
+package controllers_test
 
 import (
 	"net/http"
@@ -33,8 +33,7 @@ type RegisterDbTestSuite struct {
 func (s *RegisterDbTestSuite) SetupTest() {
 	testDB.SetupTestDatabase()
 
-	s.engine = testConfig.GetRouter(true)
-	new(RegisterController).applyRoutes(EnsureGuestUserGroup(s.engine))
+	s.engine = testConfig.SetupTestRouter()
 
 	s.headers = http.Header{}
 	s.headers.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -136,8 +135,7 @@ func (s *RegisterDbTestSuite) TestDisplayRegisterWithAuthenticatedUser() {
 }
 
 func TestDisplayRegister(t *testing.T) {
-	engine := testConfig.GetRouter(true)
-	new(RegisterController).applyRoutes(EnsureGuestUserGroup(engine))
+	engine := testConfig.SetupTestRouter()
 
 	response := testHttp.PerformRequest(engine, "GET", "/register", nil, nil)
 

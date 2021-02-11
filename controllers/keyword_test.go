@@ -1,4 +1,4 @@
-package controllers
+package controllers_test
 
 import (
 	"bytes"
@@ -35,9 +35,7 @@ func (s *KeywordDbTestSuite) SetupTest() {
 
 	testDB.SetupTestDatabase()
 
-	s.engine = testConfig.GetRouter(true)
-	new(LoginController).applyRoutes(EnsureGuestUserGroup(s.engine))
-	new(KeywordController).applyRoutes(EnsureAuthenticatedUserGroup(s.engine))
+	s.engine = testConfig.SetupTestRouter()
 
 	email := faker.Email()
 	password := faker.Password()
@@ -100,8 +98,7 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordWithAuthenticatedUserWithFilter()
 }
 
 func TestDisplayKeywordWithGuestUser(t *testing.T) {
-	engine := testConfig.GetRouter(true)
-	new(KeywordController).applyRoutes(EnsureAuthenticatedUserGroup(engine))
+	engine := testConfig.SetupTestRouter()
 
 	response := testHttp.PerformRequest(engine, "GET", "/keyword", nil, nil)
 
@@ -251,8 +248,7 @@ func (s *KeywordDbTestSuite) TestUploadKeywordWithAuthenticatedUserAndBlankPaylo
 }
 
 func TestUploadKeywordWithGuestUser(t *testing.T) {
-	engine := testConfig.GetRouter(true)
-	new(KeywordController).applyRoutes(EnsureAuthenticatedUserGroup(engine))
+	engine := testConfig.SetupTestRouter()
 
 	response := testHttp.PerformRequest(engine, "POST", "/keyword", nil, nil)
 
