@@ -58,6 +58,13 @@ func initKeywordStatusEnum(db *gorm.DB) {
 	`)
 }
 
+func DeleteRedisJob() {
+	_, err := db.GetRedisPool().Get().Do("DEL", RedisKeyJobs("go-google-scraper", "search"))
+	if err != nil {
+		log.Fatal(errorconf.DeleteRedisJobFailure, err)
+	}
+}
+
 func RedisKeyJobs(namespace, jobName string) string {
 	return redisKeyJobsPrefix(namespace) + jobName
 }

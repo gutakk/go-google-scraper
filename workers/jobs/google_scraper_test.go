@@ -66,10 +66,7 @@ func (s *KeywordScraperDBTestSuite) SetupTest() {
 func (s *KeywordScraperDBTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM keywords")
 	db.GetDB().Exec("DELETE FROM users")
-	_, err := db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("test-job", "search"))
-	if err != nil {
-		log.Fatal(errorconf.DeleteRedisJobFailure, err)
-	}
+	testDB.DeleteRedisJob()
 }
 
 func TestKeywordScraperDBTestSuite(t *testing.T) {

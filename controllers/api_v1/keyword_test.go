@@ -98,10 +98,7 @@ func (s *KeywordAPIControllerDbTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM keywords")
 	db.GetDB().Exec("DELETE FROM users")
 	db.GetDB().Exec("DELETE FROM oauth2_tokens")
-	_, err := db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
-	if err != nil {
-		log.Fatal(errorconf.DeleteRedisJobFailure, err)
-	}
+	testDB.DeleteRedisJob()
 }
 
 func TestKeywordAPIControllerDbTestSuite(t *testing.T) {

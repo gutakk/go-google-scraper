@@ -26,10 +26,7 @@ func (s *JobEnqueuerTestSuite) SetupTest() {
 }
 
 func (s *JobEnqueuerTestSuite) TearDownTest() {
-	_, err := db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
-	if err != nil {
-		log.Fatal(errorconf.DeleteRedisJobFailure, err)
-	}
+	testDB.DeleteRedisJob()
 }
 
 func TestJobEnqueuerTestSuite(t *testing.T) {
