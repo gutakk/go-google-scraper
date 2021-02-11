@@ -2,7 +2,6 @@ package api_v1_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"testing"
@@ -95,16 +94,14 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithValidParams() {
 	formData.Set("client_secret", s.oauthClient.Secret)
 
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
+
 	var parsedRespBody map[string]string
 	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	var data []byte
 	row := db.GetDB().Table("oauth2_tokens").Select("data").Row()
-	err = row.Scan(&data)
+	err := row.Scan(&data)
 	if err != nil {
 		log.Error(errorconf.ScanRowFailure, err)
 	}
@@ -127,10 +124,7 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithInvalidGrantType() 
 	formData.Set("client_secret", s.oauthClient.Secret)
 
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string]string
 	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
@@ -148,10 +142,7 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithInvalidClientID() {
 	formData.Set("client_secret", s.oauthClient.Secret)
 
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string]string
 	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
@@ -170,10 +161,7 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithInvalidClientSecret
 	formData.Set("client_secret", "invalid")
 
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string]string
 	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)

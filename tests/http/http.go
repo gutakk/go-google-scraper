@@ -49,7 +49,7 @@ func ReadResponseBody(respBody interface{}) []byte {
 	}
 
 	if err != nil {
-		log.Error("Failed to read response body: ", err)
+		log.Error(errorconf.ReadResponseBodyFailure, err)
 	}
 
 	return bodyByte

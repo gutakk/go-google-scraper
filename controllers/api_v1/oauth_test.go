@@ -1,7 +1,6 @@
 package api_v1_test
 
 import (
-	"io/ioutil"
 	"net/http"
 	"testing"
 
@@ -60,10 +59,7 @@ func (s *OAuthControllerDbTestSuite) TestGenerateClientWithValidBasicAuth() {
 	headers.Set("Authorization", "Basic YWRtaW46cGFzc3dvcmQ=")
 
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/client", headers, nil)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string]api_helper.DataResponseObject
 	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
@@ -72,7 +68,7 @@ func (s *OAuthControllerDbTestSuite) TestGenerateClientWithValidBasicAuth() {
 
 	var data []byte
 	row := db.GetDB().Table("oauth2_clients").Select("data").Row()
-	err = row.Scan(&data)
+	err := row.Scan(&data)
 	if err != nil {
 		log.Error(errorconf.ScanRowFailure, err)
 	}
