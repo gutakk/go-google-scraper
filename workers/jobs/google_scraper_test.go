@@ -12,6 +12,7 @@ import (
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/services/google_search_service"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	jobhelper "github.com/gutakk/go-google-scraper/tests/job"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/bxcodec/faker/v3"
@@ -77,16 +78,10 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithValidJob() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job, err := s.enqueuer.Enqueue(
-		"search",
-		work.Q{
-			"keywordID": keyword.ID,
-			"keyword":   keyword.Keyword,
-		},
-	)
-	if err != nil {
-		log.Error(errorconf.EnqueueJobFailure, err)
-	}
+	job := jobhelper.EnqueueJob(s.enqueuer, work.Q{
+		"keywordID": keyword.ID,
+		"keyword":   keyword.Keyword,
+	})
 
 	ctx := Context{}
 	performSearchJobErr := ctx.PerformSearchJob(job)
@@ -102,15 +97,9 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithoutKeywordID() {
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job, err := s.enqueuer.Enqueue(
-		"search",
-		work.Q{
-			"keyword": keyword.Keyword,
-		},
-	)
-	if err != nil {
-		log.Error(errorconf.EnqueueJobFailure, err)
-	}
+	job := jobhelper.EnqueueJob(s.enqueuer, work.Q{
+		"keyword": keyword.Keyword,
+	})
 
 	ctx := Context{}
 	performSearchJobErr := ctx.PerformSearchJob(job)
@@ -122,15 +111,9 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithoutKeywordAndReachMa
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job, err := s.enqueuer.Enqueue(
-		"search",
-		work.Q{
-			"keywordID": keyword.ID,
-		},
-	)
-	if err != nil {
-		log.Error(errorconf.EnqueueJobFailure, err)
-	}
+	job := jobhelper.EnqueueJob(s.enqueuer, work.Q{
+		"keywordID": keyword.ID,
+	})
 
 	job.Fails = MaxFails
 	ctx := Context{}
@@ -152,16 +135,10 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithRequestErrorAndReach
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job, err := s.enqueuer.Enqueue(
-		"search",
-		work.Q{
-			"keywordID": keyword.ID,
-			"keyword":   keyword.Keyword,
-		},
-	)
-	if err != nil {
-		log.Error(errorconf.EnqueueJobFailure, err)
-	}
+	job := jobhelper.EnqueueJob(s.enqueuer, work.Q{
+		"keywordID": keyword.ID,
+		"keyword":   keyword.Keyword,
+	})
 
 	job.Fails = MaxFails
 	ctx := Context{}
@@ -183,16 +160,10 @@ func (s *KeywordScraperDBTestSuite) TestPerformSearchJobWithParsingErrorAndReach
 	keyword := models.Keyword{UserID: s.userID, Keyword: "AWS"}
 	db.GetDB().Create(&keyword)
 
-	job, err := s.enqueuer.Enqueue(
-		"search",
-		work.Q{
-			"keywordID": keyword.ID,
-			"keyword":   keyword.Keyword,
-		},
-	)
-	if err != nil {
-		log.Error(errorconf.EnqueueJobFailure, err)
-	}
+	job := jobhelper.EnqueueJob(s.enqueuer, work.Q{
+		"keywordID": keyword.ID,
+		"keyword":   keyword.Keyword,
+	})
 
 	job.Fails = MaxFails
 	ctx := Context{}
