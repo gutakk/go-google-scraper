@@ -19,7 +19,7 @@ import (
 	"github.com/gutakk/go-google-scraper/oauth"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
-	testhttp "github.com/gutakk/go-google-scraper/tests/http"
+	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 	"github.com/gutakk/go-google-scraper/tests/oauth_test"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
@@ -110,7 +110,7 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithValidParams() {
 	formData.Set("client_id", s.oauthClient.ID)
 	formData.Set("client_secret", s.oauthClient.Secret)
 
-	resp := testhttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
+	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -148,7 +148,7 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithInvalidGrantType() 
 	formData.Set("client_id", s.oauthClient.ID)
 	formData.Set("client_secret", s.oauthClient.Secret)
 
-	resp := testhttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
+	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -172,7 +172,7 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithInvalidClientID() {
 	formData.Set("client_id", "invalid")
 	formData.Set("client_secret", s.oauthClient.Secret)
 
-	resp := testhttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
+	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -197,7 +197,7 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithInvalidClientSecret
 	formData.Set("client_id", s.oauthClient.ID)
 	formData.Set("client_secret", "invalid")
 
-	resp := testhttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
+	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)

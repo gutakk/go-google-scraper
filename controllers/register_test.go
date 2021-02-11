@@ -12,7 +12,7 @@ import (
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/fixture"
-	testhttp "github.com/gutakk/go-google-scraper/tests/http"
+	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
@@ -57,7 +57,7 @@ func TestRegisterDbTestSuite(t *testing.T) {
 }
 
 func (s *RegisterDbTestSuite) TestRegisterWithValidParameters() {
-	response := testhttp.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
+	response := testHttp.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
 	assert.Equal(s.T(), http.StatusFound, response.Code)
 	assert.Equal(s.T(), "/login", response.Header().Get("Location"))
@@ -66,10 +66,10 @@ func (s *RegisterDbTestSuite) TestRegisterWithValidParameters() {
 func (s *RegisterDbTestSuite) TestRegisterWithBlankEmailValidation() {
 	s.formData.Del("email")
 
-	response := testhttp.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
+	response := testHttp.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
-	bodyByte := testhttp.ReadResponseBody(response.Body)
-	pageError := testhttp.ValidateResponseBody(bodyByte, "invalid email format")
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	pageError := testHttp.ValidateResponseBody(bodyByte, "invalid email format")
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, pageError)
@@ -78,11 +78,11 @@ func (s *RegisterDbTestSuite) TestRegisterWithBlankEmailValidation() {
 func (s *RegisterDbTestSuite) TestRegisterWithBlankPasswordValidation() {
 	s.formData.Del("password")
 
-	response := testhttp.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
+	response := testHttp.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
-	bodyByte := testhttp.ReadResponseBody(response.Body)
-	pageError := testhttp.ValidateResponseBody(bodyByte, "Password is required")
-	isEmailFieldValueExist := testhttp.ValidateResponseBody(bodyByte, s.email)
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	pageError := testHttp.ValidateResponseBody(bodyByte, "Password is required")
+	isEmailFieldValueExist := testHttp.ValidateResponseBody(bodyByte, s.email)
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, pageError)
@@ -92,11 +92,11 @@ func (s *RegisterDbTestSuite) TestRegisterWithBlankPasswordValidation() {
 func (s *RegisterDbTestSuite) TestRegisterWithPasswordNotMatchValidation() {
 	s.formData.Set("confirm-password", "invalid")
 
-	response := testhttp.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
+	response := testHttp.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
-	bodyByte := testhttp.ReadResponseBody(response.Body)
-	pageError := testhttp.ValidateResponseBody(bodyByte, "passwords do not match")
-	isEmailFieldValueExist := testhttp.ValidateResponseBody(bodyByte, s.email)
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	pageError := testHttp.ValidateResponseBody(bodyByte, "passwords do not match")
+	isEmailFieldValueExist := testHttp.ValidateResponseBody(bodyByte, s.email)
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, pageError)
@@ -107,11 +107,11 @@ func (s *RegisterDbTestSuite) TestRegisterWithTooShortPasswordValidation() {
 	s.formData.Set("password", "12345")
 	s.formData.Set("confirm-password", "12345")
 
-	response := testhttp.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
+	response := testHttp.PerformRequest(s.engine, "POST", "/register", s.headers, s.formData)
 
-	bodyByte := testhttp.ReadResponseBody(response.Body)
-	pageError := testhttp.ValidateResponseBody(bodyByte, "Password must be longer than 6")
-	isEmailFieldValueExist := testhttp.ValidateResponseBody(bodyByte, s.email)
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	pageError := testHttp.ValidateResponseBody(bodyByte, "Password must be longer than 6")
+	isEmailFieldValueExist := testHttp.ValidateResponseBody(bodyByte, s.email)
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, pageError)
@@ -129,7 +129,7 @@ func (s *RegisterDbTestSuite) TestDisplayRegisterWithAuthenticatedUser() {
 	cookie := fixture.GenerateCookie("user_id", user.ID)
 	s.headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
-	response := testhttp.PerformRequest(s.engine, "GET", "/register", s.headers, nil)
+	response := testHttp.PerformRequest(s.engine, "GET", "/register", s.headers, nil)
 
 	assert.Equal(s.T(), http.StatusFound, response.Code)
 	assert.Equal(s.T(), "/", response.Header().Get("Location"))
@@ -139,10 +139,10 @@ func TestDisplayRegister(t *testing.T) {
 	engine := testConfig.GetRouter(true)
 	new(RegisterController).applyRoutes(EnsureGuestUserGroup(engine))
 
-	response := testhttp.PerformRequest(engine, "GET", "/register", nil, nil)
+	response := testHttp.PerformRequest(engine, "GET", "/register", nil, nil)
 
-	bodyByte := testhttp.ReadResponseBody(response.Body)
-	pageOK := testhttp.ValidateResponseBody(bodyByte, "<title>Register</title>")
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	pageOK := testHttp.ValidateResponseBody(bodyByte, "<title>Register</title>")
 
 	assert.Equal(t, http.StatusOK, response.Code)
 	assert.Equal(t, true, pageOK)
@@ -153,10 +153,10 @@ func (s *RegisterDbTestSuite) TestDisplayRegisterWithUserIDCookieButNoUser() {
 	headers := http.Header{}
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
-	response := testhttp.PerformRequest(s.engine, "GET", "/register", headers, nil)
+	response := testHttp.PerformRequest(s.engine, "GET", "/register", headers, nil)
 
-	bodyByte := testhttp.ReadResponseBody(response.Body)
-	pageOK := testhttp.ValidateResponseBody(bodyByte, "<title>Register</title>")
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	pageOK := testHttp.ValidateResponseBody(bodyByte, "<title>Register</title>")
 
 	assert.Equal(s.T(), http.StatusOK, response.Code)
 	assert.Equal(s.T(), true, pageOK) // TODO: Check the controller in other task

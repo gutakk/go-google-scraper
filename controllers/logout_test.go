@@ -10,7 +10,7 @@ import (
 	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	"github.com/gutakk/go-google-scraper/tests/fixture"
-	testhttp "github.com/gutakk/go-google-scraper/tests/http"
+	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
@@ -44,14 +44,14 @@ func (s *LogoutTestSuite) TestLogoutWithAuthenticatedUser() {
 	headers := http.Header{}
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
-	response := testhttp.PerformRequest(s.engine, "POST", "/logout", headers, nil)
+	response := testHttp.PerformRequest(s.engine, "POST", "/logout", headers, nil)
 
 	assert.Equal(s.T(), http.StatusFound, response.Code)
 	assert.Equal(s.T(), "/", response.Header().Get("Location"))
 }
 
 func (s *LogoutTestSuite) TestLogoutWithGuestUser() {
-	response := testhttp.PerformRequest(s.engine, "POST", "/logout", nil, nil)
+	response := testHttp.PerformRequest(s.engine, "POST", "/logout", nil, nil)
 
 	// TODO: Research the flash messge assertion solution
 	assert.Equal(s.T(), http.StatusFound, response.Code)

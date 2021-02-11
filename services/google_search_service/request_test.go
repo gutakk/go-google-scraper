@@ -5,7 +5,7 @@ import (
 
 	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/helpers/log"
-	testhttp "github.com/gutakk/go-google-scraper/tests/http"
+	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 
 	"github.com/dnaeon/go-vcr/recorder"
 	"gopkg.in/go-playground/assert.v1"
@@ -24,8 +24,8 @@ func TestRequestWithValidKeyword(t *testing.T) {
 		log.Error(errorconf.RecordStopFailure, err)
 	}
 
-	bodyByte := testhttp.ReadResponseBody(resp.Body)
-	isGoogleSearchPage := testhttp.ValidateResponseBody(bodyByte, "<title>AWS")
+	bodyByte := testHttp.ReadResponseBody(resp.Body)
+	isGoogleSearchPage := testHttp.ValidateResponseBody(bodyByte, "<title>AWS")
 
 	assert.Equal(t, nil, requestErr)
 	assert.Equal(t, true, isGoogleSearchPage)
@@ -44,8 +44,8 @@ func TestRequestWithBlankSpaceKeyword(t *testing.T) {
 		log.Error(errorconf.RecordStopFailure, err)
 	}
 
-	bodyByte := testhttp.ReadResponseBody(resp.Body)
-	isGoogleSearchPage := testhttp.ValidateResponseBody(bodyByte, "<title>A W S")
+	bodyByte := testHttp.ReadResponseBody(resp.Body)
+	isGoogleSearchPage := testHttp.ValidateResponseBody(bodyByte, "<title>A W S")
 
 	assert.Equal(t, nil, requestErr)
 	assert.Equal(t, true, isGoogleSearchPage)
@@ -64,8 +64,8 @@ func TestRequestWithThaiKeyword(t *testing.T) {
 		log.Error(errorconf.RecordStopFailure, err)
 	}
 
-	bodyByte := testhttp.ReadResponseBody(resp.Body)
-	isGoogleSearchPage := testhttp.ValidateResponseBody(bodyByte, "<title>สวัสดี")
+	bodyByte := testHttp.ReadResponseBody(resp.Body)
+	isGoogleSearchPage := testHttp.ValidateResponseBody(bodyByte, "<title>สวัสดี")
 
 	assert.Equal(t, nil, requestErr)
 	assert.Equal(t, true, isGoogleSearchPage)

@@ -17,7 +17,7 @@ import (
 	"github.com/gutakk/go-google-scraper/oauth"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
-	testhttp "github.com/gutakk/go-google-scraper/tests/http"
+	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/gin-gonic/gin"
@@ -66,7 +66,7 @@ func (s *OAuthControllerDbTestSuite) TestGenerateClientWithValidBasicAuth() {
 	// Basic auth with username = admin and password = password
 	headers.Set("Authorization", "Basic YWRtaW46cGFzc3dvcmQ=")
 
-	resp := testhttp.PerformRequest(s.engine, "POST", "/api/client", headers, nil)
+	resp := testHttp.PerformRequest(s.engine, "POST", "/api/client", headers, nil)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(errorconf.ReadResponseBodyFailure, err)
@@ -103,13 +103,13 @@ func (s *OAuthControllerDbTestSuite) TestGenerateClientWithInvalidBasicAuth() {
 	// Basic auth with username = admin and password = password
 	headers.Set("Authorization", "Basic invalid")
 
-	resp := testhttp.PerformRequest(s.engine, "POST", "/api/client", headers, nil)
+	resp := testHttp.PerformRequest(s.engine, "POST", "/api/client", headers, nil)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 }
 
 func (s *OAuthControllerDbTestSuite) TestGenerateClientWithoutBasicAuth() {
-	resp := testhttp.PerformRequest(s.engine, "POST", "/api/client", nil, nil)
+	resp := testHttp.PerformRequest(s.engine, "POST", "/api/client", nil, nil)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 }

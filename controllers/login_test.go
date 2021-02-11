@@ -12,7 +12,7 @@ import (
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/fixture"
-	testhttp "github.com/gutakk/go-google-scraper/tests/http"
+	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
@@ -63,7 +63,7 @@ func TestLoginDbTestSuite(t *testing.T) {
 }
 
 func (s *LoginDbTestSuite) TestLoginWithValidParameters() {
-	response := testhttp.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
+	response := testHttp.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
 
 	assert.Equal(s.T(), http.StatusFound, response.Code)
 	assert.Equal(s.T(), "/", response.Header().Get("Location"))
@@ -76,7 +76,7 @@ func (s *LoginDbTestSuite) TestDisplayLoginWithAuthenticatedUser() {
 	cookie := fixture.GenerateCookie("user_id", user.ID)
 	s.headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
-	response := testhttp.PerformRequest(s.engine, "GET", "/login", s.headers, nil)
+	response := testHttp.PerformRequest(s.engine, "GET", "/login", s.headers, nil)
 
 	assert.Equal(s.T(), http.StatusFound, response.Code)
 	assert.Equal(s.T(), "/", response.Header().Get("Location"))
@@ -85,10 +85,10 @@ func (s *LoginDbTestSuite) TestDisplayLoginWithAuthenticatedUser() {
 func (s *LoginDbTestSuite) TestLoginWithBlankEmailValidation() {
 	s.formData.Del("email")
 
-	response := testhttp.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
+	response := testHttp.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
 
-	bodyByte := testhttp.ReadResponseBody(response.Body)
-	pageError := testhttp.ValidateResponseBody(bodyByte, "invalid email format")
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	pageError := testHttp.ValidateResponseBody(bodyByte, "invalid email format")
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, pageError)
@@ -97,11 +97,11 @@ func (s *LoginDbTestSuite) TestLoginWithBlankEmailValidation() {
 func (s *LoginDbTestSuite) TestLoginWithBlankPasswordValidation() {
 	s.formData.Del("password")
 
-	response := testhttp.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
+	response := testHttp.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
 
-	bodyByte := testhttp.ReadResponseBody(response.Body)
-	pageError := testhttp.ValidateResponseBody(bodyByte, "Password is required")
-	isEmailFieldValueExist := testhttp.ValidateResponseBody(bodyByte, s.email)
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	pageError := testHttp.ValidateResponseBody(bodyByte, "Password is required")
+	isEmailFieldValueExist := testHttp.ValidateResponseBody(bodyByte, s.email)
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, pageError)
@@ -111,11 +111,11 @@ func (s *LoginDbTestSuite) TestLoginWithBlankPasswordValidation() {
 func (s *LoginDbTestSuite) TestLoginWithTooShortPasswordValidation() {
 	s.formData.Set("password", "12345")
 
-	response := testhttp.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
+	response := testHttp.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
 
-	bodyByte := testhttp.ReadResponseBody(response.Body)
-	pageError := testhttp.ValidateResponseBody(bodyByte, "Password must be longer than 6")
-	isEmailFieldValueExist := testhttp.ValidateResponseBody(bodyByte, s.email)
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	pageError := testHttp.ValidateResponseBody(bodyByte, "Password must be longer than 6")
+	isEmailFieldValueExist := testHttp.ValidateResponseBody(bodyByte, s.email)
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, pageError)
@@ -125,11 +125,11 @@ func (s *LoginDbTestSuite) TestLoginWithTooShortPasswordValidation() {
 func (s *LoginDbTestSuite) TestLoginWithInvalidEmail() {
 	s.formData.Set("email", "test@email.com")
 
-	response := testhttp.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
+	response := testHttp.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
 
-	bodyByte := testhttp.ReadResponseBody(response.Body)
-	pageError := testhttp.ValidateResponseBody(bodyByte, "username or password is invalid")
-	isEmailFieldValueExist := testhttp.ValidateResponseBody(bodyByte, "test@email.com")
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	pageError := testHttp.ValidateResponseBody(bodyByte, "username or password is invalid")
+	isEmailFieldValueExist := testHttp.ValidateResponseBody(bodyByte, "test@email.com")
 
 	assert.Equal(s.T(), http.StatusUnauthorized, response.Code)
 	assert.Equal(s.T(), true, pageError)
@@ -139,11 +139,11 @@ func (s *LoginDbTestSuite) TestLoginWithInvalidEmail() {
 func (s *LoginDbTestSuite) TestLoginWithInvalidPassword() {
 	s.formData.Set("password", "123456789")
 
-	response := testhttp.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
+	response := testHttp.PerformRequest(s.engine, "POST", "/login", s.headers, s.formData)
 
-	bodyByte := testhttp.ReadResponseBody(response.Body)
-	pageError := testhttp.ValidateResponseBody(bodyByte, "username or password is invalid")
-	isEmailFieldValueExist := testhttp.ValidateResponseBody(bodyByte, s.email)
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	pageError := testHttp.ValidateResponseBody(bodyByte, "username or password is invalid")
+	isEmailFieldValueExist := testHttp.ValidateResponseBody(bodyByte, s.email)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, response.Code)
 	assert.Equal(s.T(), true, pageError)
@@ -154,10 +154,10 @@ func TestDisplayLogin(t *testing.T) {
 	engine := testConfig.GetRouter(true)
 	new(LoginController).applyRoutes(EnsureGuestUserGroup(engine))
 
-	response := testhttp.PerformRequest(engine, "GET", "/login", nil, nil)
+	response := testHttp.PerformRequest(engine, "GET", "/login", nil, nil)
 
-	bodyByte := testhttp.ReadResponseBody(response.Body)
-	pageOK := testhttp.ValidateResponseBody(bodyByte, "<title>Login</title>")
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	pageOK := testHttp.ValidateResponseBody(bodyByte, "<title>Login</title>")
 
 	assert.Equal(t, http.StatusOK, response.Code)
 	assert.Equal(t, true, pageOK)
@@ -168,10 +168,10 @@ func (s *LoginDbTestSuite) TestDisplayLoginWithUserIDCookieButNoUser() {
 	headers := http.Header{}
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
-	response := testhttp.PerformRequest(s.engine, "GET", "/login", headers, nil)
+	response := testHttp.PerformRequest(s.engine, "GET", "/login", headers, nil)
 
-	bodyByte := testhttp.ReadResponseBody(response.Body)
-	pageOK := testhttp.ValidateResponseBody(bodyByte, "<title>Login</title>")
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	pageOK := testHttp.ValidateResponseBody(bodyByte, "<title>Login</title>")
 
 	assert.Equal(s.T(), http.StatusOK, response.Code)
 	assert.Equal(s.T(), true, pageOK) // TODO: Check the controller in other task
