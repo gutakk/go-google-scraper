@@ -76,3 +76,18 @@ func StopRecorder(recorder *recorder.Recorder) {
 		log.Error(errorconf.RecorderStopFailure, err)
 	}
 }
+
+func PerformClientRequest(url string, recorder *recorder.Recorder) *http.Response {
+	client := &http.Client{Transport: recorder}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Error(errorconf.RequestInitializeFailure, err)
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Error(errorconf.RequestFailure, err)
+	}
+
+	return resp
+}

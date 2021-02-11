@@ -1,11 +1,8 @@
 package google_search_service
 
 import (
-	"net/http"
 	"testing"
 
-	errorconf "github.com/gutakk/go-google-scraper/config/error"
-	"github.com/gutakk/go-google-scraper/helpers/log"
 	testhttp "github.com/gutakk/go-google-scraper/tests/http"
 
 	"gopkg.in/go-playground/assert.v1"
@@ -15,16 +12,7 @@ func TestParserWithValidGoogleResponse(t *testing.T) {
 	recorder := testhttp.NewRecorder("tests/fixture/vcr/valid_keyword")
 
 	url := "https://www.google.com/search?q=AWS"
-	client := &http.Client{Transport: recorder}
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		log.Error(errorconf.RequestInitializeFailure, err)
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Error(errorconf.RequestFailure, err)
-	}
+	resp := testhttp.PerformClientRequest(url, recorder)
 
 	testhttp.StopRecorder(recorder)
 
@@ -44,16 +32,7 @@ func TestParserWithNotGoogleSearchPage(t *testing.T) {
 	recorder := testhttp.NewRecorder("tests/fixture/vcr/invalid_site")
 
 	url := "https://www.golang.org"
-	client := &http.Client{Transport: recorder}
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		log.Error(errorconf.RequestInitializeFailure, err)
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Error(errorconf.RequestFailure, err)
-	}
+	resp := testhttp.PerformClientRequest(url, recorder)
 
 	testhttp.StopRecorder(recorder)
 
