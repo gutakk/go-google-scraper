@@ -3,8 +3,6 @@ package google_search_service
 import (
 	"testing"
 
-	errorconf "github.com/gutakk/go-google-scraper/config/error"
-	"github.com/gutakk/go-google-scraper/helpers/log"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 
 	"gopkg.in/go-playground/assert.v1"
@@ -15,10 +13,7 @@ func TestRequestWithValidKeyword(t *testing.T) {
 
 	resp, requestErr := Request("AWS", recorder)
 
-	err := recorder.Stop()
-	if err != nil {
-		log.Error(errorconf.RecordStopFailure, err)
-	}
+	testHttp.StopRecorder(recorder)
 
 	bodyByte := testHttp.ReadResponseBody(resp.Body)
 	isGoogleSearchPage := testHttp.ValidateResponseBody(bodyByte, "<title>AWS")
@@ -32,10 +27,7 @@ func TestRequestWithBlankSpaceKeyword(t *testing.T) {
 
 	resp, requestErr := Request("A W S", recorder)
 
-	err := recorder.Stop()
-	if err != nil {
-		log.Error(errorconf.RecordStopFailure, err)
-	}
+	testHttp.StopRecorder(recorder)
 
 	bodyByte := testHttp.ReadResponseBody(resp.Body)
 	isGoogleSearchPage := testHttp.ValidateResponseBody(bodyByte, "<title>A W S")
@@ -49,10 +41,7 @@ func TestRequestWithThaiKeyword(t *testing.T) {
 
 	resp, requestErr := Request("สวัสดี", recorder)
 
-	err := recorder.Stop()
-	if err != nil {
-		log.Error(errorconf.RecordStopFailure, err)
-	}
+	testHttp.StopRecorder(recorder)
 
 	bodyByte := testHttp.ReadResponseBody(resp.Body)
 	isGoogleSearchPage := testHttp.ValidateResponseBody(bodyByte, "<title>สวัสดี")

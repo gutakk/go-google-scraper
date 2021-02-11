@@ -69,3 +69,10 @@ func NewRecorder(cassetteName string) *recorder.Recorder {
 
 	return recorder
 }
+
+func StopRecorder(recorder *recorder.Recorder) {
+	err := recorder.Stop()
+	if err != nil {
+		log.Error(errorconf.RecorderStopFailure, err)
+	}
+}

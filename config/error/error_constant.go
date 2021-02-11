@@ -11,7 +11,7 @@ const (
 	MigrateDatabaseFailure    = "Failed to migrate database: "
 	ReadResponseBodyFailure   = "Failed to read response body: "
 	RecorderInitializeFailure = "Failed to init recorder: "
-	RecordStopFailure         = "Failed to stop record: "
+	RecorderStopFailure       = "Failed to stop recorder: "
 	RequestInitializeFailure  = "Failed to init request: "
 	RequestFailure            = "Failed to make a request: "
 	ScanRowFailure            = "Failed to scan row: "

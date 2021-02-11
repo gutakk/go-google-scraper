@@ -26,10 +26,7 @@ func TestParserWithValidGoogleResponse(t *testing.T) {
 		log.Error(errorconf.RequestFailure, err)
 	}
 
-	err = recorder.Stop()
-	if err != nil {
-		log.Error(errorconf.RecordStopFailure, err)
-	}
+	testhttp.StopRecorder(recorder)
 
 	parsingResult, parsingError := ParseGoogleResponse(resp)
 
@@ -58,10 +55,7 @@ func TestParserWithNotGoogleSearchPage(t *testing.T) {
 		log.Error(errorconf.RequestFailure, err)
 	}
 
-	err = recorder.Stop()
-	if err != nil {
-		log.Error(errorconf.RecordStopFailure, err)
-	}
+	testhttp.StopRecorder(recorder)
 
 	parsingResult, parsingErr := ParseGoogleResponse(resp)
 
