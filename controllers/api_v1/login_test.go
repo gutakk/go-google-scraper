@@ -18,6 +18,7 @@ import (
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/fabricator"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
+	testjson "github.com/gutakk/go-google-scraper/tests/json"
 	"github.com/gutakk/go-google-scraper/tests/oauth_test"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
@@ -65,10 +66,7 @@ func (s *LoginAPIControllerDbTestSuite) SetupTest() {
 		Secret: "client-secret",
 		Domain: "http://localhost:8080",
 	}
-	data, err := json.Marshal(s.oauthClient)
-	if err != nil {
-		log.Error(errorconf.JSONMarshalFailure, err)
-	}
+	data := testjson.JSONMarshaler(s.oauthClient)
 	s.oauthClient.Data = data
 
 	db.GetDB().Exec("INSERT INTO oauth2_clients VALUES(?, ?, ?, ?)",

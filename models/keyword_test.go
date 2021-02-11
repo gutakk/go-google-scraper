@@ -10,6 +10,7 @@ import (
 	"github.com/gutakk/go-google-scraper/models"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/fabricator"
+	testjson "github.com/gutakk/go-google-scraper/tests/json"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/jackc/pgconn"
@@ -39,15 +40,8 @@ func TestKeywordDBTestSuite(t *testing.T) {
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
-	nonAdwordLinks, err := json.Marshal([]string{"test-non-ads-link"})
-	if err != nil {
-		log.Error(errorconf.JSONMarshalFailure, err)
-	}
-
-	topPositionAdwordLinks, err := json.Marshal([]string{"test-top-ads-link"})
-	if err != nil {
-		log.Error(errorconf.JSONMarshalFailure, err)
-	}
+	nonAdwordLinks := testjson.JSONMarshaler([]string{"test-non-ads-link"})
+	topPositionAdwordLinks := testjson.JSONMarshaler([]string{"test-top-ads-link"})
 
 	keyword := models.Keyword{
 		Keyword:                 "Hazard",
@@ -65,7 +59,7 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 	result, resultError := models.SaveKeyword(keyword, nil)
 
 	var nonAdwordLinksVal []string
-	err = json.Unmarshal(result.NonAdwordLinks, &nonAdwordLinksVal)
+	err := json.Unmarshal(result.NonAdwordLinks, &nonAdwordLinksVal)
 	if err != nil {
 		log.Error(errorconf.JSONUnmarshalFailure, err)
 	}

@@ -21,6 +21,7 @@ import (
 	"github.com/gutakk/go-google-scraper/tests/fabricator"
 	testFile "github.com/gutakk/go-google-scraper/tests/file"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
+	testjson "github.com/gutakk/go-google-scraper/tests/json"
 	"github.com/gutakk/go-google-scraper/tests/oauth_test"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
@@ -69,13 +70,10 @@ func (s *KeywordAPIControllerDbTestSuite) SetupTest() {
 		Refresh:   "test-refresh",
 	}
 
-	data, err := json.Marshal(&oauth_test.TokenData{
+	data := testjson.JSONMarshaler(&oauth_test.TokenData{
 		Access: tokenItem.Access,
 		UserID: fmt.Sprint(s.user.ID),
 	})
-	if err != nil {
-		log.Error(errorconf.JSONMarshalFailure, err)
-	}
 	tokenItem.Data = data
 
 	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
@@ -191,13 +189,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParamsButNotT
 		Refresh:   "test-refresh",
 	}
 
-	data, err := json.Marshal(&oauth_test.TokenData{
+	data := testjson.JSONMarshaler(&oauth_test.TokenData{
 		Access: tokenItem.Access,
 		UserID: "invalidUserID",
 	})
-	if err != nil {
-		log.Error(errorconf.JSONMarshalFailure, err)
-	}
 	tokenItem.Data = data
 
 	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
@@ -287,13 +282,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithExpiredAccessTo
 		Refresh:   "test-refresh",
 	}
 
-	data, err := json.Marshal(&oauth_test.TokenData{
+	data := testjson.JSONMarshaler(&oauth_test.TokenData{
 		AccessExpiresIn: 1,
 		Access:          tokenItem.Access,
 	})
-	if err != nil {
-		log.Error(errorconf.JSONMarshalFailure, err)
-	}
 	tokenItem.Data = data
 
 	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
@@ -378,13 +370,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNot
 		Refresh:   "test-refresh",
 	}
 
-	data, err := json.Marshal(&oauth_test.TokenData{
+	data := testjson.JSONMarshaler(&oauth_test.TokenData{
 		Access: tokenItem.Access,
 		UserID: "invalidUserID",
 	})
-	if err != nil {
-		log.Error(errorconf.JSONMarshalFailure, err)
-	}
 	tokenItem.Data = data
 
 	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
@@ -466,13 +455,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithExpiredAccessT
 		Refresh:   "test-refresh",
 	}
 
-	data, err := json.Marshal(&oauth_test.TokenData{
+	data := testjson.JSONMarshaler(&oauth_test.TokenData{
 		AccessExpiresIn: 1,
 		Access:          tokenItem.Access,
 	})
-	if err != nil {
-		log.Error(errorconf.JSONMarshalFailure, err)
-	}
 	tokenItem.Data = data
 
 	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
@@ -560,13 +546,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithExpiredAccessT
 		Refresh:   "test-refresh",
 	}
 
-	data, err := json.Marshal(&oauth_test.TokenData{
+	data := testjson.JSONMarshaler(&oauth_test.TokenData{
 		AccessExpiresIn: 1,
 		Access:          tokenItem.Access,
 	})
-	if err != nil {
-		log.Error(errorconf.JSONMarshalFailure, err)
-	}
 	tokenItem.Data = data
 
 	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
