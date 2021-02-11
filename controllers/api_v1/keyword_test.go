@@ -32,7 +32,6 @@ import (
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -51,20 +50,7 @@ func init() {
 		log.Fatal(errorconf.StartOAuthServerFailure, err)
 	}
 
-	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
-	if err != nil {
-		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
-	}
-
-	db.GetDB = func() *gorm.DB {
-		return database
-	}
-
-	testDB.InitKeywordStatusEnum(db.GetDB())
-	err = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
-	if err != nil {
-		log.Fatal(errorconf.MigrateDatabaseFailure, err)
-	}
+	testDB.SetupTestDatabase()
 }
 
 type KeywordAPIControllerDbTestSuite struct {

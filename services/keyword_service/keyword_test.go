@@ -17,8 +17,6 @@ import (
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 func init() {
@@ -38,15 +36,7 @@ type KeywordServiceDbTestSuite struct {
 }
 
 func (s *KeywordServiceDbTestSuite) SetupTest() {
-	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
-	db.GetDB = func() *gorm.DB {
-		return database
-	}
-
-	db.SetupRedisPool()
-
-	testDB.InitKeywordStatusEnum(db.GetDB())
-	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
+	testDB.SetupTestDatabase()
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
 	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}

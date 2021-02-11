@@ -15,15 +15,13 @@ import (
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	testFile "github.com/gutakk/go-google-scraper/tests/file"
 	"github.com/gutakk/go-google-scraper/tests/fixture"
-	testhttp "github.com/gutakk/go-google-scraper/tests/http"
+	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 type KeywordDbTestSuite struct {
@@ -35,22 +33,7 @@ type KeywordDbTestSuite struct {
 func (s *KeywordDbTestSuite) SetupTest() {
 	config.LoadEnv()
 
-	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
-	if err != nil {
-		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
-	}
-
-	db.GetDB = func() *gorm.DB {
-		return database
-	}
-
-	db.SetupRedisPool()
-
-	testDB.InitKeywordStatusEnum(db.GetDB())
-	err = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
-	if err != nil {
-		log.Fatal(errorconf.MigrateDatabaseFailure, err)
-	}
+	testDB.SetupTestDatabase()
 
 	s.engine = testConfig.GetRouter(true)
 	new(LoginController).applyRoutes(EnsureGuestUserGroup(s.engine))
@@ -73,6 +56,7 @@ func (s *KeywordDbTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM keywords")
 	db.GetDB().Exec("DELETE FROM users")
 	_, err := db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
+	log.Printf("===================== %v", err)
 	if err != nil {
 		log.Fatal(errorconf.DeleteRedisJobFailure, err)
 	}
@@ -88,10 +72,10 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordWithAuthenticatedUserWithoutFilte
 	cookie := fixture.GenerateCookie("user_id", s.userID)
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
-	response := testhttp.PerformRequest(s.engine, "GET", "/keyword", headers, nil)
+	response := testHttp.PerformRequest(s.engine, "GET", "/keyword", headers, nil)
 
-	bodyByte := testhttp.ReadResponseBody(response.Body)
-	isKeywordPage := testhttp.ValidateResponseBody(bodyByte, "<title>Keyword</title>")
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	isKeywordPage := testHttp.ValidateResponseBody(bodyByte, "<title>Keyword</title>")
 
 	assert.Equal(s.T(), http.StatusOK, response.Code)
 	assert.Equal(s.T(), true, isKeywordPage)
@@ -107,10 +91,10 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordWithAuthenticatedUserWithFilter()
 		"filter[keyword]=Test&" +
 		"filter[url]=Test" +
 		"filter[is_adword_advertiser]=Test"
-	response := testhttp.PerformRequest(s.engine, "GET", url, headers, nil)
+	response := testHttp.PerformRequest(s.engine, "GET", url, headers, nil)
 
-	bodyByte := testhttp.ReadResponseBody(response.Body)
-	isKeywordPage := testhttp.ValidateResponseBody(bodyByte, "<title>Keyword</title>")
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	isKeywordPage := testHttp.ValidateResponseBody(bodyByte, "<title>Keyword</title>")
 
 	assert.Equal(s.T(), http.StatusOK, response.Code)
 	assert.Equal(s.T(), true, isKeywordPage)
@@ -120,7 +104,7 @@ func TestDisplayKeywordWithGuestUser(t *testing.T) {
 	engine := testConfig.GetRouter(true)
 	new(KeywordController).applyRoutes(EnsureAuthenticatedUserGroup(engine))
 
-	response := testhttp.PerformRequest(engine, "GET", "/keyword", nil, nil)
+	response := testHttp.PerformRequest(engine, "GET", "/keyword", nil, nil)
 
 	assert.Equal(t, http.StatusFound, response.Code)
 	assert.Equal(t, "/login", response.Header().Get("Location"))
@@ -131,7 +115,7 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordWithUserIDCookieButNoUser() {
 	headers := http.Header{}
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
-	response := testhttp.PerformRequest(s.engine, "GET", "/keyword", headers, nil)
+	response := testHttp.PerformRequest(s.engine, "GET", "/keyword", headers, nil)
 
 	assert.Equal(s.T(), http.StatusFound, response.Code)
 	assert.Equal(s.T(), "/login", response.Header().Get("Location"))
@@ -147,10 +131,10 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordResultWithAuthenticatedUserAndVal
 	cookie := fixture.GenerateCookie("user_id", s.userID)
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
-	response := testhttp.PerformRequest(s.engine, "GET", url, headers, nil)
+	response := testHttp.PerformRequest(s.engine, "GET", url, headers, nil)
 
-	bodyByte := testhttp.ReadResponseBody(response.Body)
-	isKeywordResultPage := testhttp.ValidateResponseBody(bodyByte, keyword.Keyword)
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	isKeywordResultPage := testHttp.ValidateResponseBody(bodyByte, keyword.Keyword)
 
 	assert.Equal(s.T(), http.StatusOK, response.Code)
 	assert.Equal(s.T(), true, isKeywordResultPage)
@@ -164,10 +148,10 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordResultWithAuthenticatedUserButInv
 	cookie := fixture.GenerateCookie("user_id", s.userID)
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
-	response := testhttp.PerformRequest(s.engine, "GET", "/keyword/invalid-keyword", headers, nil)
+	response := testHttp.PerformRequest(s.engine, "GET", "/keyword/invalid-keyword", headers, nil)
 
-	bodyByte := testhttp.ReadResponseBody(response.Body)
-	isNotFoundPage := testhttp.ValidateResponseBody(bodyByte, "<title>Not Found</title>")
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	isNotFoundPage := testHttp.ValidateResponseBody(bodyByte, "<title>Not Found</title>")
 
 	assert.Equal(s.T(), http.StatusNotFound, response.Code)
 	assert.Equal(s.T(), true, isNotFoundPage)
@@ -179,7 +163,7 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordResultWithGuestUser() {
 	keywordID := fmt.Sprint(keyword.ID)
 	url := fmt.Sprintf("/keyword/%s", keywordID)
 
-	response := testhttp.PerformRequest(s.engine, "GET", url, nil, nil)
+	response := testHttp.PerformRequest(s.engine, "GET", url, nil, nil)
 
 	assert.Equal(s.T(), http.StatusFound, response.Code)
 	assert.Equal(s.T(), "/login", response.Header().Get("Location"))
@@ -195,7 +179,7 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordHTMLWithAuthenticatedUserAndValid
 	cookie := fixture.GenerateCookie("user_id", s.userID)
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
-	response := testhttp.PerformRequest(s.engine, "GET", url, headers, nil)
+	response := testHttp.PerformRequest(s.engine, "GET", url, headers, nil)
 
 	assert.Equal(s.T(), http.StatusOK, response.Code)
 }
@@ -208,7 +192,7 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordHTMLWithAuthenticatedUserButInval
 	cookie := fixture.GenerateCookie("user_id", s.userID)
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
-	response := testhttp.PerformRequest(s.engine, "GET", "/keyword/invalid-keyword/html", headers, nil)
+	response := testHttp.PerformRequest(s.engine, "GET", "/keyword/invalid-keyword/html", headers, nil)
 
 	assert.Equal(s.T(), http.StatusNotFound, response.Code)
 }
@@ -223,7 +207,7 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordHTMLWithAuthenticatedUserButNoHTM
 	cookie := fixture.GenerateCookie("user_id", s.userID)
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
-	response := testhttp.PerformRequest(s.engine, "GET", url, headers, nil)
+	response := testHttp.PerformRequest(s.engine, "GET", url, headers, nil)
 
 	assert.Equal(s.T(), http.StatusNotFound, response.Code)
 }
@@ -234,7 +218,7 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordHTMLWithGuestUser() {
 	keywordID := fmt.Sprint(keyword.ID)
 	url := fmt.Sprintf("/keyword/%s/html", keywordID)
 
-	response := testhttp.PerformRequest(s.engine, "GET", url, nil, nil)
+	response := testHttp.PerformRequest(s.engine, "GET", url, nil, nil)
 
 	assert.Equal(s.T(), http.StatusFound, response.Code)
 	assert.Equal(s.T(), "/login", response.Header().Get("Location"))
@@ -245,7 +229,7 @@ func (s *KeywordDbTestSuite) TestUploadKeywordWithAuthenticatedUserAndValidParam
 	cookie := fixture.GenerateCookie("user_id", s.userID)
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
-	response := testhttp.PerformFileUploadRequest(s.engine, "POST", "/keyword", headers, payload)
+	response := testHttp.PerformFileUploadRequest(s.engine, "POST", "/keyword", headers, payload)
 
 	assert.Equal(s.T(), http.StatusFound, response.Code)
 	assert.Equal(s.T(), "/keyword", response.Header().Get("Location"))
@@ -256,11 +240,11 @@ func (s *KeywordDbTestSuite) TestUploadKeywordWithAuthenticatedUserAndBlankPaylo
 	cookie := fixture.GenerateCookie("user_id", s.userID)
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
-	response := testhttp.PerformFileUploadRequest(s.engine, "POST", "/keyword", headers, &bytes.Buffer{})
+	response := testHttp.PerformFileUploadRequest(s.engine, "POST", "/keyword", headers, &bytes.Buffer{})
 
-	bodyByte := testhttp.ReadResponseBody(response.Body)
-	isKeywordPage := testhttp.ValidateResponseBody(bodyByte, "<title>Keyword</title>")
-	pageError := testhttp.ValidateResponseBody(bodyByte, "File is required")
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	isKeywordPage := testHttp.ValidateResponseBody(bodyByte, "<title>Keyword</title>")
+	pageError := testHttp.ValidateResponseBody(bodyByte, "File is required")
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, isKeywordPage)
@@ -271,7 +255,7 @@ func TestUploadKeywordWithGuestUser(t *testing.T) {
 	engine := testConfig.GetRouter(true)
 	new(KeywordController).applyRoutes(EnsureAuthenticatedUserGroup(engine))
 
-	response := testhttp.PerformRequest(engine, "POST", "/keyword", nil, nil)
+	response := testHttp.PerformRequest(engine, "POST", "/keyword", nil, nil)
 
 	assert.Equal(t, http.StatusFound, response.Code)
 	assert.Equal(t, "/login", response.Header().Get("Location"))

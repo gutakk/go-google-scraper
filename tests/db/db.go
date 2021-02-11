@@ -3,10 +3,38 @@ package tests
 import (
 	"fmt"
 
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
+	"github.com/gutakk/go-google-scraper/db"
+	"github.com/gutakk/go-google-scraper/helpers/log"
+	"github.com/gutakk/go-google-scraper/models"
+
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func ConstructTestDsn() string {
+func SetupTestDatabase() *gorm.DB {
+	database, err := gorm.Open(postgres.Open(constructTestDsn()), &gorm.Config{})
+	if err != nil {
+		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
+	}
+
+	db.GetDB = func() *gorm.DB {
+		return database
+	}
+
+	db.SetupRedisPool()
+
+	initKeywordStatusEnum(db.GetDB())
+
+	err = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
+	if err != nil {
+		log.Fatal(errorconf.MigrateDatabaseFailure, err)
+	}
+
+	return db.GetDB()
+}
+
+func constructTestDsn() string {
 	host := "localhost"
 	port := "5433"
 	dbName := "go_google_scraper_test"
@@ -20,7 +48,7 @@ func ConstructTestDsn() string {
 	)
 }
 
-func InitKeywordStatusEnum(db *gorm.DB) {
+func initKeywordStatusEnum(db *gorm.DB) {
 	db.Exec(`
 		DO $$ BEGIN
 			CREATE TYPE keyword_status AS ENUM('pending', 'processing', 'processed', 'failed');

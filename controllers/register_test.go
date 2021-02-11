@@ -19,8 +19,6 @@ import (
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 type RegisterDbTestSuite struct {
@@ -33,19 +31,7 @@ type RegisterDbTestSuite struct {
 }
 
 func (s *RegisterDbTestSuite) SetupTest() {
-	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
-	if err != nil {
-		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
-	}
-
-	db.GetDB = func() *gorm.DB {
-		return database
-	}
-
-	err = db.GetDB().AutoMigrate(&models.User{})
-	if err != nil {
-		log.Fatal(errorconf.MigrateDatabaseFailure, err)
-	}
+	testDB.SetupTestDatabase()
 
 	s.engine = testConfig.GetRouter(true)
 	new(RegisterController).applyRoutes(EnsureGuestUserGroup(s.engine))

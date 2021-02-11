@@ -23,8 +23,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/go-playground/assert.v1"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 func init() {
@@ -42,14 +40,7 @@ func init() {
 		log.Fatal(errorconf.StartOAuthServerFailure, err)
 	}
 
-	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
-	if err != nil {
-		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
-	}
-
-	db.GetDB = func() *gorm.DB {
-		return database
-	}
+	testDB.SetupTestDatabase()
 }
 
 type OAuthControllerDbTestSuite struct {
