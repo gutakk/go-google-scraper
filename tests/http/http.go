@@ -11,6 +11,8 @@ import (
 
 	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/helpers/log"
+
+	"github.com/dnaeon/go-vcr/recorder"
 )
 
 func PerformRequest(r http.Handler, method, path string, headers http.Header, payload url.Values) *httptest.ResponseRecorder {
@@ -57,4 +59,13 @@ func ReadResponseBody(respBody interface{}) []byte {
 
 func ValidateResponseBody(bodyByte []byte, expected string) bool {
 	return strings.Index(string(bodyByte), expected) > 0
+}
+
+func NewRecorder(cassetteName string) *recorder.Recorder {
+	recorder, err := recorder.New(cassetteName)
+	if err != nil {
+		log.Error(errorconf.RecorderInitializeFailure, err)
+	}
+
+	return recorder
 }

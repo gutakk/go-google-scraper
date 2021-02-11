@@ -7,19 +7,15 @@ import (
 	"github.com/gutakk/go-google-scraper/helpers/log"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 
-	"github.com/dnaeon/go-vcr/recorder"
 	"gopkg.in/go-playground/assert.v1"
 )
 
 func TestRequestWithValidKeyword(t *testing.T) {
-	r, err := recorder.New("tests/fixture/vcr/valid_keyword")
-	if err != nil {
-		log.Error(errorconf.RecordInitializeFailure, err)
-	}
+	recorder := testHttp.NewRecorder("tests/fixture/vcr/valid_keyword")
 
-	resp, requestErr := Request("AWS", r)
+	resp, requestErr := Request("AWS", recorder)
 
-	err = r.Stop()
+	err := recorder.Stop()
 	if err != nil {
 		log.Error(errorconf.RecordStopFailure, err)
 	}
@@ -32,14 +28,11 @@ func TestRequestWithValidKeyword(t *testing.T) {
 }
 
 func TestRequestWithBlankSpaceKeyword(t *testing.T) {
-	r, err := recorder.New("tests/fixture/vcr/blank_space_keyword")
-	if err != nil {
-		log.Error(errorconf.RecordInitializeFailure, err)
-	}
+	recorder := testHttp.NewRecorder("tests/fixture/vcr/blank_space_keyword")
 
-	resp, requestErr := Request("A W S", r)
+	resp, requestErr := Request("A W S", recorder)
 
-	err = r.Stop()
+	err := recorder.Stop()
 	if err != nil {
 		log.Error(errorconf.RecordStopFailure, err)
 	}
@@ -52,14 +45,11 @@ func TestRequestWithBlankSpaceKeyword(t *testing.T) {
 }
 
 func TestRequestWithThaiKeyword(t *testing.T) {
-	r, err := recorder.New("tests/fixture/vcr/thai_keyword")
-	if err != nil {
-		log.Error(errorconf.RecordInitializeFailure, err)
-	}
+	recorder := testHttp.NewRecorder("tests/fixture/vcr/thai_keyword")
 
-	resp, requestErr := Request("สวัสดี", r)
+	resp, requestErr := Request("สวัสดี", recorder)
 
-	err = r.Stop()
+	err := recorder.Stop()
 	if err != nil {
 		log.Error(errorconf.RecordStopFailure, err)
 	}
