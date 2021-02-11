@@ -4,12 +4,13 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
 	html "github.com/gutakk/go-google-scraper/helpers/html"
 	session "github.com/gutakk/go-google-scraper/helpers/session"
 	"github.com/gutakk/go-google-scraper/models"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 const (
@@ -38,7 +39,8 @@ func (l *LoginController) displayLogin(c *gin.Context) {
 func (l *LoginController) login(c *gin.Context) {
 	form := &LoginForm{}
 
-	if err := c.ShouldBind(form); err != nil {
+	err := c.ShouldBind(form)
+	if err != nil {
 		for _, fieldErr := range err.(validator.ValidationErrors) {
 			renderLoginWithError(c, http.StatusBadRequest, errorHandler.ValidationErrorMessage(fieldErr), form)
 			return
@@ -51,7 +53,8 @@ func (l *LoginController) login(c *gin.Context) {
 		return
 	}
 
-	if err := models.ValidatePassword(user.Password, form.Password); err != nil {
+	err = models.ValidatePassword(user.Password, form.Password)
+	if err != nil {
 		renderLoginWithError(c, http.StatusUnauthorized, errors.New(invalidUsernameOrPassword), form)
 		return
 	}

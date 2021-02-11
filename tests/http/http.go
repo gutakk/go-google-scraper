@@ -6,15 +6,24 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"strings"
+
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 )
 
 func PerformRequest(r http.Handler, method, path string, headers http.Header, payload url.Values) *httptest.ResponseRecorder {
-	req, _ := http.NewRequest(method, path, strings.NewReader(payload.Encode()))
+	req, err := http.NewRequest(method, path, strings.NewReader(payload.Encode()))
+	if err != nil {
+		log.Error(errorconf.RequestInitializeFailure, err)
+	}
 	return perform(req, r, headers)
 }
 
 func PerformFileUploadRequest(r http.Handler, method, path string, headers http.Header, payload *bytes.Buffer) *httptest.ResponseRecorder {
-	req, _ := http.NewRequest(method, path, payload)
+	req, err := http.NewRequest(method, path, payload)
+	if err != nil {
+		log.Error(errorconf.RequestInitializeFailure, err)
+	}
 	return perform(req, r, headers)
 }
 

@@ -6,7 +6,9 @@ import (
 	"testing"
 
 	"github.com/gutakk/go-google-scraper/config"
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/oauth"
 	"github.com/gutakk/go-google-scraper/services/oauth_service"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
@@ -23,13 +25,22 @@ import (
 func init() {
 	gin.SetMode(gin.TestMode)
 
-	if err := os.Chdir(path_test.GetRoot()); err != nil {
-		panic(err)
+	err := os.Chdir(path_test.GetRoot())
+	if err != nil {
+		log.Fatal(errorconf.ChangeToRootDirFailure, err)
 	}
 
 	config.LoadEnv()
-	_ = oauth.SetupOAuthServer()
-	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	err = oauth.SetupOAuthServer()
+	if err != nil {
+		log.Fatal(errorconf.StartOAuthServerFailure, err)
+	}
+
+	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	if err != nil {
+		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
+	}
+
 	db.GetDB = func() *gorm.DB {
 		return database
 	}

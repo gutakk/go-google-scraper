@@ -4,23 +4,39 @@ import (
 	"net/http"
 	"testing"
 
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
+	"github.com/gutakk/go-google-scraper/helpers/log"
+
 	"github.com/dnaeon/go-vcr/recorder"
 	"gopkg.in/go-playground/assert.v1"
 )
 
 func TestParserWithValidGoogleResponse(t *testing.T) {
-	r, _ := recorder.New("tests/fixture/vcr/valid_keyword")
+	r, err := recorder.New("tests/fixture/vcr/valid_keyword")
+	if err != nil {
+		log.Error(errorconf.RecordInitializeFailure, err)
+	}
 
 	url := "https://www.google.com/search?q=AWS"
 	client := &http.Client{Transport: r}
-	req, _ := http.NewRequest("GET", url, nil)
-	resp, _ := client.Do(req)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Error(errorconf.RequestInitializeFailure, err)
+	}
 
-	_ = r.Stop()
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Error(errorconf.RequestFailure, err)
+	}
 
-	parsingResult, err := ParseGoogleResponse(resp)
+	err = r.Stop()
+	if err != nil {
+		log.Error(errorconf.RecordStopFailure, err)
+	}
 
-	assert.Equal(t, nil, err)
+	parsingResult, parsingError := ParseGoogleResponse(resp)
+
+	assert.Equal(t, nil, parsingError)
 	assert.Equal(t, 90, parsingResult.LinksCount)
 	assert.Equal(t, 7, parsingResult.NonAdwordsCount)
 	assert.Equal(t, 4, parsingResult.TopPostionAdwordsCount)
@@ -31,18 +47,31 @@ func TestParserWithValidGoogleResponse(t *testing.T) {
 }
 
 func TestParserWithNotGoogleSearchPage(t *testing.T) {
-	r, _ := recorder.New("tests/fixture/vcr/invalid_site")
+	r, err := recorder.New("tests/fixture/vcr/invalid_site")
+	if err != nil {
+		log.Error(errorconf.RecordInitializeFailure, err)
+	}
 
 	url := "https://www.golang.org"
 	client := &http.Client{Transport: r}
-	req, _ := http.NewRequest("GET", url, nil)
-	resp, _ := client.Do(req)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Error(errorconf.RequestInitializeFailure, err)
+	}
 
-	_ = r.Stop()
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Error(errorconf.RequestFailure, err)
+	}
 
-	parsingResult, err := ParseGoogleResponse(resp)
+	err = r.Stop()
+	if err != nil {
+		log.Error(errorconf.RecordStopFailure, err)
+	}
 
-	assert.Equal(t, nil, err)
+	parsingResult, parsingErr := ParseGoogleResponse(resp)
+
+	assert.Equal(t, nil, parsingErr)
 	assert.Equal(t, 16, parsingResult.LinksCount)
 	assert.Equal(t, 0, parsingResult.NonAdwordsCount)
 	assert.Equal(t, 0, parsingResult.TopPostionAdwordsCount)

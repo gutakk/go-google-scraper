@@ -5,48 +5,69 @@ import (
 	"strings"
 	"testing"
 
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
+	"github.com/gutakk/go-google-scraper/helpers/log"
+
 	"github.com/dnaeon/go-vcr/recorder"
 	"gopkg.in/go-playground/assert.v1"
 )
 
 func TestRequestWithValidKeyword(t *testing.T) {
-	r, _ := recorder.New("tests/fixture/vcr/valid_keyword")
+	r, err := recorder.New("tests/fixture/vcr/valid_keyword")
+	if err != nil {
+		log.Error(errorconf.RecordInitializeFailure, err)
+	}
 
-	resp, _ := Request("AWS", r)
+	resp, requestErr := Request("AWS", r)
+
+	err = r.Stop()
+	if err != nil {
+		log.Error(errorconf.RecordStopFailure, err)
+	}
 
 	p, err := ioutil.ReadAll(resp.Body)
 	isGoogleSearchPage := err == nil && strings.Index(string(p), "<title>AWS") > 0
 
-	assert.Equal(t, nil, err)
+	assert.Equal(t, nil, requestErr)
 	assert.Equal(t, true, isGoogleSearchPage)
-
-	_ = r.Stop()
 }
 
 func TestRequestWithBlankSpaceKeyword(t *testing.T) {
-	r, _ := recorder.New("tests/fixture/vcr/blank_space_keyword")
+	r, err := recorder.New("tests/fixture/vcr/blank_space_keyword")
+	if err != nil {
+		log.Error(errorconf.RecordInitializeFailure, err)
+	}
 
-	resp, _ := Request("A W S", r)
+	resp, requestErr := Request("A W S", r)
+
+	err = r.Stop()
+	if err != nil {
+		log.Error(errorconf.RecordStopFailure, err)
+	}
 
 	p, err := ioutil.ReadAll(resp.Body)
 	isGoogleSearchPage := err == nil && strings.Index(string(p), "<title>A W S") > 0
 
-	assert.Equal(t, nil, err)
+	assert.Equal(t, nil, requestErr)
 	assert.Equal(t, true, isGoogleSearchPage)
-
-	_ = r.Stop()
 }
 
 func TestRequestWithThaiKeyword(t *testing.T) {
-	r, _ := recorder.New("tests/fixture/vcr/thai_keyword")
+	r, err := recorder.New("tests/fixture/vcr/thai_keyword")
+	if err != nil {
+		log.Error(errorconf.RecordInitializeFailure, err)
+	}
 
-	resp, _ := Request("สวัสดี", r)
+	resp, requestErr := Request("สวัสดี", r)
+
+	err = r.Stop()
+	if err != nil {
+		log.Error(errorconf.RecordStopFailure, err)
+	}
 
 	p, err := ioutil.ReadAll(resp.Body)
 	isGoogleSearchPage := err == nil && strings.Index(string(p), "<title>สวัสดี") > 0
 
-	assert.Equal(t, nil, err)
+	assert.Equal(t, nil, requestErr)
 	assert.Equal(t, true, isGoogleSearchPage)
-
-	_ = r.Stop()
 }

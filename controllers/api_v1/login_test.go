@@ -10,9 +10,11 @@ import (
 	"testing"
 
 	"github.com/gutakk/go-google-scraper/config"
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/controllers"
 	"github.com/gutakk/go-google-scraper/controllers/api_v1"
 	"github.com/gutakk/go-google-scraper/db"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/oauth"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
@@ -24,7 +26,6 @@ import (
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/go-oauth2/oauth2/v4/errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
@@ -37,18 +38,19 @@ func init() {
 
 	err := os.Chdir(path_test.GetRoot())
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(errorconf.ChangeToRootDirFailure, err)
 	}
 
 	config.LoadEnv()
+
 	err = oauth.SetupOAuthServer()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(errorconf.StartOAuthServerFailure, err)
 	}
 
 	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
 	}
 
 	db.GetDB = func() *gorm.DB {
@@ -57,7 +59,7 @@ func init() {
 
 	err = db.GetDB().AutoMigrate(&models.User{})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(errorconf.MigrateDatabaseFailure, err)
 	}
 }
 
@@ -78,7 +80,7 @@ func (s *LoginAPIControllerDbTestSuite) SetupTest() {
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
 	if err != nil {
-		log.Error(err)
+		log.Error(errorconf.HashPasswordFailure, err)
 	}
 
 	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
@@ -92,7 +94,7 @@ func (s *LoginAPIControllerDbTestSuite) SetupTest() {
 	}
 	data, err := json.Marshal(s.oauthClient)
 	if err != nil {
-		log.Error(err)
+		log.Error(errorconf.JSONMarshalFailure, err)
 	}
 	s.oauthClient.Data = data
 
@@ -125,25 +127,25 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithValidParams() {
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Error(err)
+		log.Error(errorconf.ReadResponseBodyFailure, err)
 	}
 	var parsedRespBody map[string]string
 	err = json.Unmarshal(respBodyData, &parsedRespBody)
 	if err != nil {
-		log.Error(err)
+		log.Error(errorconf.JSONUnmarshalFailure, err)
 	}
 
 	var data []byte
 	row := db.GetDB().Table("oauth2_tokens").Select("data").Row()
 	err = row.Scan(&data)
 	if err != nil {
-		log.Error(err)
+		log.Error(errorconf.ScanRowFailure, err)
 	}
 
 	var dataVal map[string]interface{}
 	err = json.Unmarshal(data, &dataVal)
 	if err != nil {
-		log.Error(err)
+		log.Error(errorconf.JSONUnmarshalFailure, err)
 	}
 
 	assert.Equal(s.T(), http.StatusOK, resp.Code)
@@ -163,13 +165,13 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithInvalidGrantType() 
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Error(err)
+		log.Error(errorconf.ReadResponseBodyFailure, err)
 	}
 
 	var parsedRespBody map[string]string
 	err = json.Unmarshal(respBodyData, &parsedRespBody)
 	if err != nil {
-		log.Error(err)
+		log.Error(errorconf.JSONUnmarshalFailure, err)
 	}
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
@@ -187,13 +189,13 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithInvalidClientID() {
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Error(err)
+		log.Error(errorconf.ReadResponseBodyFailure, err)
 	}
 
 	var parsedRespBody map[string]string
 	err = json.Unmarshal(respBodyData, &parsedRespBody)
 	if err != nil {
-		log.Error(err)
+		log.Error(errorconf.JSONUnmarshalFailure, err)
 	}
 
 	// TODO: This need to be status unauthorized
@@ -212,13 +214,13 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithInvalidClientSecret
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
 	respBodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Error(err)
+		log.Error(errorconf.ReadResponseBodyFailure, err)
 	}
 
 	var parsedRespBody map[string]string
 	err = json.Unmarshal(respBodyData, &parsedRespBody)
 	if err != nil {
-		log.Error(err)
+		log.Error(errorconf.JSONUnmarshalFailure, err)
 	}
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)

@@ -2,10 +2,9 @@ package jobs
 
 import (
 	"errors"
-	"fmt"
-	"log"
 	"time"
 
+	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/services/google_search_service"
 
@@ -33,7 +32,7 @@ func (c *Context) PerformSearchJob(job *work.Job) error {
 	keywordID := uint(job.ArgInt64("keywordID"))
 	keyword := job.ArgString("keyword")
 	if keywordID == 0 {
-		log.Printf("Cannot perform job (reason: %v)", invalidKeywordIDError)
+		log.Error("Failed to perform job: ", invalidKeywordIDError)
 		return errors.New(invalidKeywordIDError)
 	}
 
@@ -44,31 +43,31 @@ func (c *Context) PerformSearchJob(job *work.Job) error {
 	}
 
 	// Update status to processing before start executing job
-	updateStatusErr := google_search_service.UpdateKeywordStatus(keywordID, models.Processing, nil)
-	if updateStatusErr != nil {
-		updateStatusToFailed(job.Fails, jobName, keywordID, keyword, updateStatusErr)
-		return updateStatusErr
+	err := google_search_service.UpdateKeywordStatus(keywordID, models.Processing, nil)
+	if err != nil {
+		updateStatusToFailed(job.Fails, jobName, keywordID, keyword, err)
+		return err
 	}
 
 	// Request for Google html
-	resp, reqErr := google_search_service.Request(keyword, nil)
-	if reqErr != nil {
-		updateStatusToFailed(job.Fails, jobName, keywordID, keyword, reqErr)
-		return reqErr
+	resp, err := google_search_service.Request(keyword, nil)
+	if err != nil {
+		updateStatusToFailed(job.Fails, jobName, keywordID, keyword, err)
+		return err
 	}
 
 	// Parse Google response
-	parsingResult, parseErr := google_search_service.ParseGoogleResponse(resp)
-	if parseErr != nil {
-		updateStatusToFailed(job.Fails, jobName, keywordID, keyword, parseErr)
-		return parseErr
+	parsingResult, err := google_search_service.ParseGoogleResponse(resp)
+	if err != nil {
+		updateStatusToFailed(job.Fails, jobName, keywordID, keyword, err)
+		return err
 	}
 
 	// Update keyword with parsing result
-	updateKeywordErr := google_search_service.UpdateKeywordWithParsingResult(keywordID, parsingResult)
-	if updateKeywordErr != nil {
-		updateStatusToFailed(job.Fails, jobName, keywordID, keyword, updateKeywordErr)
-		return updateKeywordErr
+	err = google_search_service.UpdateKeywordWithParsingResult(keywordID, parsingResult)
+	if err != nil {
+		updateStatusToFailed(job.Fails, jobName, keywordID, keyword, err)
+		return err
 	}
 
 	end := time.Since(start)
@@ -80,14 +79,14 @@ func (c *Context) PerformSearchJob(job *work.Job) error {
 
 // Update status to failed when (jobFails + 1) reach MaxFails. Note: Job won't retry if jobFails reach MaxFails
 // So this need to be done at jobFails + 1
-func updateStatusToFailed(jobFails int64, jobName string, keywordID uint, keyword string, err error) {
+func updateStatusToFailed(jobFails int64, jobName string, keywordID uint, keyword string, failedReason error) {
 	if int(jobFails)+1 >= MaxFails {
-		updateStatusErr := google_search_service.UpdateKeywordStatus(keywordID, models.Failed, err)
+		err := google_search_service.UpdateKeywordStatus(keywordID, models.Failed, failedReason)
 
-		if updateStatusErr != nil {
-			panic(fmt.Sprintf("Cannot update keyword status (reason: %v)", updateStatusErr))
+		if err != nil {
+			log.Fatal("Failed to update keyword status: ", err)
 		}
 
-		log.Printf("Job %v for keyword %v reached maximum fails (reason: %v)", jobName, keyword, err.Error())
+		log.Printf("Job %v for keyword %v reached maximum fails (reason: %v)", jobName, keyword, failedReason)
 	}
 }

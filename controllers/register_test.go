@@ -2,13 +2,14 @@ package controllers
 
 import (
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
 
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
@@ -34,12 +35,19 @@ type RegisterDbTestSuite struct {
 }
 
 func (s *RegisterDbTestSuite) SetupTest() {
-	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	if err != nil {
+		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
+	}
+
 	db.GetDB = func() *gorm.DB {
 		return database
 	}
 
-	_ = db.GetDB().AutoMigrate(&models.User{})
+	err = db.GetDB().AutoMigrate(&models.User{})
+	if err != nil {
+		log.Fatal(errorconf.MigrateDatabaseFailure, err)
+	}
 
 	s.engine = testConfig.GetRouter(true)
 	new(RegisterController).applyRoutes(EnsureGuestUserGroup(s.engine))
@@ -125,7 +133,7 @@ func (s *RegisterDbTestSuite) TestRegisterWithTooShortPasswordValidation() {
 func (s *RegisterDbTestSuite) TestDisplayRegisterWithAuthenticatedUser() {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(s.password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Fatalf("Cannot hash password: %s", err)
+		log.Error(errorconf.HashPasswordFailure, err)
 	}
 	user := models.User{Email: s.email, Password: string(hashedPassword)}
 	db.GetDB().Create(&user)

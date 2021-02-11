@@ -3,8 +3,10 @@ package models
 import (
 	"errors"
 
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
-	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	"github.com/gutakk/go-google-scraper/helpers/log"
+
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -29,10 +31,14 @@ func SaveUser(email string, password string) error {
 		return errors.New("Email or password cannot be blank")
 	}
 
-	hashedPassword, _ := hashPassword(password)
+	hashedPassword, err := hashPassword(password)
+	if err != nil {
+		log.Error(errorconf.HashPasswordFailure, err)
+	}
 
-	if result := db.GetDB().Create(&User{Email: email, Password: string(hashedPassword)}); result.Error != nil {
-		return errorHandler.DatabaseErrorMessage(result.Error)
+	result := db.GetDB().Create(&User{Email: email, Password: string(hashedPassword)})
+	if result.Error != nil {
+		return result.Error
 	}
 	return nil
 }

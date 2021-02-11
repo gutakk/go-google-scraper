@@ -4,9 +4,12 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/bxcodec/faker/v3"
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+
+	"github.com/bxcodec/faker/v3"
 	"github.com/jackc/pgconn"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
@@ -21,15 +24,26 @@ type KeywordDBTestSuite struct {
 }
 
 func (s *KeywordDBTestSuite) SetupTest() {
-	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
+	if err != nil {
+		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
+	}
+
 	db.GetDB = func() *gorm.DB {
 		return database
 	}
 
 	testDB.InitKeywordStatusEnum(db.GetDB())
-	_ = db.GetDB().AutoMigrate(&User{}, &Keyword{})
+	err = db.GetDB().AutoMigrate(&User{}, &Keyword{})
+	if err != nil {
+		log.Fatal(errorconf.MigrateDatabaseFailure, err)
+	}
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
+	if err != nil {
+		log.Error(errorconf.HashPasswordFailure, err)
+	}
+
 	user := User{Email: faker.Email(), Password: string(hashedPassword)}
 	db.GetDB().Create(&user)
 	s.userID = user.ID
@@ -45,8 +59,15 @@ func TestKeywordDBTestSuite(t *testing.T) {
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
-	nonAdwordLinks, _ := json.Marshal([]string{"test-non-ads-link"})
-	topPositionAdwordLinks, _ := json.Marshal([]string{"test-top-ads-link"})
+	nonAdwordLinks, err := json.Marshal([]string{"test-non-ads-link"})
+	if err != nil {
+		log.Error(errorconf.JSONMarshalFailure, err)
+	}
+
+	topPositionAdwordLinks, err := json.Marshal([]string{"test-top-ads-link"})
+	if err != nil {
+		log.Error(errorconf.JSONMarshalFailure, err)
+	}
 
 	keyword := Keyword{
 		Keyword:                 "Hazard",
@@ -61,15 +82,21 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 		UserID:                  s.userID,
 	}
 
-	result, err := SaveKeyword(keyword, nil)
+	result, resultError := SaveKeyword(keyword, nil)
 
 	var nonAdwordLinksVal []string
-	_ = json.Unmarshal(result.NonAdwordLinks, &nonAdwordLinksVal)
+	err = json.Unmarshal(result.NonAdwordLinks, &nonAdwordLinksVal)
+	if err != nil {
+		log.Error(errorconf.JSONUnmarshalFailure, err)
+	}
 
 	var topPositionAdwordLinksVal []string
-	_ = json.Unmarshal(result.TopPositionAdwordLinks, &topPositionAdwordLinksVal)
+	err = json.Unmarshal(result.TopPositionAdwordLinks, &topPositionAdwordLinksVal)
+	if err != nil {
+		log.Error(errorconf.JSONUnmarshalFailure, err)
+	}
 
-	assert.Equal(s.T(), nil, err)
+	assert.Equal(s.T(), nil, resultError)
 	assert.Equal(s.T(), "Hazard", result.Keyword)
 	assert.Equal(s.T(), Pending, result.Status)
 	assert.Equal(s.T(), 100, result.LinksCount)

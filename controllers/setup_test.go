@@ -4,14 +4,19 @@ import (
 	"os"
 	"testing"
 
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
+	"github.com/gutakk/go-google-scraper/helpers/log"
+	"github.com/gutakk/go-google-scraper/tests/path_test"
+
 	"github.com/gin-gonic/gin"
 )
 
 func TestMain(m *testing.M) {
 	gin.SetMode(gin.TestMode)
 
-	if err := os.Chdir(".."); err != nil {
-		panic(err)
+	err := os.Chdir(path_test.GetRoot())
+	if err != nil {
+		log.Fatal(errorconf.ChangeToRootDirFailure, err)
 	}
 
 	os.Exit(m.Run())

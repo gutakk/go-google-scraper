@@ -11,6 +11,7 @@ import (
 
 	"github.com/gutakk/go-google-scraper/db"
 	errorHandler "github.com/gutakk/go-google-scraper/helpers/error_handler"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/services/google_search_service"
 
@@ -62,22 +63,17 @@ func (k *KeywordService) Save(parsedKeywordList []string) error {
 	for _, value := range parsedKeywordList {
 		keyword := models.Keyword{Keyword: value, UserID: k.CurrentUserID}
 
-		txErr := db.GetDB().Transaction(func(tx *gorm.DB) error {
+		err := db.GetDB().Transaction(func(tx *gorm.DB) error {
 			savedKeyword, err := models.SaveKeyword(keyword, tx)
 			if err != nil {
 				return errorHandler.DatabaseErrorMessage(err)
 			}
 
-			enqueueErr := google_search_service.EnqueueSearchJob(savedKeyword)
-			if enqueueErr != nil {
-				return enqueueErr
-			}
-
-			return nil
+			return google_search_service.EnqueueSearchJob(savedKeyword)
 		})
 
-		if txErr != nil {
-			return txErr
+		if err != nil {
+			return err
 		}
 	}
 
@@ -85,8 +81,8 @@ func (k *KeywordService) Save(parsedKeywordList []string) error {
 }
 
 func (k *KeywordService) ReadFile(filename string) ([]string, error) {
-	csvfile, openErr := os.Open(filename)
-	if openErr != nil {
+	csvfile, err := os.Open(filename)
+	if err != nil {
 		return nil, errors.New(cannotOpenFileError)
 	}
 
@@ -107,9 +103,17 @@ func (k *KeywordService) ReadFile(filename string) ([]string, error) {
 
 func (k *KeywordService) UploadFile(c *gin.Context, file *multipart.FileHeader) string {
 	path := "dist/"
-	_ = os.Mkdir(path, 0755)
+	err := os.Mkdir(path, 0755)
+	if err != nil {
+		log.Error("Failed to create directory: ", err)
+	}
+
 	filename := filepath.Join(path, filepath.Base(file.Filename))
-	_ = c.SaveUploadedFile(file, filename)
+	err = c.SaveUploadedFile(file, filename)
+	if err != nil {
+		log.Error("Failed to save uploaded file: ", err)
+	}
+
 	return filename
 }
 

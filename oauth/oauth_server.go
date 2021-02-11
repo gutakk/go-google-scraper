@@ -2,10 +2,10 @@ package oauth
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/gutakk/go-google-scraper/db"
+	"github.com/gutakk/go-google-scraper/helpers/log"
 
 	"github.com/go-oauth2/oauth2/v4/errors"
 	"github.com/go-oauth2/oauth2/v4/manage"

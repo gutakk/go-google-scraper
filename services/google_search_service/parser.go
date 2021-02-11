@@ -53,7 +53,10 @@ var ParseGoogleResponse = func(googleResp *http.Response) (ParsingResult, error)
 	go fetchNonAdwordLinks(doc, parsingCh.fetchNonAdwordLinksCh)
 	go fetchTopPositionAdwordLinks(doc, parsingCh.fetchTopPositionAdwordLinksCh)
 
-	htmlCode, _ := doc.Html()
+	htmlCode, err := doc.Html()
+	if err != nil {
+		return ParsingResult{}, err
+	}
 
 	parsingResult := parsingCh.getParsingResultFromChannel()
 	parsingResult.HtmlCode = htmlCode
