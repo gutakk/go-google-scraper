@@ -1,0 +1,27 @@
+{{ if .notice }}
+  <div class="alert alert--success">
+    {{ .notice }}
+  </div>
+{{ end }}
+
+{{ if .noticeFlashes }}
+  <div class="alert alert--success">
+    {{ range $notice := .noticeFlashes }}
+      {{ $notice }}
+    {{ end }}
+  </div>
+{{ end }}
+
+{{ if .errorFlashes }}
+  <div class="alert alert--danger">
+    {{ range $error := .errorFlashes }}
+      {{ $error }}
+    {{ end }}
+  </div>
+{{ end }}
+
+{{ if .error }}
+  <div class="alert alert--danger">
+    {{ .error }}
+  </div>
+{{ end }}

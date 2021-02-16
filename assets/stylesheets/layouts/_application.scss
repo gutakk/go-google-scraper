@@ -1,0 +1,9 @@
+.layout-application {
+  body {
+    @apply min-h-screen;
+  }
+  
+  .app-main {
+    @apply py-10 px-16;
+  }
+}

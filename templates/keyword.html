@@ -1,0 +1,63 @@
+{{ define "content" }}
+
+<div class="keyword-container">
+  <h2>Upload CSV</h2>
+  
+  {{ include "partials/flashes" }}
+  
+  <form class="form-keyword-upload space-y-6" action="/keyword" enctype="multipart/form-data" method="POST">
+    <input name="file" type="file" required accept=".csv">
+  
+    <button type="submit">
+      Upload
+    </button>
+  </form>
+
+  <form class="form-keyword-filter space-y-6" action="/keyword" method="GET">
+    <div class="form-keyword-filter__input-container space-x-6">
+      {{ template "filter_keyword_input" filterKeywordPartialInput .data.filter "Keyword title" "text" "form-keyword-filter__text-input" "filter[keyword]" "eg. apple" }}
+      {{ template "filter_keyword_input" filterKeywordPartialInput .data.filter "URL in links" "text" "form-keyword-filter__text-input" "filter[url]" "eg. wikipedia" }}
+    </div>
+    <div>
+      {{ template "filter_keyword_input" filterKeywordPartialInput .data.filter "Adwords" "checkbox" "form-keyword-filter__checkbox-input" "filter[is_adword_advertiser]" "" }}
+    </div>
+    <button class="form-keyword-filter__button" type="submit">Search</button>
+  </form>
+
+  {{ if .data.keywordPresenters }}
+    <div class="list-keyword sm:rounded-lg">
+      <table class="list-keyword__table divide-y divide-gray-200">
+        <thead>
+          <tr>
+            <th scope="col">Keyword</th>
+            <th scope="col">Uploaded date</th>
+            <th scope="col">Status</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        
+        <tbody>
+          {{ range $k := .data.keywordPresenters }}
+            <tr>
+              <td><strong>{{ $k.Keyword.Keyword }}</strong></td>
+              <td>{{ $k.FormattedCreatedAt }}</td>
+              <td>
+                <span class="keyword-status keyword-status--{{ $k.Keyword.Status }}">{{ $k.Keyword.Status }}</span>
+              </td>
+              <td class="keyword-action">
+                {{ if eq $k.Keyword.Status "processed" }}
+                  <a href="/keyword/{{ $k.Keyword.ID }}">
+                    <img src="/dist/svg/document.svg">
+                  </a>
+                {{ end }}
+              </td>
+            </tr>
+          {{ end }}
+        </tbody>
+      </table>
+    </div>
+  {{ end }}
+</div>
+
+
+{{ end }}

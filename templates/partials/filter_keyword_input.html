@@ -1,0 +1,25 @@
+{{ define "filter_keyword_input" }}
+
+<div class="space-y-2">
+  <label>{{ .filterLabel }}</label>
+
+  {{ if eq .inputType "text" }}
+    <input 
+      class={{ .className }}
+      name={{ .filterName }}
+      type="text"
+      placeholder={{ .filterPlaceholder }}
+      value={{ .filter }}>
+  {{ end }}
+
+  {{ if eq .inputType "checkbox" }}
+    <input 
+      class={{ .className }}
+      name={{ .filterName }}
+      type="checkbox"
+      value="true"
+      {{ if .filter }} checked {{ end }}>
+  {{ end }}
+</div>
+
+{{ end }}

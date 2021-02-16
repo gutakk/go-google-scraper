@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+
+<html class="layout-authentication">
+  <head>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link type="text/css" rel="stylesheet" href="/dist/stylesheets/index.css" />
+    <title>{{ .title }}</title>
+  </head>
+
+  <body class="{{ .view }}">
+    {{ include "partials/nav" }}
+    
+    <main class="auth-main">
+      <div class="auth-main__content">
+        <img class="auth-main__image" src="/dist/images/google-go.jpg">
+        {{ template "content" . }}
+      </div>
+    </main>
+    <script src="/dist/javascripts/index.js"></script>
+  </body>
+</html>

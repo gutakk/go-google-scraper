@@ -1,0 +1,17 @@
+form {
+  @apply mt-8;
+}
+
+[type="email"],
+[type="password"],
+[type="text"] {
+  @apply relative block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md;
+
+  &:focus {
+    @apply outline-none border-indigo-500 z-10;
+  }
+}
+
+[type="checkbox"] {
+  cursor: pointer;
+}

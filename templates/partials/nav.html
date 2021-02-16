@@ -1,0 +1,19 @@
+<nav class="navigation">
+  <div>
+    <a href="/"><img class="navigation__logo" src="/dist/images/google-go.jpg"></img></a>
+  </div>
+
+  {{ if .data.authenticatedUser }}
+    <div>
+      <a class="navigation__link" href="/keyword">Keyword</a>
+      <form class="navigation__form" action="/logout" method="POST">
+        <button class="navigation__button" type="submit">Logout</button>
+      </form>
+    </div>
+  {{ else }}
+    <div>
+      <a class="navigation__link" href="/login">Login</a>
+      <a class="navigation__link" href="/register">Register</a>
+    </div>
+  {{ end }}
+</nav>

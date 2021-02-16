@@ -1,0 +1,16 @@
+version: "3.5"
+
+services:
+  db_test:
+    image: postgres:12.1
+    container_name: go_google_scraper_db_test
+    environment:
+      - POSTGRES_DB=go_google_scraper_test
+    ports:
+      - "5433:5432"
+
+  redis_test:
+    image: redis:5.0.7
+    container_name: go_google_scraper_redis_test
+    ports:
+      - "6380:6379"

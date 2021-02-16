@@ -1,0 +1,24 @@
+{{ define "content" }}
+
+<h2 class="auth-main__title">
+  Register a new account
+</h2>
+
+{{ include "partials/flashes" }}
+
+<form class="mt-8 space-y-6" action="/register" method="POST">
+  <input name="email" type="email" required placeholder="Email address" value={{.data.email}}>
+  <input name="password" type="password" required placeholder="Password">
+  <input name="confirm-password" type="password" required placeholder="Confirm Password">
+
+  <button type="submit">
+    Register
+  </button>
+</form>
+
+<p class="auth-main__content--small">
+  Already have an account?
+  <a href="/login">Login</a>
+</p>
+
+{{ end }}

@@ -1,0 +1,21 @@
+body.not-found {
+  .error-details {
+    @apply text-center mt-16;
+  
+    &__title {
+      @apply text-6xl;
+    }
+  
+    &__subtitle {
+      @apply text-gray-600 text-2xl font-medium mb-8;
+    }
+  
+    &__detail {
+      @apply text-gray-700 text-sm;
+    }
+  
+    &__link {
+      @apply text-sm;
+    }
+  }
+}
