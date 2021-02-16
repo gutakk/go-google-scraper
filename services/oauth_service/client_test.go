@@ -10,7 +10,7 @@ import (
 	"github.com/gutakk/go-google-scraper/services/oauth_service"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
-	"github.com/gutakk/go-google-scraper/tests/oauth_test"
+	testOauth "github.com/gutakk/go-google-scraper/tests/oauth_test"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/gin-gonic/gin"
@@ -44,7 +44,7 @@ func TestOAuthControllerDbTestSuite(t *testing.T) {
 
 func (s *OAuthControllerDbTestSuite) TestGenerateClient() {
 	oauthClient, err := oauth_service.GenerateClient()
-	var result oauth_test.OAuthClient
+	var result testOauth.OAuthClient
 	db.GetDB().Table("oauth2_clients").Select("id", "secret", "domain").Scan(&result)
 
 	assert.Equal(s.T(), oauthClient.ClientID, result.ID)

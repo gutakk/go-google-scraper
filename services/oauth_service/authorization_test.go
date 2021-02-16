@@ -11,7 +11,7 @@ import (
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/fabricator"
-	"github.com/gutakk/go-google-scraper/tests/oauth_test"
+	testOauth "github.com/gutakk/go-google-scraper/tests/oauth_test"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/bxcodec/faker/v3"
@@ -36,13 +36,13 @@ func init() {
 type LoginAPIServiceDbTestSuite struct {
 	suite.Suite
 	user        models.User
-	oauthClient oauth_test.OAuthClient
+	oauthClient testOauth.OAuthClient
 }
 
 func (s *LoginAPIServiceDbTestSuite) SetupTest() {
 	user := fabricator.FabricateUser(faker.Email(), "password")
 
-	s.oauthClient = oauth_test.OAuthClient{
+	s.oauthClient = testOauth.OAuthClient{
 		ID:     "client-id",
 		Secret: "client-secret",
 		Domain: "http://localhost:8080",

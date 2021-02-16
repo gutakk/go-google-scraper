@@ -14,7 +14,7 @@ import (
 	"github.com/gutakk/go-google-scraper/tests/fabricator"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 	testjson "github.com/gutakk/go-google-scraper/tests/json"
-	"github.com/gutakk/go-google-scraper/tests/oauth_test"
+	testOauth "github.com/gutakk/go-google-scraper/tests/oauth_test"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/bxcodec/faker/v3"
@@ -40,7 +40,7 @@ type LoginAPIControllerDbTestSuite struct {
 	suite.Suite
 	engine      *gin.Engine
 	user        models.User
-	oauthClient oauth_test.OAuthClient
+	oauthClient testOauth.OAuthClient
 	headers     http.Header
 }
 
@@ -53,7 +53,7 @@ func (s *LoginAPIControllerDbTestSuite) SetupTest() {
 	user := fabricator.FabricateUser(faker.Email(), "password")
 	s.user = user
 
-	s.oauthClient = oauth_test.OAuthClient{
+	s.oauthClient = testOauth.OAuthClient{
 		ID:     "client-id",
 		Secret: "client-secret",
 		Domain: "http://localhost:8080",

@@ -17,7 +17,7 @@ import (
 	testFile "github.com/gutakk/go-google-scraper/tests/file"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 	testjson "github.com/gutakk/go-google-scraper/tests/json"
-	"github.com/gutakk/go-google-scraper/tests/oauth_test"
+	testOauth "github.com/gutakk/go-google-scraper/tests/oauth_test"
 	"github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/bxcodec/faker/v3"
@@ -54,7 +54,7 @@ func (s *KeywordAPIControllerDbTestSuite) SetupTest() {
 	user := fabricator.FabricateUser(faker.Email(), "password")
 	s.user = user
 
-	tokenItem := &oauth_test.TokenStoreItem{
+	tokenItem := &testOauth.TokenStoreItem{
 		CreatedAt: time.Now(),
 		ExpiresAt: time.Now(),
 		Code:      "test-code",
@@ -62,7 +62,7 @@ func (s *KeywordAPIControllerDbTestSuite) SetupTest() {
 		Refresh:   "test-refresh",
 	}
 
-	data := testjson.JSONMarshaler(&oauth_test.TokenData{
+	data := testjson.JSONMarshaler(&testOauth.TokenData{
 		Access: tokenItem.Access,
 		UserID: fmt.Sprint(s.user.ID),
 	})
@@ -162,7 +162,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithInvalidKeywordID()
 }
 
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParamsButNotTheResourceOwner() {
-	tokenItem := &oauth_test.TokenStoreItem{
+	tokenItem := &testOauth.TokenStoreItem{
 		CreatedAt: time.Now(),
 		ExpiresAt: time.Now(),
 		Code:      "test-code",
@@ -170,7 +170,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParamsButNotT
 		Refresh:   "test-refresh",
 	}
 
-	data := testjson.JSONMarshaler(&oauth_test.TokenData{
+	data := testjson.JSONMarshaler(&testOauth.TokenData{
 		Access: tokenItem.Access,
 		UserID: "invalidUserID",
 	})
@@ -240,7 +240,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithInvalidAccessTo
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithExpiredAccessToken() {
 	db.GetDB().Exec("DELETE FROM oauth2_tokens")
 
-	tokenItem := &oauth_test.TokenStoreItem{
+	tokenItem := &testOauth.TokenStoreItem{
 		CreatedAt: time.Now(),
 		ExpiresAt: time.Now(),
 		Code:      "test-code",
@@ -248,7 +248,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithExpiredAccessTo
 		Refresh:   "test-refresh",
 	}
 
-	data := testjson.JSONMarshaler(&oauth_test.TokenData{
+	data := testjson.JSONMarshaler(&testOauth.TokenData{
 		AccessExpiresIn: 1,
 		Access:          tokenItem.Access,
 	})
@@ -311,7 +311,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNoK
 }
 
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNotTheResourceOwner() {
-	tokenItem := &oauth_test.TokenStoreItem{
+	tokenItem := &testOauth.TokenStoreItem{
 		CreatedAt: time.Now(),
 		ExpiresAt: time.Now(),
 		Code:      "test-code",
@@ -319,7 +319,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNot
 		Refresh:   "test-refresh",
 	}
 
-	data := testjson.JSONMarshaler(&oauth_test.TokenData{
+	data := testjson.JSONMarshaler(&testOauth.TokenData{
 		Access: tokenItem.Access,
 		UserID: "invalidUserID",
 	})
@@ -378,7 +378,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithInvalidAccessT
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithExpiredAccessToken() {
 	db.GetDB().Exec("DELETE FROM oauth2_tokens")
 
-	tokenItem := &oauth_test.TokenStoreItem{
+	tokenItem := &testOauth.TokenStoreItem{
 		CreatedAt: time.Now(),
 		ExpiresAt: time.Now(),
 		Code:      "test-code",
@@ -386,7 +386,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithExpiredAccessT
 		Refresh:   "test-refresh",
 	}
 
-	data := testjson.JSONMarshaler(&oauth_test.TokenData{
+	data := testjson.JSONMarshaler(&testOauth.TokenData{
 		AccessExpiresIn: 1,
 		Access:          tokenItem.Access,
 	})
@@ -451,7 +451,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithInvalidAccessT
 func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithExpiredAccessToken() {
 	db.GetDB().Exec("DELETE FROM oauth2_tokens")
 
-	tokenItem := &oauth_test.TokenStoreItem{
+	tokenItem := &testOauth.TokenStoreItem{
 		CreatedAt: time.Now(),
 		ExpiresAt: time.Now(),
 		Code:      "test-code",
@@ -459,7 +459,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithExpiredAccessT
 		Refresh:   "test-refresh",
 	}
 
-	data := testjson.JSONMarshaler(&oauth_test.TokenData{
+	data := testjson.JSONMarshaler(&testOauth.TokenData{
 		AccessExpiresIn: 1,
 		Access:          tokenItem.Access,
 	})
