@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestJSONAPIFormatWithValidKeywords(t *testing.T) {
+func testJsonAPIFormatWithValidKeywords(t *testing.T) {
 	keywordsSerializer := serializers.KeywordsSerializer{
 		Keywords: []models.Keyword{
 			{
@@ -98,7 +98,7 @@ func TestJSONAPIFormatWithValidKeywords(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
-func TestJSONAPIFormatWithBlankKeywords(t *testing.T) {
+func testJsonAPIFormatWithBlankKeywords(t *testing.T) {
 	keywordsSerializer := serializers.KeywordsSerializer{}
 	result := keywordsSerializer.JSONAPIFormat()
 

@@ -10,7 +10,7 @@ import (
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
-	testjson "github.com/gutakk/go-google-scraper/tests/json"
+	testJson "github.com/gutakk/go-google-scraper/tests/json"
 	testPath "github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/gin-gonic/gin"
@@ -56,14 +56,14 @@ func (s *OAuthControllerDbTestSuite) TestGenerateClientWithValidBasicAuth() {
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string]api_helper.DataResponseObject
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	v, _ := parsedRespBody["data"].Attributes.(map[string]interface{})
 
 	data := testDB.Scan("oauth2_clients", "data")
 
 	var dataVal map[string]interface{}
-	testjson.JSONUnmarshaler(data, &dataVal)
+	testJson.JSONUnmarshaler(data, &dataVal)
 
 	assert.Equal(s.T(), http.StatusCreated, resp.Code)
 	assert.Equal(s.T(), v["client_id"], dataVal["ID"])

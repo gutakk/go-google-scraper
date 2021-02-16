@@ -16,7 +16,7 @@ import (
 	"github.com/gutakk/go-google-scraper/tests/fabricator"
 	testFile "github.com/gutakk/go-google-scraper/tests/file"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
-	testjson "github.com/gutakk/go-google-scraper/tests/json"
+	testJson "github.com/gutakk/go-google-scraper/tests/json"
 	testOauth "github.com/gutakk/go-google-scraper/tests/oauth_test"
 	testPath "github.com/gutakk/go-google-scraper/tests/path_test"
 
@@ -62,7 +62,7 @@ func (s *KeywordAPIControllerDbTestSuite) SetupTest() {
 		Refresh:   "test-refresh",
 	}
 
-	data := testjson.JSONMarshaler(&testOauth.TokenData{
+	data := testJson.JSONMarshaler(&testOauth.TokenData{
 		Access: tokenItem.Access,
 		UserID: fmt.Sprint(s.user.ID),
 	})
@@ -110,7 +110,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParams() {
 	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", headers, nil)
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 	var parsedRespBody map[string]api_helper.DataResponseObject
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	data := parsedRespBody["data"]
 	attributes, _ := parsedRespBody["data"].Attributes.(map[string]interface{})
@@ -155,7 +155,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithInvalidKeywordID()
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusNotFound, resp.Code)
 	assert.Equal(s.T(), "keyword not found", parsedRespBody["errors"][0].Detail)
@@ -170,7 +170,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParamsButNotT
 		Refresh:   "test-refresh",
 	}
 
-	data := testjson.JSONMarshaler(&testOauth.TokenData{
+	data := testJson.JSONMarshaler(&testOauth.TokenData{
 		Access: tokenItem.Access,
 		UserID: "invalidUserID",
 	})
@@ -206,7 +206,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParamsButNotT
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusNotFound, resp.Code)
 	assert.Equal(s.T(), "keyword not found", parsedRespBody["errors"][0].Detail)
@@ -217,7 +217,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithoutAuthorizatio
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -231,7 +231,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithInvalidAccessTo
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -248,7 +248,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithExpiredAccessTo
 		Refresh:   "test-refresh",
 	}
 
-	data := testjson.JSONMarshaler(&testOauth.TokenData{
+	data := testJson.JSONMarshaler(&testOauth.TokenData{
 		AccessExpiresIn: 1,
 		Access:          tokenItem.Access,
 	})
@@ -270,7 +270,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithExpiredAccessTo
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrExpiredAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -287,7 +287,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParams() {
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.DataResponseObject
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	respValue, _ := parsedRespBody["data"][0].Attributes.(map[string]interface{})
 
@@ -304,7 +304,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNoK
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.DataResponseObject
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusOK, resp.Code)
 	assert.Equal(s.T(), 0, len(parsedRespBody["data"]))
@@ -319,7 +319,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNot
 		Refresh:   "test-refresh",
 	}
 
-	data := testjson.JSONMarshaler(&testOauth.TokenData{
+	data := testJson.JSONMarshaler(&testOauth.TokenData{
 		Access: tokenItem.Access,
 		UserID: "invalidUserID",
 	})
@@ -344,7 +344,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNot
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.DataResponseObject
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusOK, resp.Code)
 	assert.Equal(s.T(), 0, len(parsedRespBody["data"]))
@@ -355,7 +355,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithoutAuthorizati
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -369,7 +369,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithInvalidAccessT
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -386,7 +386,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithExpiredAccessT
 		Refresh:   "test-refresh",
 	}
 
-	data := testjson.JSONMarshaler(&testOauth.TokenData{
+	data := testJson.JSONMarshaler(&testOauth.TokenData{
 		AccessExpiresIn: 1,
 		Access:          tokenItem.Access,
 	})
@@ -408,7 +408,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithExpiredAccessT
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrExpiredAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -428,7 +428,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithoutAuthorizati
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -442,7 +442,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithInvalidAccessT
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -459,7 +459,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithExpiredAccessT
 		Refresh:   "test-refresh",
 	}
 
-	data := testjson.JSONMarshaler(&testOauth.TokenData{
+	data := testJson.JSONMarshaler(&testOauth.TokenData{
 		AccessExpiresIn: 1,
 		Access:          tokenItem.Access,
 	})
@@ -481,7 +481,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithExpiredAccessT
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrExpiredAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -495,7 +495,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithAccessTokenBut
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusBadRequest, resp.Code)
 	assert.Equal(s.T(), "invalid file", parsedRespBody["errors"][0].Detail)
@@ -509,7 +509,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithAccessTokenBut
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusBadRequest, resp.Code)
 	assert.Equal(s.T(), "invalid file", parsedRespBody["errors"][0].Detail)

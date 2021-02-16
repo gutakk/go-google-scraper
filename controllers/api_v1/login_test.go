@@ -13,7 +13,7 @@ import (
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/fabricator"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
-	testjson "github.com/gutakk/go-google-scraper/tests/json"
+	testJson "github.com/gutakk/go-google-scraper/tests/json"
 	testOauth "github.com/gutakk/go-google-scraper/tests/oauth_test"
 	testPath "github.com/gutakk/go-google-scraper/tests/path_test"
 
@@ -58,7 +58,7 @@ func (s *LoginAPIControllerDbTestSuite) SetupTest() {
 		Secret: "client-secret",
 		Domain: "http://localhost:8080",
 	}
-	data := testjson.JSONMarshaler(s.oauthClient)
+	data := testJson.JSONMarshaler(s.oauthClient)
 	s.oauthClient.Data = data
 
 	db.GetDB().Exec("INSERT INTO oauth2_clients VALUES(?, ?, ?, ?)",
@@ -91,12 +91,12 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithValidParams() {
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string]string
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	data := testDB.Scan("oauth2_tokens", "data")
 
 	var dataVal map[string]interface{}
-	testjson.JSONUnmarshaler(data, &dataVal)
+	testJson.JSONUnmarshaler(data, &dataVal)
 
 	assert.Equal(s.T(), http.StatusOK, resp.Code)
 	assert.Equal(s.T(), parsedRespBody["access_token"], dataVal["Access"])
@@ -116,7 +116,7 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithInvalidGrantType() 
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string]string
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrUnsupportedGrantType.Error(), parsedRespBody["error"])
@@ -134,7 +134,7 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithInvalidClientID() {
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string]string
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	// TODO: This need to be status unauthorized
 	assert.Equal(s.T(), http.StatusInternalServerError, resp.Code)
@@ -153,7 +153,7 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithInvalidClientSecret
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string]string
-	testjson.JSONUnmarshaler(respBodyData, &parsedRespBody)
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidClient.Error(), parsedRespBody["error"])

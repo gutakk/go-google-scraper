@@ -7,7 +7,7 @@ import (
 	"github.com/gutakk/go-google-scraper/models"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/fabricator"
-	testjson "github.com/gutakk/go-google-scraper/tests/json"
+	testJson "github.com/gutakk/go-google-scraper/tests/json"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/jackc/pgconn"
@@ -37,8 +37,8 @@ func TestKeywordDBTestSuite(t *testing.T) {
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
-	nonAdwordLinks := testjson.JSONMarshaler([]string{"test-non-ads-link"})
-	topPositionAdwordLinks := testjson.JSONMarshaler([]string{"test-top-ads-link"})
+	nonAdwordLinks := testJson.JSONMarshaler([]string{"test-non-ads-link"})
+	topPositionAdwordLinks := testJson.JSONMarshaler([]string{"test-top-ads-link"})
 
 	keyword := models.Keyword{
 		Keyword:                 "Hazard",
@@ -56,10 +56,10 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 	result, resultError := models.SaveKeyword(keyword, nil)
 
 	var nonAdwordLinksVal []string
-	testjson.JSONUnmarshaler(result.NonAdwordLinks, &nonAdwordLinksVal)
+	testJson.JSONUnmarshaler(result.NonAdwordLinks, &nonAdwordLinksVal)
 
 	var topPositionAdwordLinksVal []string
-	testjson.JSONUnmarshaler(result.TopPositionAdwordLinks, &topPositionAdwordLinksVal)
+	testJson.JSONUnmarshaler(result.TopPositionAdwordLinks, &topPositionAdwordLinksVal)
 
 	assert.Equal(s.T(), nil, resultError)
 	assert.Equal(s.T(), "Hazard", result.Keyword)

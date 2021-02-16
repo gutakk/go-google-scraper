@@ -7,7 +7,7 @@ import (
 	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
-	testjson "github.com/gutakk/go-google-scraper/tests/json"
+	testJson "github.com/gutakk/go-google-scraper/tests/json"
 
 	"github.com/gocraft/work"
 	"github.com/gomodule/redigo/redis"
@@ -51,7 +51,7 @@ func (s *JobEnqueuerTestSuite) TestEnqueueSearchJobWithValidSavedKeyword() {
 	}
 
 	var job work.Job
-	testjson.JSONUnmarshaler(rawJSON, &job)
+	testJson.JSONUnmarshaler(rawJSON, &job)
 
 	assert.Equal(s.T(), nil, enqueueJobErr)
 	assert.Equal(s.T(), "search", job.Name)
