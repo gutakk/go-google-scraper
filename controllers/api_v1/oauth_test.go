@@ -11,7 +11,7 @@ import (
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 	testjson "github.com/gutakk/go-google-scraper/tests/json"
-	"github.com/gutakk/go-google-scraper/tests/path_test"
+	testPath "github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
@@ -21,7 +21,7 @@ import (
 func init() {
 	gin.SetMode(gin.TestMode)
 
-	path_test.ChangeToRootDir()
+	testPath.ChangeToRootDir()
 
 	config.LoadEnv()
 

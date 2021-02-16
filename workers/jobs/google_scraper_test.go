@@ -12,7 +12,7 @@ import (
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/fabricator"
 	testjob "github.com/gutakk/go-google-scraper/tests/job"
-	"github.com/gutakk/go-google-scraper/tests/path_test"
+	testPath "github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
@@ -24,7 +24,7 @@ import (
 func init() {
 	gin.SetMode(gin.TestMode)
 
-	path_test.ChangeToRootDir()
+	testPath.ChangeToRootDir()
 
 	config.LoadEnv()
 }
