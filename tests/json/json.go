@@ -10,7 +10,7 @@ import (
 func JSONMarshaler(value interface{}) []byte {
 	data, err := json.Marshal(value)
 	if err != nil {
-		log.Error(errorconf.JSONMarshalFailure, err)
+		log.Fatal(errorconf.JSONMarshalFailure, err)
 	}
 
 	return data
@@ -19,6 +19,6 @@ func JSONMarshaler(value interface{}) []byte {
 func JSONUnmarshaler(data []byte, v interface{}) {
 	err := json.Unmarshal(data, &v)
 	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
+		log.Fatal(errorconf.JSONUnmarshalFailure, err)
 	}
 }

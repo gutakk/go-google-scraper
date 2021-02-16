@@ -13,7 +13,7 @@ func EnqueueJob(enqueuer *work.Enqueuer, args map[string]interface{}) *work.Job 
 		args,
 	)
 	if err != nil {
-		log.Error(errorconf.EnqueueJobFailure, err)
+		log.Fatal(errorconf.EnqueueJobFailure, err)
 	}
 
 	return job

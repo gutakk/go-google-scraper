@@ -86,7 +86,7 @@ func Scan(table string, column string) []byte {
 	row := db.GetDB().Table(table).Select(column).Row()
 	err := row.Scan(&data)
 	if err != nil {
-		log.Error(errorconf.ScanRowFailure, err)
+		log.Fatal(errorconf.ScanRowFailure, err)
 	}
 
 	return data

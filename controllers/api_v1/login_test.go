@@ -90,7 +90,7 @@ func (s *LoginAPIControllerDbTestSuite) TestGenerateTokenWithValidParams() {
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/login", s.headers, formData)
 	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
-	var parsedRespBody map[string]string
+	var parsedRespBody map[string]interface{}
 	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	data := testDB.Scan("oauth2_tokens", "data")

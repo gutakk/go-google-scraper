@@ -51,7 +51,7 @@ func ReadResponseBody(respBody interface{}) []byte {
 	}
 
 	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
+		log.Fatal(errorconf.ReadResponseBodyFailure, err)
 	}
 
 	return bodyByte
@@ -64,7 +64,7 @@ func ValidateResponseBody(bodyByte []byte, expected string) bool {
 func NewRecorder(cassetteName string) *recorder.Recorder {
 	recorder, err := recorder.New(cassetteName)
 	if err != nil {
-		log.Error(errorconf.RecorderInitializeFailure, err)
+		log.Fatal(errorconf.RecorderInitializeFailure, err)
 	}
 
 	return recorder
@@ -73,7 +73,7 @@ func NewRecorder(cassetteName string) *recorder.Recorder {
 func StopRecorder(recorder *recorder.Recorder) {
 	err := recorder.Stop()
 	if err != nil {
-		log.Error(errorconf.RecorderStopFailure, err)
+		log.Fatal(errorconf.RecorderStopFailure, err)
 	}
 }
 
@@ -81,12 +81,12 @@ func PerformClientRequest(url string, recorder *recorder.Recorder) *http.Respons
 	client := &http.Client{Transport: recorder}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		log.Error(errorconf.RequestInitializeFailure, err)
+		log.Fatal(errorconf.RequestInitializeFailure, err)
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Error(errorconf.RequestFailure, err)
+		log.Fatal(errorconf.RequestFailure, err)
 	}
 
 	return resp

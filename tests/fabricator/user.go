@@ -12,7 +12,7 @@ import (
 func FabricateUser(email string, password string) models.User {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Error(errorconf.HashPasswordFailure, err)
+		log.Fatal(errorconf.HashPasswordFailure, err)
 	}
 
 	user := models.User{Email: email, Password: string(hashedPassword)}
