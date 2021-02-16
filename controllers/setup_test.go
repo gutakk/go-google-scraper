@@ -1,12 +1,11 @@
-package controllers
+package controllers_test
 
 import (
 	"os"
 	"testing"
 
-	errorconf "github.com/gutakk/go-google-scraper/config/error"
-	"github.com/gutakk/go-google-scraper/helpers/log"
-	"github.com/gutakk/go-google-scraper/tests/path_test"
+	"github.com/gutakk/go-google-scraper/config"
+	testPath "github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,10 +13,9 @@ import (
 func TestMain(m *testing.M) {
 	gin.SetMode(gin.TestMode)
 
-	err := os.Chdir(path_test.GetRoot())
-	if err != nil {
-		log.Fatal(errorconf.ChangeToRootDirFailure, err)
-	}
+	testPath.ChangeToRootDir()
+
+	config.LoadEnv()
 
 	os.Exit(m.Run())
 }

@@ -2,69 +2,42 @@ package api_v1_test
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"os"
 	"testing"
 	"time"
 
 	"github.com/gutakk/go-google-scraper/config"
-	errorconf "github.com/gutakk/go-google-scraper/config/error"
-	"github.com/gutakk/go-google-scraper/controllers"
-	"github.com/gutakk/go-google-scraper/controllers/api_v1"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/helpers/api_helper"
-	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
-	"github.com/gutakk/go-google-scraper/oauth"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	"github.com/gutakk/go-google-scraper/tests/fabricator"
 	testFile "github.com/gutakk/go-google-scraper/tests/file"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
-	"github.com/gutakk/go-google-scraper/tests/oauth_test"
-	"github.com/gutakk/go-google-scraper/tests/path_test"
+	testJson "github.com/gutakk/go-google-scraper/tests/json"
+	testOauth "github.com/gutakk/go-google-scraper/tests/oauth_test"
+	testPath "github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/go-oauth2/oauth2/v4/errors"
 	"github.com/stretchr/testify/suite"
-	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func init() {
 	gin.SetMode(gin.TestMode)
 
-	err := os.Chdir(path_test.GetRoot())
-	if err != nil {
-		log.Fatal(errorconf.ChangeToRootDirFailure, err)
-	}
+	testPath.ChangeToRootDir()
 
 	config.LoadEnv()
 
-	err = oauth.SetupOAuthServer()
-	if err != nil {
-		log.Fatal(errorconf.StartOAuthServerFailure, err)
-	}
+	testConfig.SetupTestOAuthServer()
 
-	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
-	if err != nil {
-		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
-	}
-
-	db.GetDB = func() *gorm.DB {
-		return database
-	}
-
-	testDB.InitKeywordStatusEnum(db.GetDB())
-	err = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
-	if err != nil {
-		log.Fatal(errorconf.MigrateDatabaseFailure, err)
-	}
+	testDB.SetupTestDatabase()
 }
 
 type KeywordAPIControllerDbTestSuite struct {
@@ -76,19 +49,12 @@ type KeywordAPIControllerDbTestSuite struct {
 func (s *KeywordAPIControllerDbTestSuite) SetupTest() {
 	db.SetupRedisPool()
 
-	s.engine = testConfig.GetRouter(false)
-	new(api_v1.KeywordAPIController).ApplyRoutes(controllers.PrivateAPIGroup(s.engine.Group("/api/v1")))
+	s.engine = testConfig.SetupTestRouter()
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
-	if err != nil {
-		log.Error(errorconf.HashPasswordFailure, err)
-	}
-
-	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
-	db.GetDB().Create(&user)
+	user := fabricator.FabricateUser(faker.Email(), "password")
 	s.user = user
 
-	tokenItem := &oauth_test.TokenStoreItem{
+	tokenItem := &testOauth.TokenStoreItem{
 		CreatedAt: time.Now(),
 		ExpiresAt: time.Now(),
 		Code:      "test-code",
@@ -96,13 +62,10 @@ func (s *KeywordAPIControllerDbTestSuite) SetupTest() {
 		Refresh:   "test-refresh",
 	}
 
-	data, err := json.Marshal(&oauth_test.TokenData{
+	data := testJson.JSONMarshaler(&testOauth.TokenData{
 		Access: tokenItem.Access,
 		UserID: fmt.Sprint(s.user.ID),
 	})
-	if err != nil {
-		log.Error(errorconf.JSONMarshalFailure, err)
-	}
 	tokenItem.Data = data
 
 	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
@@ -119,10 +82,7 @@ func (s *KeywordAPIControllerDbTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM keywords")
 	db.GetDB().Exec("DELETE FROM users")
 	db.GetDB().Exec("DELETE FROM oauth2_tokens")
-	_, err := db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
-	if err != nil {
-		log.Fatal(errorconf.DeleteRedisJobFailure, err)
-	}
+	testDB.DeleteRedisJob()
 }
 
 func TestKeywordAPIControllerDbTestSuite(t *testing.T) {
@@ -148,15 +108,9 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParams() {
 	headers.Set("Authorization", "Bearer test-access")
 
 	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", headers, nil)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
 	var parsedRespBody map[string]api_helper.DataResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	data := parsedRespBody["data"]
 	attributes, _ := parsedRespBody["data"].Attributes.(map[string]interface{})
@@ -198,22 +152,17 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithInvalidKeywordID()
 	headers.Set("Authorization", "Bearer test-access")
 
 	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/9999", headers, nil)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
+
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusNotFound, resp.Code)
 	assert.Equal(s.T(), "keyword not found", parsedRespBody["errors"][0].Detail)
 }
 
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParamsButNotTheResourceOwner() {
-	tokenItem := &oauth_test.TokenStoreItem{
+	tokenItem := &testOauth.TokenStoreItem{
 		CreatedAt: time.Now(),
 		ExpiresAt: time.Now(),
 		Code:      "test-code",
@@ -221,13 +170,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParamsButNotT
 		Refresh:   "test-refresh",
 	}
 
-	data, err := json.Marshal(&oauth_test.TokenData{
+	data := testJson.JSONMarshaler(&testOauth.TokenData{
 		Access: tokenItem.Access,
 		UserID: "invalidUserID",
 	})
-	if err != nil {
-		log.Error(errorconf.JSONMarshalFailure, err)
-	}
 	tokenItem.Data = data
 
 	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
@@ -257,15 +203,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParamsButNotT
 	headers.Set("Authorization", "Bearer test-not-resource-owner")
 
 	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", headers, nil)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
+
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusNotFound, resp.Code)
 	assert.Equal(s.T(), "keyword not found", parsedRespBody["errors"][0].Detail)
@@ -273,15 +214,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordWithValidParamsButNotT
 
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithoutAuthorizationHeader() {
 	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", nil, nil)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
+
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -292,15 +228,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithInvalidAccessTo
 	headers.Set("Authorization", "invalid_token")
 
 	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", headers, nil)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
+
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -309,7 +240,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithInvalidAccessTo
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithExpiredAccessToken() {
 	db.GetDB().Exec("DELETE FROM oauth2_tokens")
 
-	tokenItem := &oauth_test.TokenStoreItem{
+	tokenItem := &testOauth.TokenStoreItem{
 		CreatedAt: time.Now(),
 		ExpiresAt: time.Now(),
 		Code:      "test-code",
@@ -317,13 +248,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithExpiredAccessTo
 		Refresh:   "test-refresh",
 	}
 
-	data, err := json.Marshal(&oauth_test.TokenData{
+	data := testJson.JSONMarshaler(&testOauth.TokenData{
 		AccessExpiresIn: 1,
 		Access:          tokenItem.Access,
 	})
-	if err != nil {
-		log.Error(errorconf.JSONMarshalFailure, err)
-	}
 	tokenItem.Data = data
 
 	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
@@ -339,15 +267,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordAPIWithExpiredAccessTo
 	headers.Set("Authorization", "Bearer test-access")
 
 	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords/1", headers, nil)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
+
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrExpiredAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -361,16 +284,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParams() {
 	headers.Set("Authorization", "Bearer test-access")
 
 	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.DataResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	respValue, _ := parsedRespBody["data"][0].Attributes.(map[string]interface{})
 
@@ -384,23 +301,17 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNoK
 	headers.Set("Authorization", "Bearer test-access")
 
 	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.DataResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusOK, resp.Code)
 	assert.Equal(s.T(), 0, len(parsedRespBody["data"]))
 }
 
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNotTheResourceOwner() {
-	tokenItem := &oauth_test.TokenStoreItem{
+	tokenItem := &testOauth.TokenStoreItem{
 		CreatedAt: time.Now(),
 		ExpiresAt: time.Now(),
 		Code:      "test-code",
@@ -408,13 +319,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNot
 		Refresh:   "test-refresh",
 	}
 
-	data, err := json.Marshal(&oauth_test.TokenData{
+	data := testJson.JSONMarshaler(&testOauth.TokenData{
 		Access: tokenItem.Access,
 		UserID: "invalidUserID",
 	})
-	if err != nil {
-		log.Error(errorconf.JSONMarshalFailure, err)
-	}
 	tokenItem.Data = data
 
 	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
@@ -433,16 +341,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNot
 	headers.Set("Authorization", "Bearer test-not-resource-owner")
 
 	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.DataResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusOK, resp.Code)
 	assert.Equal(s.T(), 0, len(parsedRespBody["data"]))
@@ -450,16 +352,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsWithValidParamsButNot
 
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithoutAuthorizationHeader() {
 	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", nil, nil)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -470,16 +366,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithInvalidAccessT
 	headers.Set("Authorization", "invalid_token")
 
 	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -488,7 +378,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithInvalidAccessT
 func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithExpiredAccessToken() {
 	db.GetDB().Exec("DELETE FROM oauth2_tokens")
 
-	tokenItem := &oauth_test.TokenStoreItem{
+	tokenItem := &testOauth.TokenStoreItem{
 		CreatedAt: time.Now(),
 		ExpiresAt: time.Now(),
 		Code:      "test-code",
@@ -496,13 +386,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithExpiredAccessT
 		Refresh:   "test-refresh",
 	}
 
-	data, err := json.Marshal(&oauth_test.TokenData{
+	data := testJson.JSONMarshaler(&testOauth.TokenData{
 		AccessExpiresIn: 1,
 		Access:          tokenItem.Access,
 	})
-	if err != nil {
-		log.Error(errorconf.JSONMarshalFailure, err)
-	}
 	tokenItem.Data = data
 
 	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
@@ -518,16 +405,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestFetchKeywordsAPIWithExpiredAccessT
 	headers.Set("Authorization", "Bearer test-access")
 
 	resp := testHttp.PerformRequest(s.engine, "GET", "/api/v1/keywords", headers, nil)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrExpiredAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -544,16 +425,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithValidParams() 
 
 func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithoutAuthorizationHeader() {
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", nil, nil)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -564,16 +439,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithInvalidAccessT
 	headers.Set("Authorization", "invalid_token")
 
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", headers, nil)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrInvalidAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -582,7 +451,7 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithInvalidAccessT
 func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithExpiredAccessToken() {
 	db.GetDB().Exec("DELETE FROM oauth2_tokens")
 
-	tokenItem := &oauth_test.TokenStoreItem{
+	tokenItem := &testOauth.TokenStoreItem{
 		CreatedAt: time.Now(),
 		ExpiresAt: time.Now(),
 		Code:      "test-code",
@@ -590,13 +459,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithExpiredAccessT
 		Refresh:   "test-refresh",
 	}
 
-	data, err := json.Marshal(&oauth_test.TokenData{
+	data := testJson.JSONMarshaler(&testOauth.TokenData{
 		AccessExpiresIn: 1,
 		Access:          tokenItem.Access,
 	})
-	if err != nil {
-		log.Error(errorconf.JSONMarshalFailure, err)
-	}
 	tokenItem.Data = data
 
 	db.GetDB().Exec("INSERT INTO oauth2_tokens(created_at, expires_at, code, access, refresh, data) VALUES(?, ?, ?, ?, ?, ?)",
@@ -612,16 +478,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithExpiredAccessT
 	headers.Set("Authorization", "Bearer test-access")
 
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", headers, nil)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusUnauthorized, resp.Code)
 	assert.Equal(s.T(), errors.ErrExpiredAccessToken.Error(), parsedRespBody["errors"][0].Detail)
@@ -632,16 +492,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithAccessTokenBut
 	headers.Set("Authorization", "Bearer test-access")
 
 	resp := testHttp.PerformRequest(s.engine, "POST", "/api/v1/keywords", headers, nil)
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusBadRequest, resp.Code)
 	assert.Equal(s.T(), "invalid file", parsedRespBody["errors"][0].Detail)
@@ -652,16 +506,10 @@ func (s *KeywordAPIControllerDbTestSuite) TestUploadKeywordAPIWithAccessTokenBut
 	headers.Set("Authorization", "Bearer test-access")
 
 	resp := testHttp.PerformFileUploadRequest(s.engine, "POST", "/api/v1/keywords", headers, &bytes.Buffer{})
-	respBodyData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(errorconf.ReadResponseBodyFailure, err)
-	}
+	respBodyData := testHttp.ReadResponseBody(resp.Body)
 
 	var parsedRespBody map[string][]api_helper.ErrorResponseObject
-	err = json.Unmarshal(respBodyData, &parsedRespBody)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(respBodyData, &parsedRespBody)
 
 	assert.Equal(s.T(), http.StatusBadRequest, resp.Code)
 	assert.Equal(s.T(), "invalid file", parsedRespBody["errors"][0].Detail)

@@ -2,25 +2,24 @@ package tests
 
 import (
 	"github.com/gutakk/go-google-scraper/config"
-	"github.com/gutakk/go-google-scraper/middlewares"
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
+	"github.com/gutakk/go-google-scraper/controllers"
+	"github.com/gutakk/go-google-scraper/helpers/log"
+	"github.com/gutakk/go-google-scraper/oauth"
 
-	"github.com/foolin/goview/supports/ginview"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
 
 // Helper function to create a router during testing
-func GetRouter(withTemplates bool) *gin.Engine {
-	router := gin.Default()
-	store := cookie.NewStore([]byte("secret"))
-	router.Use(sessions.Sessions("go-google-scraper", store))
-	router.Use(middlewares.CurrentUser)
+func SetupTestRouter() *gin.Engine {
+	engine := config.SetupRouter()
+	controllers.CombineRoutes(engine)
+	return engine
+}
 
-	if withTemplates {
-		router.HTMLRender = ginview.New(config.AppGoviewConfig())
-		router.Static("/dist", "./dist")
+func SetupTestOAuthServer() {
+	err := oauth.SetupOAuthServer()
+	if err != nil {
+		log.Fatal(errorconf.StartOAuthServerFailure, err)
 	}
-
-	return router
 }

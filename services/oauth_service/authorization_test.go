@@ -2,75 +2,47 @@ package oauth_service_test
 
 import (
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/gutakk/go-google-scraper/config"
-	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
-	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
-	"github.com/gutakk/go-google-scraper/oauth"
 	"github.com/gutakk/go-google-scraper/services/oauth_service"
+	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
-	"github.com/gutakk/go-google-scraper/tests/oauth_test"
-	"github.com/gutakk/go-google-scraper/tests/path_test"
+	"github.com/gutakk/go-google-scraper/tests/fabricator"
+	testOauth "github.com/gutakk/go-google-scraper/tests/oauth_test"
+	testPath "github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/go-oauth2/oauth2/v4/errors"
 	"github.com/stretchr/testify/suite"
-	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 func init() {
 	gin.SetMode(gin.TestMode)
 
-	err := os.Chdir(path_test.GetRoot())
-	if err != nil {
-		log.Fatal(errorconf.ChangeToRootDirFailure, err)
-	}
+	testPath.ChangeToRootDir()
 
 	config.LoadEnv()
-	err = oauth.SetupOAuthServer()
-	if err != nil {
-		log.Fatal(errorconf.StartOAuthServerFailure, err)
-	}
 
-	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
-	if err != nil {
-		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
-	}
+	testConfig.SetupTestOAuthServer()
 
-	db.GetDB = func() *gorm.DB {
-		return database
-	}
-
-	err = db.GetDB().AutoMigrate(&models.User{})
-	if err != nil {
-		log.Fatal(errorconf.MigrateDatabaseFailure, err)
-	}
+	testDB.SetupTestDatabase()
 }
 
 type LoginAPIServiceDbTestSuite struct {
 	suite.Suite
 	user        models.User
-	oauthClient oauth_test.OAuthClient
+	oauthClient testOauth.OAuthClient
 }
 
 func (s *LoginAPIServiceDbTestSuite) SetupTest() {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
-	if err != nil {
-		log.Error(errorconf.HashPasswordFailure, err)
-	}
+	user := fabricator.FabricateUser(faker.Email(), "password")
 
-	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
-	db.GetDB().Create(&user)
-
-	s.oauthClient = oauth_test.OAuthClient{
+	s.oauthClient = testOauth.OAuthClient{
 		ID:     "client-id",
 		Secret: "client-secret",
 		Domain: "http://localhost:8080",

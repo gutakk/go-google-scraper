@@ -1,14 +1,13 @@
 package google_search_service
 
 import (
-	"encoding/json"
 	"testing"
 
-	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
 	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	testJson "github.com/gutakk/go-google-scraper/tests/json"
 
 	"github.com/gocraft/work"
 	"github.com/gomodule/redigo/redis"
@@ -26,10 +25,7 @@ func (s *JobEnqueuerTestSuite) SetupTest() {
 }
 
 func (s *JobEnqueuerTestSuite) TearDownTest() {
-	_, err := db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
-	if err != nil {
-		log.Fatal(errorconf.DeleteRedisJobFailure, err)
-	}
+	testDB.DeleteRedisJob()
 }
 
 func TestJobEnqueuerTestSuite(t *testing.T) {
@@ -55,10 +51,7 @@ func (s *JobEnqueuerTestSuite) TestEnqueueSearchJobWithValidSavedKeyword() {
 	}
 
 	var job work.Job
-	err = json.Unmarshal(rawJSON, &job)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(rawJSON, &job)
 
 	assert.Equal(s.T(), nil, enqueueJobErr)
 	assert.Equal(s.T(), "search", job.Name)

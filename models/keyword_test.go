@@ -1,21 +1,18 @@
-package models
+package models_test
 
 import (
-	"encoding/json"
 	"testing"
 
-	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
-	"github.com/gutakk/go-google-scraper/helpers/log"
+	"github.com/gutakk/go-google-scraper/models"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	"github.com/gutakk/go-google-scraper/tests/fabricator"
+	testJson "github.com/gutakk/go-google-scraper/tests/json"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/jackc/pgconn"
 	"github.com/stretchr/testify/suite"
-	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 type KeywordDBTestSuite struct {
@@ -24,28 +21,9 @@ type KeywordDBTestSuite struct {
 }
 
 func (s *KeywordDBTestSuite) SetupTest() {
-	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
-	if err != nil {
-		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
-	}
+	testDB.SetupTestDatabase()
 
-	db.GetDB = func() *gorm.DB {
-		return database
-	}
-
-	testDB.InitKeywordStatusEnum(db.GetDB())
-	err = db.GetDB().AutoMigrate(&User{}, &Keyword{})
-	if err != nil {
-		log.Fatal(errorconf.MigrateDatabaseFailure, err)
-	}
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
-	if err != nil {
-		log.Error(errorconf.HashPasswordFailure, err)
-	}
-
-	user := User{Email: faker.Email(), Password: string(hashedPassword)}
-	db.GetDB().Create(&user)
+	user := fabricator.FabricateUser(faker.Email(), faker.Password())
 	s.userID = user.ID
 }
 
@@ -59,19 +37,12 @@ func TestKeywordDBTestSuite(t *testing.T) {
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
-	nonAdwordLinks, err := json.Marshal([]string{"test-non-ads-link"})
-	if err != nil {
-		log.Error(errorconf.JSONMarshalFailure, err)
-	}
+	nonAdwordLinks := testJson.JSONMarshaler([]string{"test-non-ads-link"})
+	topPositionAdwordLinks := testJson.JSONMarshaler([]string{"test-top-ads-link"})
 
-	topPositionAdwordLinks, err := json.Marshal([]string{"test-top-ads-link"})
-	if err != nil {
-		log.Error(errorconf.JSONMarshalFailure, err)
-	}
-
-	keyword := Keyword{
+	keyword := models.Keyword{
 		Keyword:                 "Hazard",
-		Status:                  Pending,
+		Status:                  models.Pending,
 		LinksCount:              100,
 		NonAdwordsCount:         20,
 		NonAdwordLinks:          nonAdwordLinks,
@@ -82,23 +53,17 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 		UserID:                  s.userID,
 	}
 
-	result, resultError := SaveKeyword(keyword, nil)
+	result, resultError := models.SaveKeyword(keyword, nil)
 
 	var nonAdwordLinksVal []string
-	err = json.Unmarshal(result.NonAdwordLinks, &nonAdwordLinksVal)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(result.NonAdwordLinks, &nonAdwordLinksVal)
 
 	var topPositionAdwordLinksVal []string
-	err = json.Unmarshal(result.TopPositionAdwordLinks, &topPositionAdwordLinksVal)
-	if err != nil {
-		log.Error(errorconf.JSONUnmarshalFailure, err)
-	}
+	testJson.JSONUnmarshaler(result.TopPositionAdwordLinks, &topPositionAdwordLinksVal)
 
 	assert.Equal(s.T(), nil, resultError)
 	assert.Equal(s.T(), "Hazard", result.Keyword)
-	assert.Equal(s.T(), Pending, result.Status)
+	assert.Equal(s.T(), models.Pending, result.Status)
 	assert.Equal(s.T(), 100, result.LinksCount)
 	assert.Equal(s.T(), 20, result.NonAdwordsCount)
 	assert.Equal(s.T(), []string{"test-non-ads-link"}, nonAdwordLinksVal)
@@ -109,93 +74,93 @@ func (s *KeywordDBTestSuite) TestSaveKeywordsWithValidParams() {
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidKeywordValue() {
-	keyword := Keyword{
+	keyword := models.Keyword{
 		Keyword: "", UserID: s.userID,
 	}
 
-	result, err := SaveKeyword(keyword, nil)
+	result, err := models.SaveKeyword(keyword, nil)
 
 	assert.Equal(s.T(), nil, err)
 	assert.Equal(s.T(), "", result.Keyword)
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidUserID() {
-	keyword := Keyword{
+	keyword := models.Keyword{
 		Keyword: "Hazard", UserID: 99999999,
 	}
 
-	result, err := SaveKeyword(keyword, nil)
+	result, err := models.SaveKeyword(keyword, nil)
 	errVal, isPgError := err.(*pgconn.PgError)
 
 	assert.Equal(s.T(), "23503", errVal.Code)
 	assert.Equal(s.T(), true, isPgError)
-	assert.Equal(s.T(), Keyword{}, result)
+	assert.Equal(s.T(), models.Keyword{}, result)
 }
 
 func (s *KeywordDBTestSuite) TestSaveKeywordsWithInvalidKeywordStatus() {
-	keyword := Keyword{
+	keyword := models.Keyword{
 		Status: "test",
 	}
 
-	result, err := SaveKeyword(keyword, nil)
+	result, err := models.SaveKeyword(keyword, nil)
 
 	assert.Equal(s.T(), "invalid keyword status", err.Error())
-	assert.Equal(s.T(), Keyword{}, result)
+	assert.Equal(s.T(), models.Keyword{}, result)
 }
 
 func (s *KeywordDBTestSuite) TestGetKeywordByValidKeyword() {
-	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
 	condition := make(map[string]interface{})
 	condition["keyword"] = keyword.Keyword
 
-	result, err := GetKeywordBy(condition)
+	result, err := models.GetKeywordBy(condition)
 
 	assert.Equal(s.T(), keyword.Keyword, result.Keyword)
 	assert.Equal(s.T(), nil, err)
 }
 
 func (s *KeywordDBTestSuite) TestGetKeywordWithoutCondition() {
-	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	result, err := GetKeywordBy(nil)
+	result, err := models.GetKeywordBy(nil)
 
 	assert.Equal(s.T(), keyword.Keyword, result.Keyword)
 	assert.Equal(s.T(), nil, err)
 }
 
 func (s *KeywordDBTestSuite) TestGetKeywordByInvalidKeyword() {
-	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
 	condition := make(map[string]interface{})
 	condition["keyword"] = "invalid"
 
-	result, err := GetKeywordBy(condition)
+	result, err := models.GetKeywordBy(condition)
 
-	assert.Equal(s.T(), Keyword{}, result)
+	assert.Equal(s.T(), models.Keyword{}, result)
 	assert.Equal(s.T(), "record not found", err.Error())
 }
 
 func (s *KeywordDBTestSuite) TestGetKeywordByInvalidColumn() {
-	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
 	condition := make(map[string]interface{})
 	condition["unknown_column"] = keyword.Keyword
 
-	result, err := GetKeywordBy(condition)
+	result, err := models.GetKeywordBy(condition)
 	_, isPgError := err.(*pgconn.PgError)
 
 	assert.Equal(s.T(), "ERROR: column \"unknown_column\" does not exist (SQLSTATE 42703)", err.Error())
 	assert.Equal(s.T(), true, isPgError)
-	assert.Equal(s.T(), Keyword{}, result)
+	assert.Equal(s.T(), models.Keyword{}, result)
 }
 
 func (s *KeywordDBTestSuite) TestGetKeywordsByWithMoreThanOneRows() {
-	keywordList := []Keyword{
+	keywordList := []models.Keyword{
 		{Keyword: "Hazard", UserID: s.userID},
 		{Keyword: "Ronaldo", UserID: s.userID},
 		{Keyword: "Neymar", UserID: s.userID},
@@ -205,7 +170,7 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByWithMoreThanOneRows() {
 
 	db.GetDB().Create(&keywordList)
 
-	result, err := GetKeywordsBy(nil)
+	result, err := models.GetKeywordsBy(nil)
 
 	assert.Equal(s.T(), 5, len(result))
 	assert.Equal(s.T(), "Hazard", result[0].Keyword)
@@ -217,17 +182,17 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByWithMoreThanOneRows() {
 }
 
 func (s *KeywordDBTestSuite) TestGetKeywordsByValidKeywordStringCondition() {
-	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	conditions := []Condition{
+	conditions := []models.Condition{
 		{
 			ConditionName: "keyword",
 			Value:         keyword.Keyword,
 		},
 	}
 
-	result, err := GetKeywordsBy(conditions)
+	result, err := models.GetKeywordsBy(conditions)
 
 	assert.Equal(s.T(), 1, len(result))
 	assert.Equal(s.T(), keyword.Keyword, result[0].Keyword)
@@ -235,27 +200,27 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByValidKeywordStringCondition() {
 }
 
 func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidKeywordCondition() {
-	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	conditions := []Condition{
+	conditions := []models.Condition{
 		{
 			ConditionName: "keyword",
 			Value:         "invalid",
 		},
 	}
 
-	result, err := GetKeywordsBy(conditions)
+	result, err := models.GetKeywordsBy(conditions)
 
 	assert.Equal(s.T(), 0, len(result))
 	assert.Equal(s.T(), nil, err)
 }
 
 func (s *KeywordDBTestSuite) TestGetKeywordsByWithoutKeyword() {
-	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	result, err := GetKeywordsBy(nil)
+	result, err := models.GetKeywordsBy(nil)
 
 	assert.Equal(s.T(), 1, len(result))
 	assert.Equal(s.T(), keyword.Keyword, result[0].Keyword)
@@ -263,31 +228,31 @@ func (s *KeywordDBTestSuite) TestGetKeywordsByWithoutKeyword() {
 }
 
 func (s *KeywordDBTestSuite) TestGetKeywordsByInvalidColumnCondition() {
-	keyword := Keyword{UserID: s.userID, Keyword: faker.Name()}
+	keyword := models.Keyword{UserID: s.userID, Keyword: faker.Name()}
 	db.GetDB().Create(&keyword)
 
-	conditions := []Condition{
+	conditions := []models.Condition{
 		{
 			ConditionName: "unknown_column",
 			Value:         keyword.Keyword,
 		},
 	}
 
-	result, err := GetKeywordsBy(conditions)
+	result, err := models.GetKeywordsBy(conditions)
 
 	assert.Equal(s.T(), "could not join conditions", err.Error())
 	assert.Equal(s.T(), nil, result)
 }
 
 func (s *KeywordDBTestSuite) TestUpdateKeywordWithValidParams() {
-	keyword := Keyword{UserID: s.userID, Keyword: "Hazard"}
+	keyword := models.Keyword{UserID: s.userID, Keyword: "Hazard"}
 	db.GetDB().Create(&keyword)
 
-	newKeyword := Keyword{Keyword: "Ronaldo"}
+	newKeyword := models.Keyword{Keyword: "Ronaldo"}
 
-	err := UpdateKeyword(keyword.ID, newKeyword)
+	err := models.UpdateKeyword(keyword.ID, newKeyword)
 
-	var result Keyword
+	var result models.Keyword
 	db.GetDB().First(&result, keyword.ID)
 
 	assert.Equal(s.T(), nil, err)
@@ -296,32 +261,32 @@ func (s *KeywordDBTestSuite) TestUpdateKeywordWithValidParams() {
 }
 
 func (s *KeywordDBTestSuite) TestUpdateKeywordWithValidStatus() {
-	keyword := Keyword{UserID: s.userID, Keyword: "Hazard"}
+	keyword := models.Keyword{UserID: s.userID, Keyword: "Hazard"}
 	db.GetDB().Create(&keyword)
 
-	newKeyword := Keyword{Status: Processing}
+	newKeyword := models.Keyword{Status: models.Processing}
 
-	err := UpdateKeyword(keyword.ID, newKeyword)
+	err := models.UpdateKeyword(keyword.ID, newKeyword)
 
-	var result Keyword
+	var result models.Keyword
 	db.GetDB().First(&result, keyword.ID)
 
 	assert.Equal(s.T(), nil, err)
 	assert.Equal(s.T(), keyword.ID, result.ID)
 	assert.Equal(s.T(), "Hazard", result.Keyword)
-	assert.Equal(s.T(), Processing, result.Status)
+	assert.Equal(s.T(), models.Processing, result.Status)
 }
 
 func (s *KeywordDBTestSuite) TestUpdateKeywordWithInvalidKeywordID() {
-	keyword := Keyword{UserID: s.userID, Keyword: "Hazard"}
+	keyword := models.Keyword{UserID: s.userID, Keyword: "Hazard"}
 	db.GetDB().Create(&keyword)
 
-	newKeyword := Keyword{Keyword: "Ronaldo"}
+	newKeyword := models.Keyword{Keyword: "Ronaldo"}
 
 	invalidKeywordID := 999999
-	err := UpdateKeyword(uint(invalidKeywordID), newKeyword)
+	err := models.UpdateKeyword(uint(invalidKeywordID), newKeyword)
 
-	var result Keyword
+	var result models.Keyword
 	db.GetDB().First(&result, keyword.ID)
 
 	assert.Equal(s.T(), nil, err)
@@ -330,12 +295,12 @@ func (s *KeywordDBTestSuite) TestUpdateKeywordWithInvalidKeywordID() {
 }
 
 func (s *KeywordDBTestSuite) TestUpdateKeywordWithInvalidStatus() {
-	keyword := Keyword{UserID: s.userID, Keyword: "Hazard"}
+	keyword := models.Keyword{UserID: s.userID, Keyword: "Hazard"}
 	db.GetDB().Create(&keyword)
 
-	newKeyword := Keyword{Status: "invalid"}
+	newKeyword := models.Keyword{Status: "invalid"}
 
-	err := UpdateKeyword(keyword.ID, newKeyword)
+	err := models.UpdateKeyword(keyword.ID, newKeyword)
 
 	assert.Equal(s.T(), "invalid keyword status", err.Error())
 }

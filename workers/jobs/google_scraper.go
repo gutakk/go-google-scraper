@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/services/google_search_service"
@@ -32,7 +33,7 @@ func (c *Context) PerformSearchJob(job *work.Job) error {
 	keywordID := uint(job.ArgInt64("keywordID"))
 	keyword := job.ArgString("keyword")
 	if keywordID == 0 {
-		log.Error("Failed to perform job: ", invalidKeywordIDError)
+		log.Error(errorconf.PerformJobFailure, invalidKeywordIDError)
 		return errors.New(invalidKeywordIDError)
 	}
 
@@ -84,7 +85,7 @@ func updateStatusToFailed(jobFails int64, jobName string, keywordID uint, keywor
 		err := google_search_service.UpdateKeywordStatus(keywordID, models.Failed, failedReason)
 
 		if err != nil {
-			log.Fatal("Failed to update keyword status: ", err)
+			log.Fatal(errorconf.UpdateKeywordStatusFailure, err)
 		}
 
 		log.Printf("Job %v for keyword %v reached maximum fails (reason: %v)", jobName, keyword, failedReason)

@@ -1,20 +1,17 @@
-package controllers
+package controllers_test
 
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"strings"
 	"testing"
 
 	"github.com/gutakk/go-google-scraper/config"
-	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
-	"github.com/gutakk/go-google-scraper/helpers/log"
 	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	"github.com/gutakk/go-google-scraper/tests/fabricator"
 	testFile "github.com/gutakk/go-google-scraper/tests/file"
 	"github.com/gutakk/go-google-scraper/tests/fixture"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
@@ -22,10 +19,7 @@ import (
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
-	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 type KeywordDbTestSuite struct {
@@ -37,47 +31,21 @@ type KeywordDbTestSuite struct {
 func (s *KeywordDbTestSuite) SetupTest() {
 	config.LoadEnv()
 
-	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
-	if err != nil {
-		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
-	}
+	testDB.SetupTestDatabase()
 
-	db.GetDB = func() *gorm.DB {
-		return database
-	}
-
-	db.SetupRedisPool()
-
-	testDB.InitKeywordStatusEnum(db.GetDB())
-	err = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
-	if err != nil {
-		log.Fatal(errorconf.MigrateDatabaseFailure, err)
-	}
-
-	s.engine = testConfig.GetRouter(true)
-	new(LoginController).applyRoutes(EnsureGuestUserGroup(s.engine))
-	new(KeywordController).applyRoutes(EnsureAuthenticatedUserGroup(s.engine))
+	s.engine = testConfig.SetupTestRouter()
 
 	email := faker.Email()
 	password := faker.Password()
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		log.Error(errorconf.HashPasswordFailure, err)
-	}
-
-	user := models.User{Email: email, Password: string(hashedPassword)}
-	db.GetDB().Create(&user)
+	user := fabricator.FabricateUser(email, password)
 	s.userID = user.ID
 }
 
 func (s *KeywordDbTestSuite) TearDownTest() {
 	db.GetDB().Exec("DELETE FROM keywords")
 	db.GetDB().Exec("DELETE FROM users")
-	_, err := db.GetRedisPool().Get().Do("DEL", testDB.RedisKeyJobs("go-google-scraper", "search"))
-	if err != nil {
-		log.Fatal(errorconf.DeleteRedisJobFailure, err)
-	}
+	testDB.DeleteRedisJob()
 }
 
 func TestKeywordDbTestSuite(t *testing.T) {
@@ -91,8 +59,9 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordWithAuthenticatedUserWithoutFilte
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
 	response := testHttp.PerformRequest(s.engine, "GET", "/keyword", headers, nil)
-	p, err := ioutil.ReadAll(response.Body)
-	isKeywordPage := err == nil && strings.Index(string(p), "<title>Keyword</title>") > 0
+
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	isKeywordPage := testHttp.ValidateResponseBody(bodyByte, "<title>Keyword</title>")
 
 	assert.Equal(s.T(), http.StatusOK, response.Code)
 	assert.Equal(s.T(), true, isKeywordPage)
@@ -109,16 +78,16 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordWithAuthenticatedUserWithFilter()
 		"filter[url]=Test" +
 		"filter[is_adword_advertiser]=Test"
 	response := testHttp.PerformRequest(s.engine, "GET", url, headers, nil)
-	p, err := ioutil.ReadAll(response.Body)
-	isKeywordPage := err == nil && strings.Index(string(p), "<title>Keyword</title>") > 0
+
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	isKeywordPage := testHttp.ValidateResponseBody(bodyByte, "<title>Keyword</title>")
 
 	assert.Equal(s.T(), http.StatusOK, response.Code)
 	assert.Equal(s.T(), true, isKeywordPage)
 }
 
 func TestDisplayKeywordWithGuestUser(t *testing.T) {
-	engine := testConfig.GetRouter(true)
-	new(KeywordController).applyRoutes(EnsureAuthenticatedUserGroup(engine))
+	engine := testConfig.SetupTestRouter()
 
 	response := testHttp.PerformRequest(engine, "GET", "/keyword", nil, nil)
 
@@ -148,8 +117,9 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordResultWithAuthenticatedUserAndVal
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
 	response := testHttp.PerformRequest(s.engine, "GET", url, headers, nil)
-	p, err := ioutil.ReadAll(response.Body)
-	isKeywordResultPage := err == nil && strings.Index(string(p), keyword.Keyword) > 0
+
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	isKeywordResultPage := testHttp.ValidateResponseBody(bodyByte, keyword.Keyword)
 
 	assert.Equal(s.T(), http.StatusOK, response.Code)
 	assert.Equal(s.T(), true, isKeywordResultPage)
@@ -164,8 +134,9 @@ func (s *KeywordDbTestSuite) TestDisplayKeywordResultWithAuthenticatedUserButInv
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
 	response := testHttp.PerformRequest(s.engine, "GET", "/keyword/invalid-keyword", headers, nil)
-	p, err := ioutil.ReadAll(response.Body)
-	isNotFoundPage := err == nil && strings.Index(string(p), "<title>Not Found</title>") > 0
+
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	isNotFoundPage := testHttp.ValidateResponseBody(bodyByte, "<title>Not Found</title>")
 
 	assert.Equal(s.T(), http.StatusNotFound, response.Code)
 	assert.Equal(s.T(), true, isNotFoundPage)
@@ -256,9 +227,9 @@ func (s *KeywordDbTestSuite) TestUploadKeywordWithAuthenticatedUserAndBlankPaylo
 
 	response := testHttp.PerformFileUploadRequest(s.engine, "POST", "/keyword", headers, &bytes.Buffer{})
 
-	p, err := ioutil.ReadAll(response.Body)
-	isKeywordPage := err == nil && strings.Index(string(p), "<title>Keyword</title>") > 0
-	pageError := err == nil && strings.Index(string(p), "File is required") > 0
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	isKeywordPage := testHttp.ValidateResponseBody(bodyByte, "<title>Keyword</title>")
+	pageError := testHttp.ValidateResponseBody(bodyByte, "File is required")
 
 	assert.Equal(s.T(), http.StatusBadRequest, response.Code)
 	assert.Equal(s.T(), true, isKeywordPage)
@@ -266,8 +237,7 @@ func (s *KeywordDbTestSuite) TestUploadKeywordWithAuthenticatedUserAndBlankPaylo
 }
 
 func TestUploadKeywordWithGuestUser(t *testing.T) {
-	engine := testConfig.GetRouter(true)
-	new(KeywordController).applyRoutes(EnsureAuthenticatedUserGroup(engine))
+	engine := testConfig.SetupTestRouter()
 
 	response := testHttp.PerformRequest(engine, "POST", "/keyword", nil, nil)
 

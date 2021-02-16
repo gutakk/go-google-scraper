@@ -1,54 +1,33 @@
-package controllers
+package controllers_test
 
 import (
-	"io/ioutil"
 	"net/http"
-	"strings"
 	"testing"
 
-	errorconf "github.com/gutakk/go-google-scraper/config/error"
-	"github.com/gutakk/go-google-scraper/db"
-	"github.com/gutakk/go-google-scraper/helpers/log"
-	"github.com/gutakk/go-google-scraper/models"
 	testConfig "github.com/gutakk/go-google-scraper/tests/config"
-	testDB "github.com/gutakk/go-google-scraper/tests/db"
+	testdb "github.com/gutakk/go-google-scraper/tests/db"
 	"github.com/gutakk/go-google-scraper/tests/fixture"
 	testHttp "github.com/gutakk/go-google-scraper/tests/http"
 
 	"gopkg.in/go-playground/assert.v1"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 func TestDisplayHomeWithGuestUser(t *testing.T) {
-	engine := testConfig.GetRouter(true)
-	new(HomeController).applyRoutes(engine)
+	engine := testConfig.SetupTestRouter()
 
-	w := testHttp.PerformRequest(engine, "GET", "/", nil, nil)
-	p, err := ioutil.ReadAll(w.Body)
-	isHomePage := err == nil && strings.Index(string(p), "<title>Home</title>") > 0
+	response := testHttp.PerformRequest(engine, "GET", "/", nil, nil)
 
-	assert.Equal(t, http.StatusOK, w.Code)
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	isHomePage := testHttp.ValidateResponseBody(bodyByte, "<title>Home</title>")
+
+	assert.Equal(t, http.StatusOK, response.Code)
 	assert.Equal(t, true, isHomePage)
 }
 
 func TestDisplayHomeWithAuthenticatedUser(t *testing.T) {
-	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
-	if err != nil {
-		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
-	}
+	testdb.SetupTestDatabase()
 
-	db.GetDB = func() *gorm.DB {
-		return database
-	}
-
-	err = db.GetDB().AutoMigrate(&models.User{})
-	if err != nil {
-		log.Fatal(errorconf.MigrateDatabaseFailure, err)
-	}
-
-	engine := testConfig.GetRouter(true)
-	new(HomeController).applyRoutes(engine)
+	engine := testConfig.SetupTestRouter()
 
 	// Cookie from login API Set-Cookie header
 	headers := http.Header{}
@@ -56,8 +35,9 @@ func TestDisplayHomeWithAuthenticatedUser(t *testing.T) {
 	headers.Set("Cookie", cookie.Name+"="+cookie.Value)
 
 	response := testHttp.PerformRequest(engine, "GET", "/", headers, nil)
-	p, err := ioutil.ReadAll(response.Body)
-	isHomePage := err == nil && strings.Index(string(p), "<title>Home</title>") > 0
+
+	bodyByte := testHttp.ReadResponseBody(response.Body)
+	isHomePage := testHttp.ValidateResponseBody(bodyByte, "<title>Home</title>")
 
 	assert.Equal(t, http.StatusOK, response.Code)
 	assert.Equal(t, true, isHomePage)

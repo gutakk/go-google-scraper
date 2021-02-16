@@ -6,44 +6,28 @@ import (
 	"testing"
 
 	"github.com/gutakk/go-google-scraper/config"
-	errorconf "github.com/gutakk/go-google-scraper/config/error"
 	"github.com/gutakk/go-google-scraper/db"
-	"github.com/gutakk/go-google-scraper/helpers/log"
-	"github.com/gutakk/go-google-scraper/oauth"
 	"github.com/gutakk/go-google-scraper/services/oauth_service"
+	testConfig "github.com/gutakk/go-google-scraper/tests/config"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
-	"github.com/gutakk/go-google-scraper/tests/oauth_test"
-	"github.com/gutakk/go-google-scraper/tests/path_test"
+	testOauth "github.com/gutakk/go-google-scraper/tests/oauth_test"
+	testPath "github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/go-playground/assert.v1"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 func init() {
 	gin.SetMode(gin.TestMode)
 
-	err := os.Chdir(path_test.GetRoot())
-	if err != nil {
-		log.Fatal(errorconf.ChangeToRootDirFailure, err)
-	}
+	testPath.ChangeToRootDir()
 
 	config.LoadEnv()
-	err = oauth.SetupOAuthServer()
-	if err != nil {
-		log.Fatal(errorconf.StartOAuthServerFailure, err)
-	}
 
-	database, err := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
-	if err != nil {
-		log.Fatal(errorconf.ConnectToDatabaseFailure, err)
-	}
+	testConfig.SetupTestOAuthServer()
 
-	db.GetDB = func() *gorm.DB {
-		return database
-	}
+	testDB.SetupTestDatabase()
 }
 
 type OAuthControllerDbTestSuite struct {
@@ -60,7 +44,7 @@ func TestOAuthControllerDbTestSuite(t *testing.T) {
 
 func (s *OAuthControllerDbTestSuite) TestGenerateClient() {
 	oauthClient, err := oauth_service.GenerateClient()
-	var result oauth_test.OAuthClient
+	var result testOauth.OAuthClient
 	db.GetDB().Table("oauth2_clients").Select("id", "secret", "domain").Scan(&result)
 
 	assert.Equal(s.T(), oauthClient.ClientID, result.ID)

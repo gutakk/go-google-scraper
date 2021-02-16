@@ -2,7 +2,6 @@ package keyword_service
 
 import (
 	"errors"
-	"os"
 	"testing"
 
 	"github.com/gutakk/go-google-scraper/config"
@@ -10,23 +9,19 @@ import (
 	"github.com/gutakk/go-google-scraper/models"
 	"github.com/gutakk/go-google-scraper/services/google_search_service"
 	testDB "github.com/gutakk/go-google-scraper/tests/db"
-	"github.com/gutakk/go-google-scraper/tests/path_test"
+	testPath "github.com/gutakk/go-google-scraper/tests/path_test"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/assert.v1"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 func init() {
 	gin.SetMode(gin.TestMode)
 
-	if err := os.Chdir(path_test.GetRoot()); err != nil {
-		panic(err)
-	}
+	testPath.ChangeToRootDir()
 
 	config.LoadEnv()
 }
@@ -38,15 +33,7 @@ type KeywordServiceDbTestSuite struct {
 }
 
 func (s *KeywordServiceDbTestSuite) SetupTest() {
-	database, _ := gorm.Open(postgres.Open(testDB.ConstructTestDsn()), &gorm.Config{})
-	db.GetDB = func() *gorm.DB {
-		return database
-	}
-
-	db.SetupRedisPool()
-
-	testDB.InitKeywordStatusEnum(db.GetDB())
-	_ = db.GetDB().AutoMigrate(&models.User{}, &models.Keyword{})
+	testDB.SetupTestDatabase()
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(faker.Password()), bcrypt.DefaultCost)
 	user := models.User{Email: faker.Email(), Password: string(hashedPassword)}
